@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:harcama_app/presentation/pages/add_expense_page.dart';
 import 'package:harcama_app/presentation/pages/home_page.dart';
 import 'package:harcama_app/presentation/pages/chart_page.dart';
-import 'package:harcama_app/presentation/pages/profile_page';
+import 'package:harcama_app/presentation/pages/profile_page.dart';
 import 'package:harcama_app/presentation/pages/report_page.dart';
 import 'package:harcama_app/presentation/viewmodels/nav_model.dart';
 import 'package:harcama_app/presentation/widgets/nav_bar.dart';
@@ -57,52 +58,73 @@ class _MainScreenState extends State<MainScreen> {
                 );
               }).toList(),
             ),
-
-            Align(
-              alignment: Alignment.bottomCenter,
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
               child: SafeArea(
-                top: false,
-                left: false,
-                right: false,
-                bottom: true,
-                child: NavBar(
-                  pageIndex: selectedTab,
-                  onTap: (index) {
-                    if (index == selectedTab) {
-                      items[index].navKey.currentState?.popUntil(
-                        (route) => route.isFirst,
-                      );
-                    } else {
-                      setState(() {
-                        selectedTab = index;
-                      });
-                    }
-                  },
-                ),
-              ),
-            ),
-
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SafeArea(
-                top: false,
-                left: false,
-                right: false,
-                bottom: true,
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  height: 64,
-                  width: 64,
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.white,
-                    elevation: 0,
-                    onPressed: () {},
-                    shape: RoundedRectangleBorder(
-                      side: const BorderSide(width: 3, color: Colors.green),
-                      borderRadius: BorderRadius.circular(100),
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    NavBar(
+                      pageIndex: selectedTab,
+                      onTap: (index) {
+                        if (index == selectedTab) {
+                          items[index].navKey.currentState?.popUntil(
+                            (route) => route.isFirst,
+                          );
+                        } else {
+                          setState(() {
+                            selectedTab = index;
+                          });
+                        }
+                      },
                     ),
-                    child: const Icon(Icons.add, color: Colors.green),
-                  ),
+
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 25),
+                      height: 64,
+                      width: 64,
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          side: const BorderSide(width: 3, color: Colors.green),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: const Icon(Icons.add, color: Colors.green),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              transitionDuration: const Duration(
+                                milliseconds: 300,
+                              ),
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      AddExpensePage(),
+                              transitionsBuilder:
+                                  (
+                                    context,
+                                    animation,
+                                    secondaryAnimation,
+                                    child,
+                                  ) {
+                                    final tween = Tween(
+                                      begin: const Offset(0, 1),
+                                      end: Offset.zero,
+                                    ).chain(CurveTween(curve: Curves.easeOut));
+
+                                    return SlideTransition(
+                                      position: animation.drive(tween),
+                                      child: child,
+                                    );
+                                  },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

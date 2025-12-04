@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/domain/entities/category.dart';
-import 'package:harcama_app/domain/entities/expenses.dart';
+import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:provider/provider.dart';
-import 'package:harcama_app/presentation/notifiers/expense_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 
-class AddExpensePage extends StatefulWidget {
+class AddTransactionPage extends StatefulWidget {
   @override
-  State<AddExpensePage> createState() => _AddExpensePageState();
+  State<AddTransactionPage> createState() => _AddTransactionPageState();
 }
 
-class _AddExpensePageState extends State<AddExpensePage> {
+class _AddTransactionPageState extends State<AddTransactionPage> {
   final _formKey = GlobalKey<FormState>();
 
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
 
-  DateTime selectedDate = DateTime.now();
-  Category? selectedCategory;
+  DateTime _selectedDate = DateTime.now();
+  Category? _selectedCategory;
+  TransactionType _selectedType = TransactionType.expense;
 
   // Fake category list (backend ile uyumlu hale getirilebilir)
   final List<Category> categories = const [
@@ -28,7 +29,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
   @override
   Widget build(BuildContext context) {
-    final notifier = Provider.of<ExpenseNotifier>(context);
+    final notifier = Provider.of<TransactionNotifier>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -89,19 +90,19 @@ class _AddExpensePageState extends State<AddExpensePage> {
                           borderRadius: BorderRadius.circular(8),
                           side: BorderSide(color: Colors.grey.shade300)),
                       title: Text(
-                        "Tarih: ${selectedDate.toLocal().toString().split(" ")[0]}",
+                        "Tarih: ${_selectedDate.toLocal().toString().split(" ")[0]}",
                       ),
                       trailing: const Icon(Icons.calendar_month),
                       onTap: () async {
                         final picked = await showDatePicker(
                           context: context,
-                          initialDate: selectedDate,
+                          initialDate: _selectedDate,
                           firstDate: DateTime(2020),
                           lastDate: DateTime(2100),
                         );
                         if (picked != null) {
                           setState(() {
-                            selectedDate = picked;
+                            _selectedDate = picked;
                           });
                         }
                       },
@@ -123,7 +124,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       }).toList(),
                       onChanged: (value) {
                         setState(() {
-                          selectedCategory = value;
+                          _selectedCategory = value;
                         });
                       },
                       validator: (value) {
@@ -146,17 +147,17 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       ),
                       onPressed: () async {
                         if (!_formKey.currentState!.validate()) return;
-                        if (selectedCategory == null) return;
 
-                        final newExpense = Expense(
+                        final newTransaction = Transaction(
                           id: "", // Repo içinde UUID atanıyor
                           title: _titleController.text,
                           amount: double.parse(_amountController.text),
-                          date: selectedDate,
-                          category: selectedCategory!,
+                          date: _selectedDate,
+                          category: _selectedType == TransactionType.expense ? _selectedCategory : null,
+                          type: _selectedType,
                         );
 
-                        await notifier.addNewExpense(newExpense);
+                        await notifier.addNewTransaction(newTransaction);
 
                         if (context.mounted) Navigator.pop(context);
                       },

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:harcama_app/presentation/pages/add_expense_page.dart';
+import 'package:harcama_app/presentation/pages/add_transaction_page.dart';
 import 'package:harcama_app/presentation/pages/home_page.dart';
 import 'package:harcama_app/presentation/pages/chart_page.dart';
 import 'package:harcama_app/presentation/pages/profile_page.dart';
@@ -101,7 +101,7 @@ class _MainScreenState extends State<MainScreen> {
                               ),
                               pageBuilder:
                                   (context, animation, secondaryAnimation) =>
-                                      AddExpensePage(),
+                                      AddTransactionPage(),
                               transitionsBuilder:
                                   (
                                     context,

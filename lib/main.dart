@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:harcama_app/data/repositories/expenses_repository_impl.dart';
-import 'package:harcama_app/presentation/notifiers/expense_notifier.dart';
+import 'package:harcama_app/data/repositories/transaction_repository_impl.dart';
+import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:harcama_app/presentation/pages/main_screen.dart';
-import 'package:harcama_app/domain/usecases/expense/add_expense.dart';
-import 'package:harcama_app/domain/usecases/expense/delete_expense.dart';
-import 'package:harcama_app/domain/usecases/expense/get_expenses.dart';
-import 'package:harcama_app/domain/usecases/expense/update_expense.dart';
+import 'package:harcama_app/domain/usecases/transaction/add_transaction.dart';
+import 'package:harcama_app/domain/usecases/transaction/delete_transaction.dart';
+import 'package:harcama_app/domain/usecases/transaction/get_transactions.dart';
+import 'package:harcama_app/domain/usecases/transaction/update_transaction.dart';
 
 void main() {
-  final expenseRepository = ExpenseRepositoryImpl();
+  final transactionRepository = TransactionRepositoryImpl();
 
-  final addExpense = AddExpense(expenseRepository);
-  final deleteExpense = DeleteExpense(expenseRepository);
-  final getExpenses = GetExpenses(expenseRepository);
-  final updateExpense = UpdateExpense(expenseRepository);
+  final addTransaction = AddTransaction(transactionRepository);
+  final deleteTransaction = DeleteTransaction(transactionRepository);
+  final getTransactions = GetTransactions(transactionRepository);
+  final updateTransaction = UpdateTransaction(transactionRepository);
 
   runApp(
     ChangeNotifierProvider(
-      create: (_) => ExpenseNotifier(
-        addExpense: addExpense,
-        deleteExpense: deleteExpense,
-        getExpenses: getExpenses,
-        updateExpense: updateExpense,
+      create: (_) => TransactionNotifier(
+        addTransaction: addTransaction,
+        deleteTransaction: deleteTransaction,
+        getTransactions: getTransactions,
+        updateTransaction: updateTransaction,
       ),
       child: const MyApp(),
     ),

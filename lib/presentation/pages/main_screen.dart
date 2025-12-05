@@ -15,22 +15,22 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final homeNavKey = GlobalKey<NavigatorState>();
-  final chartNavKey = GlobalKey<NavigatorState>();
-  final reportNavKey = GlobalKey<NavigatorState>();
-  final profileNavKey = GlobalKey<NavigatorState>();
+  final homeKey = GlobalKey<NavigatorState>();
+  final chartKey = GlobalKey<NavigatorState>();
+  final reportKey = GlobalKey<NavigatorState>();
+  final profileKey = GlobalKey<NavigatorState>();
 
-  int selectedTab = 0;
+  int selected = 0;
   List<NavModel> items = [];
 
   @override
   void initState() {
     super.initState();
     items = [
-      NavModel(page: const HomePage(), navKey: homeNavKey),
-      NavModel(page: const ChartPage(), navKey: chartNavKey),
-      NavModel(page: const ReportPage(), navKey: reportNavKey),
-      NavModel(page: const ProfilePage(), navKey: profileNavKey),
+      NavModel(page: const HomePage(), navKey: homeKey),
+      NavModel(page: const ChartPage(), navKey: chartKey),
+      NavModel(page: const ReportPage(), navKey: reportKey),
+      NavModel(page: const ProfilePage(), navKey: profileKey),
     ];
   }
 
@@ -38,8 +38,8 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (items[selectedTab].navKey.currentState?.canPop() ?? false) {
-          items[selectedTab].navKey.currentState?.pop();
+        if (items[selected].navKey.currentState?.canPop() ?? false) {
+          items[selected].navKey.currentState?.pop();
           return false;
         }
         return true;
@@ -48,12 +48,34 @@ class _MainScreenState extends State<MainScreen> {
         body: Stack(
           children: [
             IndexedStack(
-              index: selectedTab,
-              children: items.map((page) {
+              index: selected,
+              children: items.map((e) {
                 return Navigator(
-                  key: page.navKey,
-                  onGenerateInitialRoutes: (navigator, initialRoute) {
-                    return [MaterialPageRoute(builder: (context) => page.page)];
+                  key: e.navKey,
+                  onGenerateInitialRoutes: (navigator, _) {
+                    return [
+                      PageRouteBuilder(
+                        transitionDuration:
+                            const Duration(milliseconds: 250),
+                        pageBuilder: (_, animation, __) => e.page,
+                        transitionsBuilder: (_, anim, __, child) {
+                          return FadeTransition(
+                            opacity: anim,
+                            child: SlideTransition(
+                              position: anim.drive(
+                                Tween(
+                                  begin: const Offset(0.1, 0),
+                                  end: Offset.zero,
+                                ).chain(
+                                  CurveTween(curve: Curves.easeOutCubic),
+                                ),
+                              ),
+                              child: child,
+                            ),
+                          );
+                        },
+                      )
+                    ];
                   },
                 );
               }).toList(),
@@ -67,67 +89,67 @@ class _MainScreenState extends State<MainScreen> {
                   alignment: Alignment.bottomCenter,
                   children: [
                     NavBar(
-                      pageIndex: selectedTab,
-                      onTap: (index) {
-                        if (index == selectedTab) {
-                          items[index].navKey.currentState?.popUntil(
+                      index: selected,
+                      onTap: (i) {
+                        if (i == selected) {
+                          items[i].navKey.currentState?.popUntil(
                             (route) => route.isFirst,
                           );
                         } else {
-                          setState(() {
-                            selectedTab = index;
-                          });
+                          setState(() => selected = i);
                         }
                       },
                     ),
-
                     Container(
-                      margin: const EdgeInsets.only(bottom: 25),
-                      height: 64,
-                      width: 64,
+                      margin: const EdgeInsets.only(bottom: 45),
+                      height: 70,
+                      width: 70,
                       child: FloatingActionButton(
                         backgroundColor: Colors.white,
-                        elevation: 0,
+                        elevation: 8,
                         shape: RoundedRectangleBorder(
-                          side: const BorderSide(width: 3, color: Colors.green),
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: BorderRadius.circular(22),
+                          side: const BorderSide(
+                            color: Colors.green,
+                            width: 3,
+                          ),
                         ),
-                        child: const Icon(Icons.add, color: Colors.green),
+                        child: Icon(
+                          Icons.add,
+                          size: 32,
+                          color: Colors.green.shade700,
+                        ),
                         onPressed: () {
                           Navigator.of(context).push(
                             PageRouteBuilder(
-                              transitionDuration: const Duration(
-                                milliseconds: 300,
-                              ),
+                              transitionDuration:
+                                  const Duration(milliseconds: 300),
                               pageBuilder:
                                   (context, animation, secondaryAnimation) =>
                                       AddTransactionPage(),
                               transitionsBuilder:
-                                  (
-                                    context,
-                                    animation,
-                                    secondaryAnimation,
-                                    child,
-                                  ) {
-                                    final tween = Tween(
+                                  (_, animation, __, child) {
+                                return SlideTransition(
+                                  position: animation.drive(
+                                    Tween(
                                       begin: const Offset(0, 1),
                                       end: Offset.zero,
-                                    ).chain(CurveTween(curve: Curves.easeOut));
-
-                                    return SlideTransition(
-                                      position: animation.drive(tween),
-                                      child: child,
-                                    );
-                                  },
+                                    ).chain(
+                                      CurveTween(curve: Curves.easeOut),
+                                    ),
+                                  ),
+                                  child: child,
+                                );
+                              },
                             ),
                           );
                         },
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),

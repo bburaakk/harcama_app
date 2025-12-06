@@ -188,6 +188,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                           title: _titleController.text,
                           amount: double.parse(_amountController.text),
                           date: _selectedDate,
+                          entryDate: DateTime.now(),
                           category:
                               _selectedType == TransactionType.expense
                                   ? _selectedCategory

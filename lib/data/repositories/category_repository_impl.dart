@@ -1,37 +1,28 @@
 import 'package:harcama_app/domain/entities/category.dart';
 import 'package:harcama_app/domain/repositories/category_repository.dart';
-import 'package:uuid/uuid.dart';
+import 'package:hive/hive.dart';
 
 class CategoryRepositoryImpl implements CategoryRepository {
-  final List<Category> _categories = [];
-  final Uuid _uuid = Uuid();
-
+  final Box<Category> _categoryBox;
+  CategoryRepositoryImpl(this._categoryBox);
   @override
   Future<void> addCategory(Category category) async {
-    final newCategory = Category(
-      id: _uuid.v4(),
-      title: category.title,
-      icon: category.icon,
-    );
-    _categories.add(newCategory);
+    await _categoryBox.put(category.id, category);
   }
 
   @override
   Future<void> deleteCategory(String id) async {
-    _categories.removeWhere((category) => category.id == id);
+    await _categoryBox.delete(id);
   }
 
   @override
   Future<List<Category>> getCategories() async {
-    return List.from(_categories);
+    return _categoryBox.values.toList();
   }
 
   @override
   Future<void> updateCategory(Category category) async {
-    final index = _categories.indexWhere((e) => e.id == category.id);
-    if (index != -1) {
-      _categories[index] = category;
-    }
+    await _categoryBox.put(category.id, category);
   }
 
 }

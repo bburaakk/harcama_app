@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -135,6 +136,7 @@ class HomePage extends StatelessWidget {
                           final t = notifier.transactions[index];
                           final iconEmoji =
                               t.category?.icon ?? _fallbackIcon(t.type);
+                          final dateFormat = DateFormat('dd/MM/yyyy');
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 14),
@@ -168,7 +170,7 @@ class HomePage extends StatelessWidget {
                                 ),
                               ),
                               subtitle: Text(
-                                "₺${t.amount.toStringAsFixed(2)}",
+                                "₺${t.amount.toStringAsFixed(2)} (${dateFormat.format(t.entryDate)})",
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: theme.colorScheme.onSurface.withOpacity(0.6),

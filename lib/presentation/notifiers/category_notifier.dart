@@ -8,11 +8,11 @@ import 'package:harcama_app/domain/usecases/category/update_category.dart';
 class CategoryNotifier extends ChangeNotifier{
   final AddCategory addCategory;
   final DeleteCategory deleteCategory;
-  final GetCategory getCategory;
+  final GetCategory getCategories;
   final UpdateCategory updateCategory;
 
   CategoryNotifier({
-    required this.getCategory,
+    required this.getCategories,
     required this.addCategory,
     required this.updateCategory,
     required this.deleteCategory,
@@ -31,10 +31,10 @@ class CategoryNotifier extends ChangeNotifier{
   Future<void> fetchCategories() async {
     _setLoading(true);
     try {
-      _categories = await getCategory();
+      _categories = await getCategories();
       _errorMessage = null;
     } catch (e) {
-      _errorMessage = 'Fuck!! kategoriler yüklenirken bir aksilik oldu: $e';
+      _errorMessage = 'Hata: Kategoriler yüklenirken bir sorun oluştu: $e';
     } finally {
       _setLoading(false);
     }
@@ -46,7 +46,7 @@ class CategoryNotifier extends ChangeNotifier{
       await addCategory(category);
       await fetchCategories();
     } catch (e) {
-      _errorMessage = 'Fuck!! kategorileri ekleyemedin dostum: $e';
+      _errorMessage = 'Hata: Kategori eklenemedi: $e';
     } finally {
       _setLoading(false);
     }
@@ -58,7 +58,7 @@ class CategoryNotifier extends ChangeNotifier{
       await updateCategory(category);
       await fetchCategories();
     } catch (e) {
-      _errorMessage = 'Fuck!! kategorileri günceleyemedim bro: $e';
+      _errorMessage = 'Hata: Kategori güncellenemedi: $e';
     } finally {
       _setLoading(false);
     }
@@ -70,7 +70,7 @@ class CategoryNotifier extends ChangeNotifier{
       await deleteCategory(id);
       await fetchCategories();
     } catch (e) {
-      _errorMessage = 'Fuck!! kategorileri silemedim dostum: $e';
+      _errorMessage = 'Hata: Kategori silinemedi: $e';
     } finally {
       _setLoading(false);
     }

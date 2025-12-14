@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:harcama_app/domain/entities/category.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/domain/usecases/transaction/add_transaction.dart';
 import 'package:harcama_app/domain/usecases/transaction/delete_transaction.dart';
@@ -74,6 +75,33 @@ class TransactionNotifier extends ChangeNotifier{
     } finally {
       _setLoading(false);
     }
+  }
+
+  Category? getMostExpensiveCategoryByDate(int targetMonth, int targetYear) {
+    final filteredList = _transactions.where((t) {
+      return t.date.month == targetMonth &&
+          t.date.year == targetYear &&
+          t.type == TransactionType.expense &&
+          t.category != null;
+    }).toList();
+
+    if (filteredList.isEmpty) return null;
+    final Map<String, double> categoryTotals = {};
+    final Map<String, Category> categoryObjects = {};
+
+    for (var t in filteredList) {
+      final catId = t.category!.id;
+
+      categoryTotals[catId] = (categoryTotals[catId] ?? 0) + t.amount;
+
+      categoryObjects.putIfAbsent(catId, () => t.category!);
+    }
+
+    if (categoryTotals.isEmpty) return null;
+
+    final topEntry = categoryTotals.entries.reduce((a, b) => a.value > b.value ? a : b);
+
+    return categoryObjects[topEntry.key];
   }
 
   void _setLoading(bool loading) {

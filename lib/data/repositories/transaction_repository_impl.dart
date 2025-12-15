@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:uuid/uuid.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/domain/repositories/transaction_repository.dart';
 

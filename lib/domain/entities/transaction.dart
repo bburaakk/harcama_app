@@ -31,6 +31,11 @@ class Transaction extends Equatable {
   final TransactionType type;
   @HiveField(7)
   final bool isRecurring;
+  @HiveField(8)
+  final String ledgerID;
+  @HiveField(9)
+  final String accountID;
+
 
   const Transaction({
     required this.id,
@@ -41,8 +46,10 @@ class Transaction extends Equatable {
     this.category,
     required this.type,
     this.isRecurring = false,
+    required this.ledgerID,
+    required this.accountID,
   });
 
   @override
-  List<Object?> get props => [id, title, amount, date, entryDate, category, type, isRecurring];
+  List<Object?> get props => [id, title, amount, date, entryDate, category, type, isRecurring, ledgerID, accountID];
 }

@@ -1,8 +1,6 @@
 import 'package:harcama_app/domain/entities/category.dart';
+import 'package:harcama_app/domain/repositories/base_repository.dart';
 
-abstract class CategoryRepository {
-  Future<List<Category>> getCategories();
-  Future<void> addCategory(Category category);
-  Future<void> deleteCategory(String id);
-  Future<void> updateCategory(Category category);
+abstract class CategoryRepository extends BaseRepository<Category> {
+
 }

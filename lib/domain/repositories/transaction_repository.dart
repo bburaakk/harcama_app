@@ -1,8 +1,6 @@
 import 'package:harcama_app/domain/entities/transaction.dart';
+import 'package:harcama_app/domain/repositories/base_repository.dart';
 
-abstract class TransactionRepository {
-  Future<List<Transaction>> getTransactions();
-  Future<void> addTransaction(Transaction transaction);
-  Future<void> deleteTransaction(String id);
-  Future<void> updateTransaction(Transaction transaction);
+abstract class TransactionRepository extends BaseRepository<Transaction> {
+
 }

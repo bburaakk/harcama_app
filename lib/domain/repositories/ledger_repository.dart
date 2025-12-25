@@ -1,8 +1,6 @@
 import 'package:harcama_app/domain/entities/ledger.dart';
+import 'package:harcama_app/domain/repositories/base_repository.dart';
 
-abstract class LedgerRepository {
-  Future<List<Ledger>> getLedgers();
-  Future<void> addLedger(Ledger ledger);
-  Future<void> deleteLedger(String id);
-  Future<void> updateLedger(Ledger ledger);
+abstract class LedgerRepository extends BaseRepository<Ledger> {
+
 }

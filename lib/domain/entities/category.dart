@@ -1,11 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
-
+import 'package:harcama_app/domain/entities/base_entity.dart';
 part 'category.g.dart';
 
 @HiveType(typeId: 2)
-class Category extends Equatable {
+class Category extends Equatable implements BaseEntity {
   @HiveField(0)
+  @override
   final String id;
   @HiveField(1)
   final String title;

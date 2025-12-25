@@ -179,7 +179,7 @@ class HomePage extends StatelessWidget {
                               trailing: IconButton(
                                 icon: const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () =>
-                                    notifier.deleteExistingTransaction(t.id),
+                                    notifier.deleteItem(t.id),
                               ),
                             ),
                           );

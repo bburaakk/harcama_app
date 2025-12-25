@@ -185,6 +185,8 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
                         final newTransaction = Transaction(
                           id: "",
+                          ledgerID: "",
+                          accountID: "",
                           title: _titleController.text,
                           amount: double.parse(_amountController.text),
                           date: _selectedDate,
@@ -196,7 +198,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                           type: _selectedType,
                         );
 
-                        await notifier.addNewTransaction(newTransaction);
+                        await notifier.addItem(newTransaction);
 
                         if (context.mounted) Navigator.pop(context);
                       },

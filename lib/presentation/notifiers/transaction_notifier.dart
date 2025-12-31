@@ -10,9 +10,28 @@ class TransactionNotifier extends BaseNotifier<Transaction> {
     required super.getAllUseCase,
   });
 
-  List<Transaction> get transactions => items;
+  String _searchQuery = '';
 
-  Category? getMostExpensiveCategoryByDate(int targetMonth, int targetYear) {
+  List<Transaction> get transactions {
+    if (_searchQuery.isEmpty) {
+      return items;
+    }
+
+    return items.where((t) {
+      final queryLower = _searchQuery.toLowerCase();
+      final titleLower = t.title.toLowerCase();
+      final categoryLower = t.category?.title.toLowerCase() ?? '';
+
+      return titleLower.contains(queryLower) || categoryLower.contains(queryLower);
+    }).toList();
+  }
+
+  void updateSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
+
+  Map<String, dynamic>? getMostExpensiveCategoryInfo(int targetMonth, int targetYear) {
     final filteredList = items.where((t) {
       return t.date.month == targetMonth &&
           t.date.year == targetYear &&
@@ -21,14 +40,13 @@ class TransactionNotifier extends BaseNotifier<Transaction> {
     }).toList();
 
     if (filteredList.isEmpty) return null;
+
     final Map<String, double> categoryTotals = {};
     final Map<String, Category> categoryObjects = {};
 
     for (var t in filteredList) {
       final catId = t.category!.id;
-
       categoryTotals[catId] = (categoryTotals[catId] ?? 0) + t.amount;
-
       categoryObjects.putIfAbsent(catId, () => t.category!);
     }
 
@@ -36,6 +54,9 @@ class TransactionNotifier extends BaseNotifier<Transaction> {
 
     final topEntry = categoryTotals.entries.reduce((a, b) => a.value > b.value ? a : b);
 
-    return categoryObjects[topEntry.key];
+    return {
+      'category': categoryObjects[topEntry.key],
+      'amount': topEntry.value,
+    };
   }
 }

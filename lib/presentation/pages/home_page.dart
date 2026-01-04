@@ -4,14 +4,19 @@ import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:intl/intl.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context); // ← DARK/LIGHT TEMA
-    final isDark = theme.brightness == Brightness.dark;
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  bool isSearching = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final notifier = context.watch<TransactionNotifier>();
 
     final income = notifier.transactions
@@ -26,203 +31,290 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: theme.colorScheme.onSurface,
-        title: Text(
-          "Harcamalar",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onSurface,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {},
-        ),
-        actions: [
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.calendar_month), onPressed: () {}),
-        ],
-      ),
-
-      body: Column(
-        children: [
-          // TOP SUMMARY CARD
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              height: 150,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.green.withOpacity(0.2) : Colors.green.shade100,
-                borderRadius: BorderRadius.circular(26),
-                boxShadow: [
-                  if (!isDark)
-                    BoxShadow(
-                      color: Colors.green.shade200.withOpacity(0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                ],
-              ),
-              child: DefaultTextStyle(
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurface,
-                ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            _topBar(context),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text("Gelir: ₺${income.toStringAsFixed(2)}"),
-                    Text("Gider: ₺${expense.toStringAsFixed(2)}"),
-                    Text("Bakiye: ₺${balance.toStringAsFixed(2)}"),
+                    const SizedBox(height: 8),
+
+                    if (!isSearching) ...[
+                      _heroCard(context, balance, income, expense),
+                      const SizedBox(height: 20),
+                      _insights(context),
+                      const SizedBox(height: 24),
+                    ],
+
+                    _transactions(context, notifier),
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
             ),
-          ),
+          ],
+        ),
+      ),
+    );
+  }
 
-          // QUICK CARDS
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _quickCard(
-                    context,
-                    color: isDark ? Colors.blue.withOpacity(0.25) : Colors.blue.shade100,
-                    shadow: Colors.blue,
-                    label: "🏆 En Çok Harcama",
+  // TOP BAR WITH SEARCH
+  Widget _topBar(BuildContext context) {
+    final notifier = context.read<TransactionNotifier>();
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: isSearching
+            ? Row(
+                key: const ValueKey('search'),
+                children: [
+                  Expanded(
+                    child: TextField(
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        hintText: "Search transactions...",
+                        border: InputBorder.none,
+                      ),
+                      onChanged: notifier.updateSearchQuery,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _quickCard(
-                    context,
-                    color: isDark ? Colors.orange.withOpacity(0.25) : Colors.orange.shade100,
-                    shadow: Colors.orange,
-                    label: "💰 Tasarruf Oranı",
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      notifier.updateSearchQuery('');
+                      setState(() => isSearching = false);
+                    },
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // LIST
-          Expanded(
-            child: notifier.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : notifier.transactions.isEmpty
-                    ? Center(
-                        child: Text(
-                          "Henüz işlem yok",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: theme.colorScheme.onSurface,
+                ],
+              )
+            : Row(
+                key: const ValueKey('normal'),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const CircleAvatar(radius: 20),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Welcome back",
+                            style: theme.textTheme.labelSmall,
                           ),
-                        ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: notifier.transactions.length,
-                        itemBuilder: (context, index) {
-                          final t = notifier.transactions[index];
-                          final iconEmoji =
-                              t.category?.icon ?? _fallbackIcon(t.type);
-                          final dateFormat = DateFormat('dd/MM/yyyy');
-
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 14),
-                            decoration: BoxDecoration(
-                              color: theme.cardColor,
-                              borderRadius: BorderRadius.circular(26),
-                              boxShadow: [
-                                if (!isDark)
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.15),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                              ],
+                          Text(
+                            "Alex Morgan",
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 8,
-                              ),
-                              leading: Text(
-                                iconEmoji,
-                                style: const TextStyle(fontSize: 28),
-                              ),
-                              title: Text(
-                                t.title,
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w600,
-                                  color: theme.colorScheme.onSurface,
-                                ),
-                              ),
-                              subtitle: Text(
-                                "₺${t.amount.toStringAsFixed(2)} (${dateFormat.format(t.entryDate)})",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: theme.colorScheme.onSurface.withOpacity(0.6),
-                                ),
-                              ),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () =>
-                                    notifier.deleteItem(t.id),
-                              ),
-                            ),
-                          );
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: () {
+                          setState(() => isSearching = true);
                         },
                       ),
+                      IconButton(
+                        icon: const Icon(Icons.notifications_outlined),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  // HERO CARD
+  Widget _heroCard(
+    BuildContext context,
+    double balance,
+    double income,
+    double expense,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(32),
+        color: isDark ? const Color(0xFF1A2C26) : Colors.white,
+      ),
+      child: Column(
+        children: [
+          const Text("Total Balance"),
+          const SizedBox(height: 6),
+          Text(
+            "₺${balance.toStringAsFixed(2)}",
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              _miniStat(
+                context,
+                icon: Icons.arrow_downward,
+                label: "Income",
+                value: income,
+                color: Colors.green,
+              ),
+              const SizedBox(width: 12),
+              _miniStat(
+                context,
+                icon: Icons.arrow_upward,
+                label: "Expenses",
+                value: expense,
+                color: Colors.redAccent,
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _quickCard(
+  Widget _miniStat(
     BuildContext context, {
-    required Color color,
-    required Color shadow,
+    required IconData icon,
     required String label,
+    required double value,
+    required Color color,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      height: 110,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(26),
-        boxShadow: [
-          if (!isDark)
-            BoxShadow(
-              color: shadow.withOpacity(0.4),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: color.withOpacity(0.12),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(height: 6),
+            Text(label),
+            Text(
+              "₺${value.toStringAsFixed(0)}",
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+          ],
         ),
       ),
+    );
+  }
+
+  // INSIGHTS
+  Widget _insights(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 140,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: Theme.of(context).cardColor,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            height: 140,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: Colors.greenAccent,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // TRANSACTIONS LIST
+  Widget _transactions(
+    BuildContext context,
+    TransactionNotifier notifier,
+  ) {
+    final dateFormat = DateFormat('dd MMM, HH:mm');
+
+    if (notifier.isLoading) {
+      return const Padding(
+        padding: EdgeInsets.all(40),
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (notifier.transactions.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(40),
+        child: Text("No transactions found"),
+      );
+    }
+
+    return Column(
+      children: notifier.transactions.map((t) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            color: Theme.of(context).cardColor,
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 24,
+                child: Text(
+                  t.category?.icon ?? _fallbackIcon(t.type),
+                  style: const TextStyle(fontSize: 20),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      t.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      dateFormat.format(t.entryDate),
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                "${t.type == TransactionType.expense ? "-" : "+"}₺${t.amount.toStringAsFixed(2)}",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: t.type == TransactionType.expense
+                      ? Colors.red
+                      : Colors.green,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 

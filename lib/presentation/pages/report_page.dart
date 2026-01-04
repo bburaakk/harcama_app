@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class ReportPage extends StatelessWidget {
   const ReportPage({super.key});
@@ -7,156 +6,316 @@ class ReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Raporlar'),
-        centerTitle: true,
-      ),
+      backgroundColor: const Color(0xFFF6F8F7),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 120),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+              // ---------- HEADER ----------
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 26,
+                      backgroundImage: NetworkImage(
+                        'https://i.pravatar.cc/150',
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Good Morning,',
+                            style: TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                          Text(
+                            'Alex Johnson 👋',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _iconButton(Icons.notifications),
+                  ],
+                ),
+              ),
 
-            // ---------- TOP SUMMARY ----------
-            _sectionCard(
-              child: _monthlySummary(),
-            ),
-            const SizedBox(height: 25),
+              // ---------- TOTAL BALANCE ----------
+              _totalBalanceCard(),
 
-            // ---------- LINE CHART ----------
-            const Text(
-              'Aylık Trend',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 28),
 
-            _sectionCard(
-              child: SizedBox(height: 220, child: _dummyLineChart()),
-            ),
+              // ---------- QUICK ACTIONS ----------
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _quickActions(),
+              ),
 
-            const SizedBox(height: 28),
+              const SizedBox(height: 32),
 
-            // ---------- BAR CHART ----------
-            const Text(
-              'Kategori Bazlı Harcama',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 12),
+              // ---------- WALLETS ----------
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Text(
+                      'My Wallets',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      'See All',
+                      style: TextStyle(
+                        color: Color(0xFF2BEEAD),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  ],
+                ),
+              ),
 
-            _sectionCard(
-              child: SizedBox(height: 220, child: _dummyBarChart()),
-            ),
+              const SizedBox(height: 14),
 
-            const SizedBox(height: 28),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    _walletCard(
+                      icon: Icons.account_balance,
+                      title: 'Main Bank',
+                      subtitle: '**** 4589',
+                      amount: '\$4,000.00',
+                      color: Colors.blue,
+                    ),
+                    const SizedBox(height: 14),
+                    _walletCard(
+                      icon: Icons.savings,
+                      title: 'Dream Savings',
+                      subtitle: 'Target: \$10k',
+                      amount: '\$8,200.00',
+                      color: Colors.purple,
+                    ),
+                  ],
+                ),
+              ),
 
-            // ---------- TOP 3 ----------
-            const Text(
-              'En Yüksek 3 Harcama',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 32),
 
-            _sectionCard(
-              child: _dummyTopThree(),
-            ),
-          ],
+              // ---------- RECENT ACTIVITY ----------
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: const Text(
+                  'Recent Activity',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    _activityItem(
+                      icon: Icons.lunch_dining,
+                      title: 'Tasty Burger',
+                      subtitle: 'Food & Drink • Today',
+                      amount: '-\$14.50',
+                      amountColor: Colors.red,
+                    ),
+                    _activityItem(
+                      icon: Icons.work,
+                      title: 'Freelance Project',
+                      subtitle: 'Income • Yesterday',
+                      amount: '+\$450.00',
+                      amountColor: Colors.green,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+
+      // ---------- FLOATING ACTION ----------
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF2BEEAD),
+        onPressed: () {},
+        child: const Icon(Icons.add, size: 30),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  // ------------------------------------------
-  //  SECTION CARD WRAPPER (Duolingo style)
-  // ------------------------------------------
-  Widget _sectionCard({required Widget child}) {
+  // --------------------------------------------------
+
+  static Widget _iconButton(IconData icon) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      width: 42,
+      height: 42,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-            color: Colors.black.withOpacity(0.06),
-          )
+            blurRadius: 12,
+            color: Colors.black.withOpacity(0.08),
+          ),
         ],
       ),
-      child: child,
+      child: Icon(icon),
     );
   }
 
-  // ------------------------------------------
-  // SUMMARY CARDS
-  // ------------------------------------------
-  Widget _monthlySummary() {
+  Widget _totalBalanceCard() {
+  return Container(
+    width: double.infinity,
+    margin: const EdgeInsets.symmetric(horizontal: 16),
+    padding: const EdgeInsets.symmetric(vertical: 28),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(32),
+      boxShadow: [
+        BoxShadow(
+          blurRadius: 24,
+          offset: const Offset(0, 12),
+          color: Colors.black.withOpacity(0.08),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: const [
+        Text(
+          'Total Net Worth',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          '\$12,450.00',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 38,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -1,
+          ),
+        ),
+        SizedBox(height: 14),
+        Chip(
+          backgroundColor: Color(0xFFE7FBF4),
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          label: Text(
+            '+2.5% this month',
+            style: TextStyle(
+              color: Color(0xFF2BEEAD),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+
+  Widget _quickActions() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: _summaryCard('Toplam Harcama', '4.280 ₺', Icons.wallet)),
-        const SizedBox(width: 16),
-        Expanded(child: _summaryCard('Kategori Sayısı', '5', Icons.category)),
+        _actionButton(Icons.add_card, 'Top Up', Colors.purple),
+        _actionButton(Icons.send, 'Send', Colors.blue),
+        _actionButton(Icons.qr_code_scanner, 'Scan', Colors.orange),
+        _actionButton(Icons.more_horiz, 'More', Colors.green),
       ],
     );
   }
 
-  Widget _summaryCard(String title, String value, IconData icon) {
+  Widget _actionButton(IconData icon, String label, Color color) {
+    return Column(
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Icon(icon, color: color),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12),
+        ),
+      ],
+    );
+  }
+
+  Widget _walletCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String amount,
+    required Color color,
+  }) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.green.shade100,
-        borderRadius: BorderRadius.circular(18),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 18,
+            color: Colors.black.withOpacity(0.06),
+          ),
+        ],
       ),
-      child: Column(
+      child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 28, color: Colors.green),
+            child: Icon(icon, color: color),
           ),
-          const SizedBox(height: 14),
-          Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
-          const SizedBox(height: 4),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(subtitle, style: const TextStyle(color: Colors.grey)),
+              ],
+            ),
+          ),
           Text(
-            value,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ------------------------------------------
-  // LINE CHART
-  // ------------------------------------------
-  Widget _dummyLineChart() {
-    return LineChart(
-      LineChartData(
-        gridData: FlGridData(show: false),
-        borderData: FlBorderData(show: false),
-        titlesData: FlTitlesData(show: false),
-        lineBarsData: [
-          LineChartBarData(
-            spots: [
-              FlSpot(1, 50),
-              FlSpot(5, 120),
-              FlSpot(10, 80),
-              FlSpot(15, 160),
-              FlSpot(20, 110),
-              FlSpot(25, 220),
-              FlSpot(30, 190),
-            ],
-            isCurved: true,
-            barWidth: 4,
-            color: Colors.green.shade400,
-            dotData: FlDotData(show: false),
-            belowBarData: BarAreaData(
-              show: true,
-              color: Colors.green.shade200.withOpacity(0.5),
+            amount,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
           ),
         ],
@@ -164,76 +323,51 @@ class ReportPage extends StatelessWidget {
     );
   }
 
-  // ------------------------------------------
-  // BAR CHART
-  // ------------------------------------------
-  Widget _dummyBarChart() {
-    final categories = {
-      "Yemek": 1200.0,
-      "Market": 850.0,
-      "Ulaşım": 430.0,
-      "Kira": 1500.0,
-      "Eğlence": 300.0,
-    };
-
-    final bars = categories.entries.toList();
-
-    return BarChart(
-      BarChartData(
-        titlesData: FlTitlesData(show: false),
-        borderData: FlBorderData(show: false),
-        gridData: FlGridData(show: false),
-        barGroups: bars.asMap().entries.map((e) {
-          return BarChartGroupData(
-            x: e.key,
-            barRods: [
-              BarChartRodData(
-                toY: e.value.value,
-                width: 20,
-                color: Colors.blue.shade400,
-                borderRadius: BorderRadius.circular(8),
-              )
-            ],
-          );
-        }).toList(),
+  Widget _activityItem({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String amount,
+    required Color amountColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 10,
+                  color: Colors.black.withOpacity(0.06),
+                ),
+              ],
+            ),
+            child: Icon(icon),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(subtitle, style: const TextStyle(color: Colors.grey)),
+              ],
+            ),
+          ),
+          Text(
+            amount,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: amountColor,
+            ),
+          ),
+        ],
       ),
-    );
-  }
-
-  // ------------------------------------------
-  // TOP 3 LIST
-  // ------------------------------------------
-  Widget _dummyTopThree() {
-    final dummyExpenses = [
-      {"title": "Kira", "amount": 1500.0},
-      {"title": "Market Alışverişi", "amount": 470.0},
-      {"title": "Restoran", "amount": 320.0},
-    ];
-
-    return Column(
-      children: dummyExpenses.map((e) {
-        return Container(
-          padding: const EdgeInsets.all(14),
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: Colors.orange.shade100,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                e["title"].toString(),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-              Text(
-                '${e["amount"]} ₺',
-                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
     );
   }
 }

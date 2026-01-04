@@ -1,281 +1,421 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:harcama_app/domain/entities/category.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
-import 'package:provider/provider.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 
 class AddTransactionPage extends StatefulWidget {
+  const AddTransactionPage({super.key});
+
   @override
   State<AddTransactionPage> createState() => _AddTransactionPageState();
 }
 
 class _AddTransactionPageState extends State<AddTransactionPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _amountController = TextEditingController();
+  String amount = "0";
+  String note = "";
+  DateTime selectedDate = DateTime.now();
+  Category? selectedCategory;
 
-  DateTime _selectedDate = DateTime.now();
-  Category? _selectedCategory;
-  TransactionType _selectedType = TransactionType.expense;
-
-  final List<Category> categories = const [
-    Category(id: "1", title: "Yemek", icon: "🍔"),
-    Category(id: "2", title: "Eğitim", icon: "📚"),
-    Category(id: "3", title: "Fatura", icon: "💡"),
-    Category(id: "4", title: "Ulaşım", icon: "🚗"),
+  final categories = const [
+    Category(id: "1", title: "Food", icon: "🍕"),
+    Category(id: "2", title: "Transport", icon: "🚌"),
+    Category(id: "3", title: "Shopping", icon: "🛍️"),
+    Category(id: "4", title: "Rent", icon: "🏠"),
+    Category(id: "5", title: "Fun", icon: "🎮"),
   ];
+
+  void onKeyTap(String value) {
+    setState(() {
+      if (value == "⌫") {
+        if (amount.isNotEmpty) {
+          amount = amount.substring(0, amount.length - 1);
+        }
+        if (amount.isEmpty) amount = "0";
+      } else {
+        if (amount == "0") {
+          amount = value;
+        } else {
+          amount += value;
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final notifier = Provider.of<TransactionNotifier>(context);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final notifier = context.watch<TransactionNotifier>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FB),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Text(
-          "Harcama Ekle",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
-        ),
-        centerTitle: true,
-      ),
-      body: notifier.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: Stack(
+        children: [
+          Builder(builder: (ctx) { try { return Column(
+            children: [
+              const SizedBox(height: 48),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    _iconButton(context, Icons.close, () {
+                      Navigator.pop(context);
+                    }),
                     const Text(
-                      "Harcama Detayları",
+                      "New Expense",
                       style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black87,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 20),
-
-                    _buildCard(
-                      child: TextFormField(
-                        controller: _titleController,
-                        decoration: const InputDecoration(
-                          hintText: "Harcamaya bir isim ver...",
-                          border: InputBorder.none,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Başlık boş olamaz";
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    Text(
-                      "İşlem Türü",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    Row(
-                      children: [
-                        _buildTypeChip("Gider", TransactionType.expense,
-                            Icons.arrow_downward, Colors.red),
-                        const SizedBox(width: 8),
-                        _buildTypeChip("Gelir", TransactionType.income,
-                            Icons.arrow_upward, Colors.green),
-                        const SizedBox(width: 8),
-                        _buildTypeChip("Transfer", TransactionType.transfer,
-                            Icons.swap_horiz, Colors.blue),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    TextFormField(
-                      controller: _amountController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: "Tutar",
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Tutar boş olamaz";
-                        }
-                        final amount = double.tryParse(value);
-                        if (amount == null || amount <= 0) {
-                          return "Geçerli bir tutar girin";
-                        }
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    ListTile(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      title: Text(
-                        "Tarih: ${_selectedDate.toLocal().toString().split(" ")[0]}",
-                      ),
-                      trailing: const Icon(Icons.calendar_month),
-                      onTap: () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: _selectedDate,
-                          firstDate: DateTime(2020),
-                          lastDate: DateTime(2100),
-                        );
-                        if (picked != null) {
-                          setState(() => _selectedDate = picked);
-                        }
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    if (_selectedType == TransactionType.expense)
-                      DropdownButtonFormField<Category>(
-                        decoration: const InputDecoration(
-                          labelText: "Kategori",
-                          border: OutlineInputBorder(),
-                        ),
-                        items: categories.map((cat) {
-                          return DropdownMenuItem(
-                            value: cat,
-                            child: Text("${cat.icon}  ${cat.title}"),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() => _selectedCategory = value);
-                        },
-                        validator: (value) {
-                          if (_selectedType == TransactionType.expense &&
-                              value == null) {
-                            return "Kategori seçmelisin";
-                          }
-                          return null;
-                        },
-                      ),
-
-                    const SizedBox(height: 30),
-
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.green,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      onPressed: () async {
-                        if (!_formKey.currentState!.validate()) return;
-
-                        final newTransaction = Transaction(
-                          id: "",
-                          ledgerID: "",
-                          accountID: "",
-                          title: _titleController.text,
-                          amount: double.parse(_amountController.text),
-                          date: _selectedDate,
-                          entryDate: DateTime.now(),
-                          category:
-                              _selectedType == TransactionType.expense
-                                  ? _selectedCategory
-                                  : null,
-                          type: _selectedType,
-                        );
-
-                        await notifier.addItem(newTransaction);
-
-                        if (context.mounted) Navigator.pop(context);
-                      },
-                      child: const Text(
-                        "Kaydet",
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                    ),
+                    _iconButton(context, Icons.more_horiz, () {}),
                   ],
                 ),
               ),
-            ),
-    );
-  }
 
-  Widget _buildCard({required Widget child, VoidCallback? onTap}) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              const SizedBox(height: 32),
+
+              Column(
+                children: [
+                  const Text(
+                    "ENTER AMOUNT",
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "₺",
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        amount,
+                        style: const TextStyle(
+                          fontSize: 56,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 28),
+
+              SizedBox(
+                height: 96,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final cat = categories[index];
+                    final isActive = selectedCategory == cat;
+
+                    return GestureDetector(
+                      onTap: () => setState(() => selectedCategory = cat),
+                      child: Column(
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? theme.colorScheme.primary
+                                  : theme.cardColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isActive
+                                    ? theme.colorScheme.primary
+                                    : Colors.grey.withOpacity(0.2),
+                                width: 2,
+                              ),
+                              boxShadow: [
+                                if (isActive)
+                                  BoxShadow(
+                                    color: theme.colorScheme.primary
+                                        .withOpacity(0.3),
+                                    blurRadius: 12,
+                                  ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                cat.icon,
+                                style: TextStyle(
+                                  fontSize: 26,
+                                  color:
+                                      isActive ? Colors.white : Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            cat.title,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: isActive
+                                  ? theme.colorScheme.primary
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  separatorBuilder: (_, __) => const SizedBox(width: 16),
+                  itemCount: categories.length,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      _inputRow(
+                        context,
+                        icon: Icons.edit_note,
+                        hint: "What is this for?",
+                        onChanged: (v) => note = v,
+                      ),
+                      _divider(),
+                      _selectRow(
+                        context,
+                        icon: Icons.calendar_today,
+                        title: "Date",
+                        value:
+                            DateFormat("EEE, MMM d").format(selectedDate),
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: selectedDate,
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime(2100),
+                          );
+                          if (picked != null) {
+                            setState(() => selectedDate = picked);
+                          }
+                        },
+                      ),
+                      _divider(),
+                      _selectRow(
+                        context,
+                        icon: Icons.account_balance_wallet,
+                        title: "Payment",
+                        value: "VISA 4242",
+                        onTap: () {},
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  itemCount: 12,
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 24,
+                    childAspectRatio: 1.4,
+                  ),
+                  itemBuilder: (context, index) {
+                    final keys = [
+                      "1","2","3",
+                      "4","5","6",
+                      "7","8","9",
+                      ".","0","⌫"
+                    ];
+                    final key = keys[index];
+
+                    return GestureDetector(
+                      onTap: () => onKeyTap(key),
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.transparent,
+                        ),
+                        child: key == "⌫"
+                            ? const Icon(Icons.backspace_outlined)
+                            : Text(
+                                key,
+                                style: const TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ); } catch (e, st) { print('AddTransactionPage build error: $e\n$st'); return Container( padding: const EdgeInsets.all(24), child: Center(child: Text('Error building page: $e'))); } },),
+
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding:
+                  const EdgeInsets.fromLTRB(20, 40, 20, 24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    theme.scaffoldBackgroundColor.withOpacity(0),
+                    theme.scaffoldBackgroundColor,
+                  ],
+                ),
+              ),
+              child: SizedBox(
+                height: 56,
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  onPressed: notifier.isLoading
+                      ? null
+                      : () async {
+                          final tx = Transaction(
+                            id: "",
+                            ledgerID: "",
+                            accountID: "",
+                            title: note.isEmpty ? "Expense" : note,
+                            amount: double.tryParse(amount) ?? 0,
+                            date: selectedDate,
+                            entryDate: DateTime.now(),
+                            category: selectedCategory,
+                            type: TransactionType.expense,
+                          );
+                          await notifier.addItem(tx);
+                          if (context.mounted) Navigator.pop(context);
+                        },
+                  icon: const Icon(Icons.check),
+                  label: const Text(
+                    "Save Expense",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ],
-        ),
-        child: child,
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildTypeChip(
-      String label, TransactionType type, IconData icon, Color color) {
-    final isSelected = _selectedType == type;
+  Widget _iconButton(
+      BuildContext context, IconData icon, VoidCallback onTap) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon),
+      ),
+    );
+  }
 
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _selectedType = type;
-            if (type != TransactionType.expense) {
-              _selectedCategory = null;
-            }
-          });
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected ? color.withOpacity(0.15) : Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: isSelected ? color : Colors.grey.shade300,
-              width: 1.4,
-            ), 
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: isSelected ? color : Colors.grey, size: 20),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? color : Colors.grey.shade600,
-                  fontWeight: FontWeight.w600,
-                ),
+  Widget _divider() {
+    return Divider(height: 1, color: Colors.grey.withOpacity(0.15));
+  }
+
+  Widget _inputRow(
+    BuildContext context, {
+    required IconData icon,
+    required String hint,
+    required ValueChanged<String> onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.grey),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: hint,
+                border: InputBorder.none,
               ),
-            ],
+              onChanged: onChanged,
+            ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _selectRow(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.grey),
+            const SizedBox(width: 12),
+            Text(title),
+            const Spacer(),
+            Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 6),
+            const Icon(Icons.chevron_right, size: 18),
+          ],
         ),
       ),
     );

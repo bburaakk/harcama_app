@@ -81,7 +81,7 @@ class _MainScreenState extends State<MainScreen> {
               }).toList(),
             ),
             Positioned(
-              bottom: 0,
+              bottom: 10,
               left: 0,
               right: 0,
               child: SafeArea(
@@ -101,7 +101,7 @@ class _MainScreenState extends State<MainScreen> {
                       },
                     ),
                     Container(
-                      margin: const EdgeInsets.only(bottom: 45),
+                      margin: const EdgeInsets.only(bottom: 25),
                       height: 70,
                       width: 70,
                       child: FloatingActionButton(

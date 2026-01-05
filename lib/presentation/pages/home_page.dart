@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
                     if (!isSearching) ...[
                       _heroCard(context, balance, income, expense),
                       const SizedBox(height: 20),
-                      _insights(context),
+                      _insights(context, notifier),
                       const SizedBox(height: 24),
                     ],
 
@@ -221,29 +221,202 @@ class _HomePageState extends State<HomePage> {
   }
 
   // INSIGHTS
-  Widget _insights(BuildContext context) {
+  Widget _insights(BuildContext context, TransactionNotifier notifier) {
+    final now = DateTime.now();
+    final theme = Theme.of(context);
+
+    final mostExpensive = notifier.getMostExpensiveCategoryInfo(now.month, now.year);
+
+    final budgetInfo = notifier.getBudgetOverview(now.month, now.year);
+    final dailyAvailable = budgetInfo['dailyAvailable'] as double;
+    final remainingBudget = budgetInfo['remaining'] as double;
+
     return Row(
       children: [
         Expanded(
           child: Container(
             height: 140,
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              color: Theme.of(context).cardColor,
+              color: theme.cardColor,
             ),
+            child: mostExpensive == null
+                ? Center(
+                    child: Text(
+                      "No expenses\nthis month",
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.hintColor,
+                      ),
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.trending_up,
+                                color: Colors.red, size: 20),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            "Top Spending",
+                            style: theme.textTheme.labelSmall,
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            mostExpensive['category'].title,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            "₺${(mostExpensive['amount'] as double).toStringAsFixed(0)}",
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
           ),
         ),
         const SizedBox(width: 12),
+        
+        // Daily Budget Limit Card
         Expanded(
-          child: Container(
-            height: 140,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              color: Colors.greenAccent,
+          child: GestureDetector(
+            onTap: () => _showBudgetDialog(context, notifier),
+            child: Container(
+              height: 140,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                color: const Color(0xFFE0F7FA),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.cyan.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.savings_outlined,
+                                color: Colors.cyan, size: 20),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            "Daily Limit",
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: Colors.cyan[900],
+                              fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ],
+                      ),
+                      Icon(Icons.edit, size: 16, color: Colors.cyan[900]),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (remainingBudget < 0)
+                         Text(
+                          "Over Budget!",
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        )
+                      else
+                        Text(
+                          "₺${dailyAvailable.toStringAsFixed(0)}",
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.cyan[900],
+                          ),
+                        ),
+                      
+                      const SizedBox(height: 4),
+                      Text(
+                        remainingBudget < 0 
+                          ? "₺${remainingBudget.abs().toStringAsFixed(0)} excess"
+                          : "left for ${budgetInfo['daysLeft']} days",
+                        style: theme.textTheme.labelSmall?.copyWith(
+                           color: remainingBudget < 0 ? Colors.red : Colors.cyan[800],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  void _showBudgetDialog(BuildContext context, TransactionNotifier notifier) {
+    final controller = TextEditingController(
+      text: notifier.monthlyBudget.toStringAsFixed(0)
+    );
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Set Monthly Budget"),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: "Budget Amount",
+            prefixText: "₺",
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          FilledButton(
+            onPressed: () {
+              final amount = double.tryParse(controller.text);
+              if (amount != null) {
+                notifier.setMonthlyBudget(amount);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
     );
   }
 

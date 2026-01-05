@@ -11,6 +11,7 @@ class TransactionNotifier extends BaseNotifier<Transaction> {
   });
 
   String _searchQuery = '';
+  double monthlyBudget = 0;
 
   List<Transaction> get transactions {
     if (_searchQuery.isEmpty) {
@@ -30,11 +31,17 @@ class TransactionNotifier extends BaseNotifier<Transaction> {
     _searchQuery = query;
     notifyListeners();
   }
+  
+  void setMonthlyBudget(double amount) {
+    monthlyBudget = amount;
+    notifyListeners();
+  }
 
-  Map<String, dynamic>? getMostExpensiveCategoryInfo(int targetMonth, int targetYear) {
+  Map<String, dynamic>? getMostExpensiveCategoryInfo(int targetMonth, int targetYear, {int? targetDay}) {
     final filteredList = items.where((t) {
       return t.date.month == targetMonth &&
           t.date.year == targetYear &&
+          (targetDay == null || t.date.day == targetDay) &&
           t.type == TransactionType.expense &&
           t.category != null;
     }).toList();
@@ -57,6 +64,39 @@ class TransactionNotifier extends BaseNotifier<Transaction> {
     return {
       'category': categoryObjects[topEntry.key],
       'amount': topEntry.value,
+    };
+  }
+
+  Map<String, dynamic> getBudgetOverview(int month, int year) {
+    final totalExpense = items
+        .where((t) => t.date.month == month && t.date.year == year && t.type == TransactionType.expense)
+        .fold(0.0, (sum, t) => sum + t.amount);
+
+    final remainingBudget = monthlyBudget - totalExpense;
+
+    final now = DateTime.now();
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+
+    int daysLeft = 0;
+    if (now.month == month && now.year == year) {
+      daysLeft = daysInMonth - now.day;
+    } else {
+      daysLeft = 0; 
+    }
+
+    double dailyAvailable = 0;
+    if (daysLeft > 0 && remainingBudget > 0) {
+      dailyAvailable = remainingBudget / daysLeft;
+    } else if (daysLeft == 0 && remainingBudget > 0) {
+       dailyAvailable = remainingBudget;
+    }
+
+    return {
+      'totalBudget': monthlyBudget,
+      'spent': totalExpense,
+      'remaining': remainingBudget,
+      'daysLeft': daysLeft,
+      'dailyAvailable': dailyAvailable,
     };
   }
 }

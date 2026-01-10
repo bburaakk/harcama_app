@@ -310,10 +310,10 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                   ),
                   itemBuilder: (context, index) {
                     final keys = [
-                      "1","2","3","+",
+                      "1","2","3","⌫",
                       "4","5","6","-",
                       "7","8","9","/",
-                      ".","0","⌫","="
+                      ".","0","+","="
                     ];
                     final key = keys[index];
 

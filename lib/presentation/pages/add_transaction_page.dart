@@ -454,7 +454,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     if (notifier.isLoading) return;
 
     final tx = Transaction(
-      id: "",
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
       ledgerID: "",
       accountID: "",
       title: note.isEmpty ? "Expense" : note,

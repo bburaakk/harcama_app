@@ -3,6 +3,7 @@ import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:intl/intl.dart';
+import 'package:harcama_app/presentation/pages/expense_detail.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             _topBar(context),
             Expanded(
-              child: SingleChildScrollView(
+              child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
@@ -46,11 +47,33 @@ class _HomePageState extends State<HomePage> {
                       _heroCard(context, balance, income, expense),
                       const SizedBox(height: 20),
                       _insights(context, notifier),
+
                       const SizedBox(height: 24),
+
+                      // subtle separator between boxes and list
+                      Container(
+                        height: 10,
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.72),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
                     ],
 
-                    _transactions(context, notifier),
-                    const SizedBox(height: 100),
+                    // Make only the transactions area scrollable
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _transactions(context, notifier),
+                            const SizedBox(height: 100),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -226,6 +249,8 @@ class _HomePageState extends State<HomePage> {
     final theme = Theme.of(context);
 
     final mostExpensive = notifier.getMostExpensiveCategoryInfo(now.month, now.year);
+    final topCategory = mostExpensive == null ? null : (mostExpensive['category'] as dynamic);
+    final topAmount = mostExpensive == null ? 0.0 : (mostExpensive['amount'] as double);
 
     final budgetInfo = notifier.getBudgetOverview(now.month, now.year);
     final dailyAvailable = budgetInfo['dailyAvailable'] as double;
@@ -239,7 +264,7 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              color: theme.cardColor,
+              color: Colors.orange.withOpacity(0.1),
             ),
             child: mostExpensive == null
                 ? Center(
@@ -273,27 +298,52 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+
+                      // Show category icon + name and the amount
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            mostExpensive['category'].title,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              shape: BoxShape.circle,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            child: Center(
+                              child: Text(
+                                topCategory?.icon ?? _fallbackIcon(TransactionType.expense),
+                                style: const TextStyle(fontSize: 18),
+                              ),
+                            ),
                           ),
-                          Text(
-                            "₺${(mostExpensive['amount'] as double).toStringAsFixed(0)}",
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red,
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  topCategory?.title ?? "-",
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  "₺${topAmount.toStringAsFixed(2)}",
+                                  style: theme.textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                    ],
+                    ], 
                   ),
           ),
         ),
@@ -442,49 +492,53 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Column(
-      children: notifier.transactions.map((t) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            color: Theme.of(context).cardColor,
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 24,
-                child: Text(
-                  t.category?.icon ?? _fallbackIcon(t.type),
-                  style: const TextStyle(fontSize: 20),
+      children: notifier.transactions.reversed.map((t) {
+        return InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: () => Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (_) => ExpenseDetailPage(transaction: t))),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: Colors.grey.withOpacity(0.1),
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 24,
+                  child: Text(
+                    t.category?.icon ?? _fallbackIcon(t.type),
+                    style: const TextStyle(fontSize: 20),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      t.title,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      dateFormat.format(t.entryDate),
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                  ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        t.title,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        dateFormat.format(t.entryDate),
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Text(
-                "${t.type == TransactionType.expense ? "-" : "+"}₺${t.amount.toStringAsFixed(2)}",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: t.type == TransactionType.expense
-                      ? Colors.red
-                      : Colors.green,
+                Text(
+                  "${t.type == TransactionType.expense ? "-" : "+"}₺${t.amount.toStringAsFixed(2)}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: t.type == TransactionType.expense
+                        ? Colors.red
+                        : Colors.green,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       }).toList(),

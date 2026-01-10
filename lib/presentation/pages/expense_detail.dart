@@ -6,19 +6,21 @@ import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/domain/utility/math_helper.dart';
 
-class AddTransactionPage extends StatefulWidget {
-  const AddTransactionPage({super.key});
+class ExpenseDetailPage extends StatefulWidget {
+  final Transaction transaction;
+
+  const ExpenseDetailPage({super.key, required this.transaction});
 
   @override
-  State<AddTransactionPage> createState() => _AddTransactionPageState();
+  State<ExpenseDetailPage> createState() => _ExpenseDetailPageState();
 }
 
-class _AddTransactionPageState extends State<AddTransactionPage> {
-  String amount = "0";
-  String note = "";
-  DateTime selectedDate = DateTime.now();
-  Category? selectedCategory;
-  TransactionType selectedType = TransactionType.expense;
+class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
+  late String amount;
+  late String note;
+  late DateTime selectedDate;
+  late Category? selectedCategory;
+  late TransactionType selectedType;
 
   final categories = const [
     Category(id: "1", title: "Food", icon: "🍕"),
@@ -27,6 +29,17 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     Category(id: "4", title: "Rent", icon: "🏠"),
     Category(id: "5", title: "Fun", icon: "🎮"),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    amount = widget.transaction.amount.toStringAsFixed(2).replaceAll(RegExp(r"\.00$"), "");
+    if (amount.isEmpty) amount = "0";
+    note = widget.transaction.title;
+    selectedDate = widget.transaction.date;
+    selectedCategory = widget.transaction.category;
+    selectedType = widget.transaction.type;
+  }
 
   void onKeyTap(String value) {
     setState(() {
@@ -45,9 +58,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
           var out = res.toString();
           out = out.replaceAll(RegExp(r"\.0+$"), "");
           amount = out;
-        } catch (_) {
-          // ignore parse errors
-        }
+        } catch (_) {}
         return;
       }
 
@@ -55,7 +66,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         if (amount.isEmpty) {
           amount = "0$value";
         } else {
-          // replace trailing operator if present
           if (RegExp(r'[+\-\/]$').hasMatch(amount)) {
             amount = amount.substring(0, amount.length - 1) + value;
           } else {
@@ -65,14 +75,12 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         return;
       }
 
-      // handle dot
       if (value == ".") {
         final matches = RegExp(r"[^+\-\/]+").allMatches(amount);
         final last = matches.isNotEmpty ? matches.last.group(0) ?? '' : amount;
         if (last.contains('.')) return;
       }
 
-      // digits
       if (amount == "0") {
         amount = value;
       } else {
@@ -84,14 +92,13 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final notifier = context.watch<TransactionNotifier>();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
-          Builder(builder: (ctx) { try { return Column(
+          Column(
             children: [
               const SizedBox(height: 36),
 
@@ -100,22 +107,26 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _iconButton(context, Icons.close, () {
-                      Navigator.pop(context);
-                    }),
+                    _iconButton(context, Icons.close, () => Navigator.pop(context)),
                     const Text(
-                      "New Expense",
+                      "Expense Details",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    _iconButton(context, Icons.check, _saveNewTransaction),
+                    Row(
+                      children: [
+                        _iconButton(context, Icons.delete_outline, _confirmDelete),
+                        const SizedBox(width: 8),
+                        _iconButton(context, Icons.check, _saveChanges),
+                      ],
+                    ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 32),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -136,7 +147,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               Column(
                 children: [
                   const Text(
-                    "ENTER AMOUNT",
+                    "AMOUNT",
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -187,7 +198,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
                     final cat = categories[index];
-                    final isActive = selectedCategory == cat;
+                    final isActive = selectedCategory?.id == cat.id;
 
                     return GestureDetector(
                       onTap: () => setState(() => selectedCategory = cat),
@@ -198,21 +209,16 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                             width: 64,
                             height: 64,
                             decoration: BoxDecoration(
-                              color: isActive
-                                  ? theme.colorScheme.primary
-                                  : theme.cardColor,
+                              color: isActive ? theme.colorScheme.primary : theme.cardColor,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: isActive
-                                    ? theme.colorScheme.primary
-                                    : Colors.grey.withOpacity(0.2),
+                                color: isActive ? theme.colorScheme.primary : Colors.grey.withOpacity(0.2),
                                 width: 2,
                               ),
                               boxShadow: [
                                 if (isActive)
                                   BoxShadow(
-                                    color: theme.colorScheme.primary
-                                        .withOpacity(0.3),
+                                    color: theme.colorScheme.primary.withOpacity(0.3),
                                     blurRadius: 12,
                                   ),
                               ],
@@ -220,11 +226,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                             child: Center(
                               child: Text(
                                 cat.icon,
-                                style: TextStyle(
-                                  fontSize: 26,
-                                  color:
-                                      isActive ? Colors.white : Colors.grey,
-                                ),
+                                style: TextStyle(fontSize: 26, color: isActive ? Colors.white : Colors.grey),
                               ),
                             ),
                           ),
@@ -234,9 +236,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: isActive
-                                  ? theme.colorScheme.primary
-                                  : Colors.grey,
+                              color: isActive ? theme.colorScheme.primary : Colors.grey,
                             ),
                           ),
                         ],
@@ -263,6 +263,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                         context,
                         icon: Icons.edit_note,
                         hint: "What is this for?",
+                        initialValue: note,
                         onChanged: (v) => note = v,
                       ),
                       _divider(),
@@ -270,8 +271,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                         context,
                         icon: Icons.calendar_today,
                         title: "Date",
-                        value:
-                            DateFormat("EEE, MMM d").format(selectedDate),
+                        value: DateFormat("EEE, MMM d").format(selectedDate),
                         onTap: () async {
                           final picked = await showDatePicker(
                             context: context,
@@ -279,9 +279,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                             firstDate: DateTime(2020),
                             lastDate: DateTime(2100),
                           );
-                          if (picked != null) {
-                            setState(() => selectedDate = picked);
-                          }
+                          if (picked != null) setState(() => selectedDate = picked);
                         },
                       ),
                       _divider(),
@@ -312,10 +310,10 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                   ),
                   itemBuilder: (context, index) {
                     final keys = [
-                      "1","2","3","⌫",
+                      "1","2","3","+",
                       "4","5","6","-",
                       "7","8","9","/",
-                      ".","0","+","="
+                      ".","0","⌫","="
                     ];
                     final key = keys[index];
 
@@ -342,7 +340,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 ),
               ),
             ],
-          ); } catch (e, st) { print('AddTransactionPage build error: $e\n$st'); return Container( padding: const EdgeInsets.all(24), child: Center(child: Text('Error building page: $e'))); } },),
+          ),
 
           const SizedBox(height: 24),
         ],
@@ -373,8 +371,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     );
   }
 
-  Widget _iconButton(
-      BuildContext context, IconData icon, VoidCallback onTap) {
+  Widget _iconButton(BuildContext context, IconData icon, VoidCallback onTap) {
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: onTap,
@@ -399,7 +396,9 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     required IconData icon,
     required String hint,
     required ValueChanged<String> onChanged,
+    String initialValue = "",
   }) {
+    final controller = TextEditingController(text: initialValue);
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -408,10 +407,8 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
-              decoration: InputDecoration(
-                hintText: hint,
-                border: InputBorder.none,
-              ),
+              controller: controller,
+              decoration: InputDecoration(hintText: hint, border: InputBorder.none),
               onChanged: onChanged,
             ),
           ),
@@ -437,10 +434,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
             const SizedBox(width: 12),
             Text(title),
             const Spacer(),
-            Text(
-              value,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(width: 6),
             const Icon(Icons.chevron_right, size: 18),
           ],
@@ -449,26 +443,46 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     );
   }
 
-  Future<void> _saveNewTransaction() async {
-    final notifier = context.read<TransactionNotifier>();
-    if (notifier.isLoading) return;
-
-    final tx = Transaction(
-      id: "",
-      ledgerID: "",
-      accountID: "",
-      title: note.isEmpty ? "Expense" : note,
-      amount: _evaluateAmount(),
-      date: selectedDate,
-      entryDate: DateTime.now(),
-      category: selectedCategory,
-      type: selectedType,
+  Future<void> _confirmDelete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete expense?'),
+        content: const Text('This action cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Delete')),
+        ],
+      ),
     );
 
-    await notifier.addItem(tx);
-    if (context.mounted) Navigator.pop(context);
+    if (confirmed == true) {
+      final notifier = context.read<TransactionNotifier>();
+      await notifier.deleteItem(widget.transaction.id);
+      if (context.mounted) Navigator.pop(context);
+    }
   }
 
+  Future<void> _saveChanges() async {
+    final notifier = context.read<TransactionNotifier>();
+    final parsed = _evaluateAmount();
+
+    final updated = Transaction(
+      id: widget.transaction.id,
+      ledgerID: widget.transaction.ledgerID,
+      accountID: widget.transaction.accountID,
+      title: note.isEmpty ? 'Expense' : note,
+      amount: parsed,
+      date: selectedDate,
+      entryDate: widget.transaction.entryDate,
+      category: selectedCategory,
+      type: selectedType,
+      isRecurring: widget.transaction.isRecurring,
+    );
+
+    await notifier.updateItem(updated);
+    if (context.mounted) Navigator.pop(context);
+  }
   String _sanitizeExpression(String expr) {
     var e = expr;
     while (e.isNotEmpty && RegExp(r'[+\-\/]$').hasMatch(e)) {
@@ -487,6 +501,4 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     } catch (_) {
       return double.tryParse(RegExp(r'[\d\.]+').stringMatch(amount) ?? '0') ?? 0;
     }
-  }
-
-}
+  }}

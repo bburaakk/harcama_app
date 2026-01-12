@@ -128,4 +128,24 @@ class TransactionNotifier extends BaseNotifier<Transaction> {
       'dailyAvailable': dailyAvailable,
     };
   }
+
+  List<Transaction> getFilteredTransactions(String timeframe) {
+    final now = DateTime.now();
+    return items.where((t) {
+      if (t.type != TransactionType.expense) return false;
+      
+      if (timeframe == 'Weekly') {
+        final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+        final startOfWeekDate = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
+        final endOfWeekDate = startOfWeekDate.add(const Duration(days: 7));
+        return t.date.isAfter(startOfWeekDate.subtract(const Duration(seconds: 1))) && 
+               t.date.isBefore(endOfWeekDate);
+      } else if (timeframe == 'Monthly') {
+        return t.date.month == now.month && t.date.year == now.year;
+      } else if (timeframe == 'Yearly') {
+        return t.date.year == now.year;
+      }
+      return true;
+    }).toList();
+  }
 }

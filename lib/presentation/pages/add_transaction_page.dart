@@ -6,7 +6,7 @@ import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/domain/utility/math_helper.dart';
-import 'package:harcama_app/presentation/widgets/keypad.dart';
+import 'package:harcama_app/presentation/widgets/Keypad.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -88,62 +88,71 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            _buildHeader(context),
-            
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 8),
-                    
-                    // Title
-                    Text(
-                      "How much did you spend?",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.text(context),
-                      ),
+      // Use LayoutBuilder to adapt to screen height
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final screenHeight = constraints.maxHeight;
+          final isSmallScreen = screenHeight < 700;
+          
+          return SafeArea(
+            child: Column(
+              children: [
+                // Header
+                _buildHeader(context),
+                
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        SizedBox(height: isSmallScreen ? 4 : 8),
+                        
+                        // Title
+                        Text(
+                          "How much did you spend?",
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 18 : 22,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.text(context),
+                          ),
+                        ),
+                        
+                        SizedBox(height: isSmallScreen ? 8 : 16),
+                        
+                        // Description + Date Row
+                        _buildDescriptionDateRow(context),
+                        
+                        SizedBox(height: isSmallScreen ? 8 : 16),
+                        
+                        // Amount Display
+                        _buildAmountDisplay(context, isSmallScreen),
+                        
+                        SizedBox(height: isSmallScreen ? 8 : 16),
+                        
+                        // Type Selector
+                        _buildTypeSelector(context),
+                        
+                        SizedBox(height: isSmallScreen ? 8 : 16),
+                        
+                        // Category Section
+                        _buildCategorySection(context),
+                        
+                        SizedBox(height: isSmallScreen ? 8 : 12),
+                        
+                        // Keypad
+                        // Use constrained height for keypad on small screens if needed
+                        KeyPad(onTap: onKeyTap),
+                      ],
                     ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Description + Date Row
-                    _buildDescriptionDateRow(context),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Amount Display
-                    _buildAmountDisplay(context),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Type Selector
-                    _buildTypeSelector(context),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Category Section
-                    _buildCategorySection(context),
-                    
-                    const SizedBox(height: 12),
-                    
-                    // Keypad
-                    KeyPad(onTap: onKeyTap),
-                  ],
+                  ),
                 ),
-              ),
+                
+                // Save Button
+                _buildSaveButton(context),
+              ],
             ),
-            
-            // Save Button
-            _buildSaveButton(context),
-          ],
-        ),
+          );
+        }
       ),
     );
   }
@@ -266,7 +275,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     if (picked != null) setState(() => selectedDate = picked);
   }
 
-  Widget _buildAmountDisplay(BuildContext context) {
+  Widget _buildAmountDisplay(BuildContext context, bool isSmallScreen) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: ValueListenableBuilder<String>(
@@ -280,7 +289,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               Text(
                 "₺",
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: isSmallScreen ? 18 : 22,
                   fontWeight: FontWeight.w700,
                   color: AppColors.subtitleText(context),
                 ),
@@ -289,7 +298,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 42,
+                  fontSize: isSmallScreen ? 32 : 42,
                   fontWeight: FontWeight.w800,
                   color: _getTypeColor(),
                   letterSpacing: -2,

@@ -34,29 +34,23 @@ class FloatingAddButton extends StatelessWidget {
       },
       margin: EdgeInsets.only(bottom: 20 + bottomPadding),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppColors.cardBorderRadius),
-        border: Border.all(
-          color: Colors.black.withOpacity(0.3),
-          width: 4,
-        ),
-        color: AppColors.primaryCardColor,
+        borderRadius: BorderRadius.circular(20),
+        color: AppColors.secondaryBlue,
       ),
       boxShadow: const [
         BoxShadow(
-          color: AppColors.primaryCardShadow,
-          offset: AppColors.cardShadowOffset,
+          color: AppColors.secondaryBlueDark,
+          offset: Offset(0, 4),
         ),
       ],
       child: const SizedBox(
-        height: 70,
-        width: 70,
+        height: 64,
+        width: 64,
         child: Center(
           child: Icon(
             Symbols.add_rounded,
-            size: 42,
+            size: 36,
             weight: 700,
-            opticalSize: 20,
-            grade: 200,
             color: Colors.white,
           ),
         ),

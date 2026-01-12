@@ -21,7 +21,7 @@ class BalanceCard extends StatelessWidget {
       onPressed: () {
         // TODO: Add functionality
       },
-      padding: const EdgeInsets.all(AppColors.cardPadding),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppColors.cardBorderRadius),
         border: Border.all(
@@ -42,20 +42,20 @@ class BalanceCard extends StatelessWidget {
             "Total Balance",
             style: TextStyle(
               color: AppColors.primaryTextOnCard.withOpacity(0.9),
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
             "₺${balance.toStringAsFixed(2)}",
             style: Theme.of(context).textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: AppColors.primaryTextOnCard,
-                  fontSize: 38,
+                  fontSize: 32,
                 ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () {},

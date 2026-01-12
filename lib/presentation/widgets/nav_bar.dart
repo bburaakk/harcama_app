@@ -25,16 +25,16 @@ class NavBar extends StatelessWidget {
         bottom: bottomPadding,
       ),
       decoration: BoxDecoration(
-        color: AppColors.primaryCardColor,
+        color: Colors.white,
         border: Border(
           top: BorderSide(
-            color: Colors.black.withOpacity(0.3),
-            width: 4,
+            color: AppColors.gray200,
+            width: 2,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryCardShadow.withOpacity(0.3),
+            color: AppColors.gray200,
             blurRadius: 8,
             offset: const Offset(0, -3),
           ),
@@ -83,10 +83,10 @@ class NavBar extends StatelessWidget {
         child: Icon(
           icon,
           fill: selected ? 1 : 0,
-          size: selected ? 36 : 24,
+          size: selected ? 30 : 24,
           weight: 700,
           grade: 200,
-          color: Colors.white,
+          color: selected ? AppColors.primary : AppColors.gray400,
         ),
       ),
     );

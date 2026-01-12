@@ -19,7 +19,7 @@ class StatBox extends StatelessWidget {
     return Expanded(
       child: PressableContainer(
         onPressed: () => {},
-        padding: const EdgeInsets.symmetric(vertical: AppColors.statBoxPadding),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppColors.statBoxBorderRadius),
           color: AppColors.statBoxColor,
@@ -36,14 +36,14 @@ class StatBox extends StatelessWidget {
         ],
         child: Column(
           children: [
-            Icon(icon, size: 22, color: AppColors.primaryTextOnCard),
-            const SizedBox(height: 8),
+            Icon(icon, size: 20, color: AppColors.primaryTextOnCard),
+            const SizedBox(height: 6),
             Text(
               label,
               style: const TextStyle(
                 color: AppColors.primaryTextOnCard,
                 fontWeight: FontWeight.w700,
-                fontSize: 14,
+                fontSize: 12,
               ),
             ),
             const SizedBox(height: 2),
@@ -51,7 +51,7 @@ class StatBox extends StatelessWidget {
               "₺${value.toStringAsFixed(0)}",
               style: const TextStyle(
                 color: AppColors.primaryTextOnCard,
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: FontWeight.w900,
               ),
             ),

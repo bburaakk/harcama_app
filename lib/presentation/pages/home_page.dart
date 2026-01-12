@@ -4,10 +4,12 @@ import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/top_bar.dart';
 import 'package:harcama_app/presentation/widgets/ledger_dropdown.dart';
-import 'package:harcama_app/presentation/widgets/balance_card.dart';
+import 'package:harcama_app/presentation/widgets/remaining_balance_card.dart';
+import 'package:harcama_app/presentation/widgets/daily_goal_card.dart';
 import 'package:harcama_app/presentation/widgets/transaction_list.dart';
 import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -72,28 +74,83 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           const SizedBox(height: 8),
                           if (!isSearching) ...[
-                            BalanceCard(
-                              balance: balance,
-                              income: income,
-                              expense: expense,
+                            RemainingBalanceCard(balance: balance),
+                            const SizedBox(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                const Text(
+                                  "Daily Goals",
+                                  style: TextStyle(
+                                    color: AppColors.textDark,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                Text(
+                                  "See All",
+                                  style: TextStyle(
+                                    color: AppColors.primaryDark,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            GridView.count(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 1.1,
+                              children: [
+                                DailyGoalCard(
+                                  icon: Symbols.restaurant_rounded,
+                                  label: "Food",
+                                  current: 12,
+                                  target: 20,
+                                  color: AppColors.secondaryYellow,
+                                  colorDark: AppColors.secondaryYellowDark,
+                                ),
+                                DailyGoalCard(
+                                  icon: Symbols.directions_car_rounded,
+                                  label: "Travel",
+                                  current: 5,
+                                  target: 15,
+                                  color: AppColors.secondaryBlue,
+                                  colorDark: AppColors.secondaryBlueDark,
+                                ),
+                                DailyGoalCard(
+                                  icon: Symbols.confirmation_number_rounded,
+                                  label: "Fun",
+                                  current: 8,
+                                  target: 10,
+                                  color: AppColors.primary,
+                                  colorDark: AppColors.primaryDark,
+                                ),
+                                const AddGoalCard(),
+                              ],
                             ),
                             const SizedBox(height: 24),
-                            Container(
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryCardShadow,
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(8),
-                                  topRight: Radius.circular(8),
-                                  bottomLeft: Radius.zero,
-                                  bottomRight: Radius.zero,
+                            Row(
+                              children: [
+                                const Text(
+                                  "Recent Activity",
+                                  style: TextStyle(
+                                    color: AppColors.textDark,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w900,
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
+                            const SizedBox(height: 8),
                           ],
                           Expanded(
                             child: SingleChildScrollView(
-                              padding: const EdgeInsets.only(top: 24),
                               child: Column(
                                 children: [
                                   TransactionList(

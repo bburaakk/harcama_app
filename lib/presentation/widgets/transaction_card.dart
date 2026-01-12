@@ -46,27 +46,20 @@ class TransactionCard extends StatelessWidget {
           ),
         );
       },
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.black.withOpacity(0.3),
-          width: 4,
+          color: AppColors.gray200,
+          width: 2,
         ),
-        color: isDark
-            ? Colors.white.withOpacity(0.06)
-            : AppColors.primaryCardColor,
+        color: Colors.white,
       ),
-      boxShadow: [
+      boxShadow: const [
         BoxShadow(
-          color: Colors.black.withOpacity(0.10),
-          blurRadius: 18,
-          offset: const Offset(0, 10),
-        ),
-        const BoxShadow(
-          color: AppColors.primaryCardShadow,
-          offset: Offset(0, 10),
+          color: AppColors.gray100,
+          offset: Offset(0, 4),
         ),
       ],
       child: Row(
@@ -76,7 +69,7 @@ class TransactionCard extends StatelessWidget {
                 children: [
                   Text(
                     t.category?.icon ?? _fallbackIcon(t.type),
-                    style: const TextStyle(fontSize: 28),
+                    style: const TextStyle(fontSize: 24),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -88,16 +81,19 @@ class TransactionCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 18,
-                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
+                            color: AppColors.textDark,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
                           dateFormat.format(t.entryDate),
-                          style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(color: Colors.white70),
+                          style: const TextStyle(
+                            color: AppColors.gray400,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ],
                     ),
@@ -107,31 +103,38 @@ class TransactionCard extends StatelessWidget {
             ),
 
             SizedBox(
-              width: 50,
+              width: 40,
               child: Center(
-                child: Icon(
-                  typeIcon,
-                  size: 42,
-                  weight: 700,
-                  opticalSize: 20,
-                  grade: 200,
-                  color: typeColor,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: typeColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    typeIcon,
+                    size: 18,
+                    weight: 700,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
 
             SizedBox(
-              width: 110,
+              width: 100,
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Text(
                   "${t.type == TransactionType.expense ? "-" : "+"}₺${t.amount.toStringAsFixed(2)}",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    color: Colors.white,
+                    fontSize: 16,
+                    color: t.type == TransactionType.expense 
+                        ? Colors.red.shade500 
+                        : AppColors.primaryDark,
                   ),
                 ),
               ),

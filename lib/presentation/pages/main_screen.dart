@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:harcama_app/presentation/pages/add_transaction_page.dart';
 import 'package:harcama_app/presentation/pages/home_page.dart';
 import 'package:harcama_app/presentation/pages/chart_page.dart';
 import 'package:harcama_app/presentation/pages/profile_page.dart';
 import 'package:harcama_app/presentation/pages/report_page.dart';
 import 'package:harcama_app/presentation/viewmodels/nav_model.dart';
 import 'package:harcama_app/presentation/widgets/nav_bar.dart';
-import 'package:harcama_app/presentation/widgets/pressable_container.dart';
-import 'package:harcama_app/presentation/theme/app_colors.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import 'package:harcama_app/presentation/widgets/floating_add_button.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -99,62 +96,7 @@ class _MainScreenState extends State<MainScreen> {
                         }
                       },
                     ),
-                    PressableContainer(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          PageRouteBuilder(
-                            transitionDuration: const Duration(
-                              milliseconds: 300,
-                            ),
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    AddTransactionPage(),
-                            transitionsBuilder: (_, animation, __, child) {
-                              return SlideTransition(
-                                position: animation.drive(
-                                  Tween(
-                                    begin: const Offset(0, 1),
-                                    end: Offset.zero,
-                                  ).chain(CurveTween(curve: Curves.easeOut)),
-                                ),
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      margin: EdgeInsets.only(bottom: 20 + MediaQuery.of(context).padding.bottom),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          AppColors.cardBorderRadius,
-                        ),
-                        border: Border.all(
-                          color: Colors.black.withOpacity(0.3),
-                          width: 4,
-                        ),
-                        color: AppColors.primaryCardColor,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: AppColors.primaryCardShadow,
-                          offset: AppColors.cardShadowOffset,
-                        ),
-                      ],
-                      child: SizedBox(
-                        height: 70,
-                        width: 70,
-                        child: Center(
-                          child: Icon(
-                            Symbols.add_rounded,
-                            size: 42,
-                            weight: 700,
-                            opticalSize: 20,
-                            grade: 200,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
+                    const FloatingAddButton(),
                   ],
                 ),
               ),

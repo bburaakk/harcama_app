@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class NavBar extends StatelessWidget {
   final int index;
@@ -42,34 +43,49 @@ class NavBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _item(icon: Icons.home, i: 0),
-          _item(icon: Icons.pie_chart, i: 1),
+          _item(
+            icon: Symbols.home_rounded,
+            i: 0,
+          ), 
+          _item(
+            icon: Symbols.pie_chart_rounded,
+            i: 1,
+          ),
 
           const SizedBox(width: 80),
 
-          _item(icon: Icons.account_balance_wallet, i: 2),
-          _item(icon: Icons.person, i: 3),
+          _item(
+            icon: Symbols.account_balance_wallet_rounded,
+            i: 2,
+          ),
+          _item(
+            icon: Symbols.person_rounded,
+            i: 3,
+          ),
         ],
       ),
     );
   }
 
-  Widget _item({required IconData icon, required int i}) {
+  Widget _item({
+    required IconData icon,
+    required int i,
+  }) {
     final selected = index == i;
 
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () => onTap(i),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 46,
-        height: 46,
-        decoration: BoxDecoration(
-          color: selected ? Colors.white.withOpacity(0.2) : Colors.transparent,
-          shape: BoxShape.circle,
-        ),
+      child: Container(
+        width: 60,
+        height: 60,
+        alignment: Alignment.center,
         child: Icon(
           icon,
-          size: selected ? 26 : 24,
+          fill: selected ? 1 : 0,
+          size: selected ? 36 : 24,
+          weight: 700,
+          grade: 200,
           color: Colors.white,
         ),
       ),

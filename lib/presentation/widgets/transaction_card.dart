@@ -51,15 +51,15 @@ class TransactionCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.gray200,
+          color: AppColors.cardBorder(context),
           width: 2,
         ),
-        color: Colors.white,
+        color: AppColors.card(context),
       ),
-      boxShadow: const [
+      boxShadow: [
         BoxShadow(
-          color: AppColors.gray100,
-          offset: Offset(0, 4),
+          color: AppColors.cardShadow(context),
+          offset: const Offset(0, 4),
         ),
       ],
       child: Row(
@@ -80,17 +80,17 @@ class TransactionCard extends StatelessWidget {
                           t.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w800,
                             fontSize: 15,
-                            color: AppColors.textDark,
+                            color: AppColors.text(context),
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           dateFormat.format(t.entryDate),
-                          style: const TextStyle(
-                            color: AppColors.gray400,
+                          style: TextStyle(
+                            color: AppColors.subtitleText(context),
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
                           ),
@@ -133,7 +133,7 @@ class TransactionCard extends StatelessWidget {
                     fontWeight: FontWeight.w900,
                     fontSize: 16,
                     color: t.type == TransactionType.expense 
-                        ? Colors.red.shade500 
+                        ? AppColors.expenseColor(context) 
                         : AppColors.primaryDark,
                   ),
                 ),

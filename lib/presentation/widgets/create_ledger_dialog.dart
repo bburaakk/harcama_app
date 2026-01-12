@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/domain/entities/ledger.dart';
+import 'package:harcama_app/presentation/theme/app_colors.dart';
 
 class CreateLedgerDialog extends StatefulWidget {
   const CreateLedgerDialog({super.key});
@@ -29,20 +30,25 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('New Ledger'),
+      backgroundColor: AppColors.card(context),
+      title: Text('New Ledger', style: TextStyle(color: AppColors.text(context))),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(
+              style: TextStyle(color: AppColors.text(context)),
+              decoration: InputDecoration(
                 hintText: 'Ledger name',
-                border: OutlineInputBorder(),
+                hintStyle: TextStyle(color: AppColors.subtitleText(context)),
+                border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.cardBorder(context))),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.cardBorder(context))),
+                focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primary)),
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Select icon'),
+            Text('Select icon', style: TextStyle(color: AppColors.text(context))),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -58,7 +64,8 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
                       shape: BoxShape.circle,
                       color: isSelected
                           ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).cardColor,
+                          : AppColors.progressBackground(context),
+                      border: Border.all(color: AppColors.cardBorder(context), width: 2),
                     ),
                     child: Center(
                       child: Text(icon, style: const TextStyle(fontSize: 24)),
@@ -73,7 +80,7 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text('Cancel', style: TextStyle(color: AppColors.subtitleText(context))),
         ),
         TextButton(
           onPressed: () {
@@ -94,7 +101,7 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
 
             Navigator.pop(context, newLedger);
           },
-          child: const Text('Create'),
+          child: Text('Create', style: TextStyle(color: AppColors.primary)),
         ),
       ],
     );

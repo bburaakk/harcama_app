@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
+  // ============ LIGHT THEME ============
   // Background Colors
   static const Color scaffoldBackground = Color(0xFFFFFFFF);
-  static const Color backgroundDark = Color(0xFF192210);
   
   // Primary Colors - Green
-  static const Color primary = Color(0xFF7BDE12);
-  static const Color primaryDark = Color(0xFF58A700);
+  static const Color primary = Color(0xFF58CC02);
+  static const Color primaryDark = Color(0xFF46A302);
   
   // Secondary Blue
   static const Color secondaryBlue = Color(0xFF1CB0F6);
@@ -17,7 +17,10 @@ class AppColors {
   static const Color secondaryYellow = Color(0xFFFFC800);
   static const Color secondaryYellowDark = Color(0xFFE5A400);
   
-  // Gray Colors
+  // Neon Pink (for expenses)
+  static const Color neonPink = Color(0xFFFF4B91);
+  
+  // Gray Colors (Light)
   static const Color gray100 = Color(0xFFF3F4F6);
   static const Color gray200 = Color(0xFFE5E7EB);
   static const Color gray300 = Color(0xFFD1D5DB);
@@ -25,17 +28,59 @@ class AppColors {
   static const Color gray500 = Color(0xFF6B7280);
   static const Color textDark = Color(0xFF151B0D);
   
-  // Legacy - Primary Card Colors (keeping for compatibility)
-  static const Color primaryCardColor = Color(0xFF7BDE12);
-  static const Color primaryCardShadow = Color(0xFF58A700);
+  // Card Colors (Light)
+  static const Color cardLight = Color(0xFFFFFFFF);
+  static const Color cardBorderLight = Color(0xFFE5E7EB);
+  static const Color cardShadowLight = Color(0xFFE5E7EB);
   
-  // Stat Box Colors
-  static const Color statBoxColor = Color(0xFF7BDE12);
-  static const Color statBoxShadow = Color(0xFF58A700);
+  // ============ DARK THEME ============
+  // Background Colors (Dark)
+  static const Color scaffoldBackgroundDark = Color(0xFF131F24);
   
-  // Text Colors
-  static const Color primaryTextOnCard = Color(0xFF151B0D);
+  // Card Colors (Dark)
+  static const Color cardDark = Color(0xFF1F2D33);
+  static const Color cardBorderDark = Color(0xFF37464F);
+  static const Color cardShadowDark = Color(0xFF151B1F);
   
+  // Gray Colors (Dark)
+  static const Color grayDark100 = Color(0xFF37464F);
+  static const Color grayDark400 = Color(0xFF9CA3AF);
+  static const Color grayDark500 = Color(0xFF6B7280);
+  
+  // Text Colors (Dark)
+  static const Color textLight = Color(0xFFFFFFFF);
+  
+  // ============ THEME-AWARE HELPERS ============
+  static Color card(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? cardDark : cardLight;
+  
+  static Color cardBorder(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? cardBorderDark : cardBorderLight;
+  
+  static Color cardShadow(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? cardShadowDark : cardShadowLight;
+  
+  static Color text(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? textLight : textDark;
+  
+  static Color progressBackground(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? grayDark100 : gray100;
+  
+  static Color subtitleText(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? grayDark400 : gray400;
+  
+  static Color expenseColor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? neonPink : Colors.red.shade500;
+  
+  // ============ LEGACY (keeping for compatibility) ============
+  static const Color primaryCardColor = Color(0xFF58CC02);
+  static const Color primaryCardShadow = Color(0xFF46A302);
+  static const Color statBoxColor = Color(0xFF58CC02);
+  static const Color statBoxShadow = Color(0xFF46A302);
+  static const Color primaryTextOnCard = Color(0xFF131F24);
+  static const Color backgroundDark = Color(0xFF131F24);
+  
+  // ============ CONSTANTS ============
   // Border Radius
   static const double cardBorderRadius = 24.0;
   static const double statBoxBorderRadius = 24.0;

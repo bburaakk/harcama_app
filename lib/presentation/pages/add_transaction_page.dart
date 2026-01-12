@@ -7,6 +7,9 @@ import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/domain/utility/math_helper.dart';
 import 'package:harcama_app/presentation/widgets/keypad.dart';
+import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:harcama_app/presentation/widgets/pressable_container.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class AddTransactionPage extends StatefulWidget {
   const AddTransactionPage({super.key});
@@ -17,6 +20,7 @@ class AddTransactionPage extends StatefulWidget {
 
 class _AddTransactionPageState extends State<AddTransactionPage> {
   final ValueNotifier<String> amount = ValueNotifier("0");
+  final TextEditingController descriptionController = TextEditingController();
 
   String note = "";
   DateTime selectedDate = DateTime.now();
@@ -29,6 +33,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     Category(id: "3", title: "Shopping", icon: "🛍️"),
     Category(id: "4", title: "Rent", icon: "🏠"),
     Category(id: "5", title: "Fun", icon: "🎮"),
+    Category(id: "6", title: "Health", icon: "💊"),
   ];
 
   // ---------------- KEYPAD LOGIC ----------------
@@ -52,8 +57,8 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       return;
     }
 
-    if ("+-/".contains(value)) {
-      if (RegExp(r'[+\-\/]$').hasMatch(a)) {
+    if ("+-*/".contains(value)) {
+      if (RegExp(r'[+\-\*/]$').hasMatch(a)) {
         a = a.substring(0, a.length - 1) + value;
       } else {
         a += value;
@@ -63,7 +68,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     }
 
     if (value == ".") {
-      final parts = RegExp(r"[^+\-\/]+").allMatches(a);
+      final parts = RegExp(r"[^+\-\*/]+").allMatches(a);
       final last = parts.isNotEmpty ? parts.last.group(0)! : a;
       if (last.contains('.')) return;
     }
@@ -81,271 +86,448 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              const SizedBox(height: 36),
-              _topBar(context),
-              const SizedBox(height: 20),
-              _typeSelector(),
-              const SizedBox(height: 16),
-              _amountView(theme),
-              const SizedBox(height: 20),
-              _categoryList(theme),
-              const SizedBox(height: 16),
-              _detailsCard(context, theme),
-              const SizedBox(height: 24),
-              Expanded(child: KeyPad(onTap: onKeyTap)),
-            ],
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
-
-  // ---------------- WIDGETS ----------------
-
-  Widget _topBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _iconButton(Icons.close, () => Navigator.pop(context)),
-          const Text("New Transaction",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          _iconButton(Icons.check, _saveNewTransaction),
-        ],
-      ),
-    );
-  }
-
-  Widget _typeSelector() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _typeButton(TransactionType.expense, "Expense", Icons.arrow_downward),
-        const SizedBox(width: 12),
-        _typeButton(TransactionType.income, "Income", Icons.arrow_upward),
-        const SizedBox(width: 12),
-        _typeButton(TransactionType.transfer, "Transfer", Icons.swap_horiz),
-      ],
-    );
-  }
-
-  Widget _amountView(ThemeData theme) {
-    return Column(
-      children: [
-        const Text("ENTER AMOUNT",
-            style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-                color: Colors.grey)),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text("₺",
-                style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary)),
-            const SizedBox(width: 6),
-            ValueListenableBuilder<String>(
-              valueListenable: amount,
-              builder: (_, value, __) {
-                return Text(value,
-                    style: const TextStyle(
-                        fontSize: 56, fontWeight: FontWeight.w900, height: 1));
-              },
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _categoryList(ThemeData theme) {
-    return RepaintBoundary(
-      child: SizedBox(
-        height: 96,
-        child: ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          scrollDirection: Axis.horizontal,
-          itemCount: categories.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 16),
-          itemBuilder: (context, index) {
-            final cat = categories[index];
-            final isActive = selectedCategory == cat;
-
-            return GestureDetector(
-              onTap: () => setState(() => selectedCategory = cat),
-              child: Column(
-                children: [
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: isActive
-                          ? theme.colorScheme.primary
-                          : theme.cardColor,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                        child:
-                            Text(cat.icon, style: const TextStyle(fontSize: 26))),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(cat.title,
-                      style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: isActive
-                              ? theme.colorScheme.primary
-                              : Colors.grey)),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _detailsCard(BuildContext context, ThemeData theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        decoration: BoxDecoration(
-            color: theme.cardColor, borderRadius: BorderRadius.circular(16)),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
         child: Column(
           children: [
-            _inputRow(
-              icon: Icons.edit_note,
-              hint: "What is this for?",
-              onChanged: (v) => note = v,
+            // Header
+            _buildHeader(context),
+            
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    
+                    // Title
+                    Text(
+                      "How much did you spend?",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.text(context),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Description + Date Row
+                    _buildDescriptionDateRow(context),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Amount Display
+                    _buildAmountDisplay(context),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Type Selector
+                    _buildTypeSelector(context),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Category Section
+                    _buildCategorySection(context),
+                    
+                    const SizedBox(height: 12),
+                    
+                    // Keypad
+                    KeyPad(onTap: onKeyTap),
+                  ],
+                ),
+              ),
             ),
-            _divider(),
-            _selectRow(
-              icon: Icons.calendar_today,
-              title: "Date",
-              value: DateFormat("EEE, MMM d").format(selectedDate),
-              onTap: () async {
-                final picked = await showDatePicker(
-                  context: context,
-                  initialDate: selectedDate,
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime(2100),
-                );
-                if (picked != null) setState(() => selectedDate = picked);
-              },
-            ),
-            _divider(),
-            _selectRow(
-              icon: Icons.account_balance_wallet,
-              title: "Payment",
-              value: "VISA 4242",
-              onTap: () {},
-            ),
+            
+            // Save Button
+            _buildSaveButton(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _typeButton(TransactionType type, String label, IconData icon) {
-    final isSelected = selectedType == type;
-    final theme = Theme.of(context);
-
-    return GestureDetector(
-      onTap: () => setState(() => selectedType = type),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? theme.colorScheme.primary : theme.cardColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(icon,
-                size: 16, color: isSelected ? Colors.white : Colors.grey),
-            const SizedBox(width: 6),
-            Text(label,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: isSelected ? Colors.white : Colors.grey)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _iconButton(IconData icon, VoidCallback onTap) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration:
-            BoxDecoration(color: Theme.of(context).cardColor, shape: BoxShape.circle),
-        child: Icon(icon),
-      ),
-    );
-  }
-
-  Widget _divider() =>
-      Divider(height: 1, color: Colors.grey.withOpacity(0.15));
-
-  Widget _inputRow(
-      {required IconData icon,
-      required String hint,
-      required ValueChanged<String> onChanged}) {
+  Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey),
-          const SizedBox(width: 12),
-          Expanded(
-              child: TextField(
-            decoration:
-                InputDecoration(hintText: hint, border: InputBorder.none),
-            onChanged: onChanged,
-          )),
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.transparent,
+              ),
+              child: Icon(
+                Symbols.close_rounded,
+                color: AppColors.text(context),
+                size: 28,
+                weight: 600,
+              ),
+            ),
+          ),
+          const Spacer(),
         ],
       ),
     );
   }
 
-  Widget _selectRow(
-      {required IconData icon,
-      required String title,
-      required String value,
-      required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.grey),
-            const SizedBox(width: 12),
-            Text(title),
-            const Spacer(),
-            Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(width: 6),
-            const Icon(Icons.chevron_right, size: 18),
+  Widget _buildDescriptionDateRow(BuildContext context) {
+    return Row(
+      children: [
+        // Description Input
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: AppColors.card(context),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.cardBorder(context), width: 2),
+            ),
+            child: TextField(
+              controller: descriptionController,
+              onChanged: (v) => note = v,
+              style: TextStyle(
+                color: AppColors.text(context),
+                fontWeight: FontWeight.w600,
+              ),
+              decoration: InputDecoration(
+                hintText: "Description (e.g. Lunch)",
+                hintStyle: TextStyle(color: AppColors.subtitleText(context)),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ),
+        ),
+        
+        const SizedBox(width: 12),
+        
+        // Date Button
+        PressableContainer(
+          onPressed: _selectDate,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.card(context),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.cardBorder(context), width: 2),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.cardBorder(context),
+              offset: const Offset(0, 3),
+            ),
           ],
+          child: Row(
+            children: [
+              Icon(
+                Symbols.calendar_today_rounded,
+                color: AppColors.primary,
+                size: 20,
+                weight: 600,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _getDateLabel(),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.text(context),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _getDateLabel() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selected = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    
+    if (selected == today) return "Today";
+    if (selected == today.subtract(const Duration(days: 1))) return "Yesterday";
+    return DateFormat("MMM d").format(selectedDate);
+  }
+
+  Future<void> _selectDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) setState(() => selectedDate = picked);
+  }
+
+  Widget _buildAmountDisplay(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: ValueListenableBuilder<String>(
+        valueListenable: amount,
+        builder: (_, value, __) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                "₺",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.subtitleText(context),
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 42,
+                  fontWeight: FontWeight.w800,
+                  color: _getTypeColor(),
+                  letterSpacing: -2,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Color _getTypeColor() {
+    switch (selectedType) {
+      case TransactionType.income:
+        return AppColors.primary;
+      case TransactionType.expense:
+        return const Color(0xFFFF4B4B);
+      case TransactionType.transfer:
+        return AppColors.secondaryBlue;
+    }
+  }
+
+  Widget _buildTypeSelector(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildTypeButton(
+            type: TransactionType.income,
+            label: "INCOME",
+            color: AppColors.primary,
+            darkColor: AppColors.primaryDark,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildTypeButton(
+            type: TransactionType.expense,
+            label: "EXPENSE",
+            color: const Color(0xFFFF4B4B),
+            darkColor: const Color(0xFFD33131),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildTypeButton(
+            type: TransactionType.transfer,
+            label: "TRANSFER",
+            color: AppColors.secondaryBlue,
+            darkColor: AppColors.secondaryBlueDark,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTypeButton({
+    required TransactionType type,
+    required String label,
+    required Color color,
+    required Color darkColor,
+  }) {
+    final isSelected = selectedType == type;
+
+    return PressableContainer(
+      onPressed: () => setState(() => selectedType = type),
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(16),
+        border: isSelected
+            ? Border.all(color: Colors.white, width: 2)
+            : null,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: darkColor,
+          offset: const Offset(0, 4),
+        ),
+      ],
+      child: Center(
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategorySection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            "SELECT CATEGORY",
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              color: AppColors.subtitleText(context),
+              letterSpacing: 1.5,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 90,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: categories.length + 1,
+            separatorBuilder: (_, __) => const SizedBox(width: 16),
+            itemBuilder: (context, index) {
+              if (index == categories.length) {
+                return _buildMoreCategoryButton(context);
+              }
+              
+              final cat = categories[index];
+              final isActive = selectedCategory?.id == cat.id;
+              
+              return _buildCategoryItem(context, cat, isActive);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryItem(BuildContext context, Category cat, bool isActive) {
+    return GestureDetector(
+      onTap: () => setState(() => selectedCategory = cat),
+      child: Column(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.card(context),
+              border: Border.all(
+                color: isActive ? AppColors.primary : AppColors.cardBorder(context),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: isActive ? AppColors.primaryDark : AppColors.cardBorder(context),
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(cat.icon, style: const TextStyle(fontSize: 28)),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            cat.title,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              color: isActive ? AppColors.text(context) : AppColors.subtitleText(context),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMoreCategoryButton(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.progressBackground(context),
+            border: Border.all(
+              color: AppColors.cardBorder(context),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cardBorder(context),
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Icon(
+            Symbols.grid_view_rounded,
+            color: AppColors.subtitleText(context),
+            size: 28,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          "MORE",
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            color: AppColors.subtitleText(context),
+            letterSpacing: -0.5,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSaveButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      child: PressableContainer(
+        onPressed: _saveNewTransaction,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.primaryDark,
+            offset: Offset(0, 6),
+          ),
+        ],
+        child: const Center(
+          child: Text(
+            "SAVE",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              letterSpacing: 2,
+            ),
+          ),
         ),
       ),
     );
@@ -377,7 +559,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
   String _sanitizeExpression(String expr) {
     var e = expr;
-    while (e.isNotEmpty && RegExp(r'[+\-\/]$').hasMatch(e)) {
+    while (e.isNotEmpty && RegExp(r'[+\-\*/]$').hasMatch(e)) {
       e = e.substring(0, e.length - 1);
     }
     return e.isEmpty ? '0' : e;
@@ -385,7 +567,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
   double _evaluateAmount() {
     try {
-      if (amount.value.contains(RegExp(r'[+\-\/]'))) {
+      if (amount.value.contains(RegExp(r'[+\-\*/]'))) {
         return calculate(_sanitizeExpression(amount.value));
       }
       return double.tryParse(amount.value) ?? 0;
@@ -397,6 +579,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   @override
   void dispose() {
     amount.dispose();
+    descriptionController.dispose();
     super.dispose();
   }
 }

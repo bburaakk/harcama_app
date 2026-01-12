@@ -16,6 +16,7 @@ class NavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       height: 70 + bottomPadding,
@@ -25,16 +26,16 @@ class NavBar extends StatelessWidget {
         bottom: bottomPadding,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card(context),
         border: Border(
           top: BorderSide(
-            color: AppColors.gray200,
+            color: AppColors.cardBorder(context),
             width: 2,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.gray200,
+            color: AppColors.cardShadow(context),
             blurRadius: 8,
             offset: const Offset(0, -3),
           ),
@@ -46,10 +47,12 @@ class NavBar extends StatelessWidget {
           _item(
             icon: Symbols.home_rounded,
             i: 0,
+            context: context,
           ), 
           _item(
             icon: Symbols.pie_chart_rounded,
             i: 1,
+            context: context,
           ),
 
           const SizedBox(width: 80),
@@ -57,10 +60,12 @@ class NavBar extends StatelessWidget {
           _item(
             icon: Symbols.account_balance_wallet_rounded,
             i: 2,
+            context: context,
           ),
           _item(
             icon: Symbols.person_rounded,
             i: 3,
+            context: context,
           ),
         ],
       ),
@@ -70,6 +75,7 @@ class NavBar extends StatelessWidget {
   Widget _item({
     required IconData icon,
     required int i,
+    required BuildContext context,
   }) {
     final selected = index == i;
 
@@ -86,7 +92,7 @@ class NavBar extends StatelessWidget {
           size: selected ? 30 : 24,
           weight: 700,
           grade: 200,
-          color: selected ? AppColors.primary : AppColors.gray400,
+          color: selected ? AppColors.primary : AppColors.subtitleText(context),
         ),
       ),
     );

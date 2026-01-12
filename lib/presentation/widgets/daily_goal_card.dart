@@ -25,22 +25,23 @@ class DailyGoalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = (current / target).clamp(0.0, 1.0);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return PressableContainer(
       onPressed: onPressed ?? () {},
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        color: Colors.white,
+        color: AppColors.card(context),
         border: Border.all(
-          color: AppColors.gray200,
+          color: AppColors.cardBorder(context),
           width: 2,
         ),
       ),
-      boxShadow: const [
+      boxShadow: [
         BoxShadow(
-          color: AppColors.gray200,
-          offset: Offset(0, 4),
+          color: AppColors.cardShadow(context),
+          offset: const Offset(0, 4),
         ),
       ],
       child: Column(
@@ -51,15 +52,15 @@ class DailyGoalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
                   color: colorDark,
-                  size: 22,
+                  size: 20,
                   weight: 700,
                 ),
               ),
@@ -68,18 +69,17 @@ class DailyGoalCard extends StatelessWidget {
                 children: [
                   Text(
                     label.toUpperCase(),
-                    style: const TextStyle(
-                      color: AppColors.gray400,
-                      fontSize: 10,
+                    style: TextStyle(
+                      color: AppColors.subtitleText(context),
+                      fontSize: 9,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 2),
                   Text(
                     "₺${current.toStringAsFixed(0)}/${target.toStringAsFixed(0)}",
-                    style: const TextStyle(
-                      color: AppColors.textDark,
-                      fontSize: 16,
+                    style: TextStyle(
+                      color: AppColors.text(context),
+                      fontSize: 14,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -87,12 +87,12 @@ class DailyGoalCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const Spacer(),
           Container(
-            height: 14,
+            height: 10,
             decoration: BoxDecoration(
-              color: AppColors.gray100,
-              borderRadius: BorderRadius.circular(7),
+              color: AppColors.progressBackground(context),
+              borderRadius: BorderRadius.circular(5),
             ),
             child: FractionallySizedBox(
               alignment: Alignment.centerLeft,
@@ -100,7 +100,7 @@ class DailyGoalCard extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   color: color,
-                  borderRadius: BorderRadius.circular(7),
+                  borderRadius: BorderRadius.circular(5),
                 ),
               ),
             ),
@@ -121,30 +121,31 @@ class AddGoalCard extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          color: AppColors.gray100.withOpacity(0.5),
+          color: AppColors.progressBackground(context).withOpacity(0.5),
           border: Border.all(
-            color: AppColors.gray300,
+            color: AppColors.cardBorder(context),
             width: 2,
             style: BorderStyle.solid,
           ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.add_circle_outline,
-              color: AppColors.gray400,
-              size: 32,
+              color: AppColors.subtitleText(context),
+              size: 28,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               "New Goal",
               style: TextStyle(
-                color: AppColors.gray400,
-                fontSize: 13,
+                color: AppColors.subtitleText(context),
+                fontSize: 12,
                 fontWeight: FontWeight.w700,
               ),
             ),

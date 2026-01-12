@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
+import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/create_ledger_dialog.dart';
 
 class LedgerDropdown extends StatelessWidget {
@@ -28,7 +29,7 @@ class LedgerDropdown extends StatelessWidget {
             height: 300,
             margin: const EdgeInsets.only(top: 60),
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: AppColors.card(context),
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
               boxShadow: [
                 BoxShadow(
@@ -51,29 +52,30 @@ class LedgerDropdown extends StatelessWidget {
                     title: Text(
                       ledgerNotifier.allLedger.name,
                       style: TextStyle(
+                        color: AppColors.text(context),
                         fontWeight: ledgerNotifier.selectedLedger?.id == 'default'
                             ? FontWeight.w900
                             : FontWeight.w600,
                       ),
                     ),
                     trailing: ledgerNotifier.selectedLedger?.id == 'default'
-                        ? const Icon(Icons.check)
+                        ? Icon(Icons.check, color: AppColors.primary)
                         : null,
                     onTap: () {
                       ledgerNotifier.selectLedger(ledgerNotifier.allLedger);
                       onToggle();
                     },
                   ),
-                  const Divider(height: 1),
+                  Divider(height: 1, color: AppColors.cardBorder(context)),
                   // User Ledgers
                   Expanded(
                     child: ledgerNotifier.ledgers.isEmpty
-                        ? const Center(child: Text("Ledger yok"))
+                        ? Center(child: Text("Ledger yok", style: TextStyle(color: AppColors.subtitleText(context))))
                         : ListView.separated(
                             physics: const NeverScrollableScrollPhysics(),
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             itemCount: ledgerNotifier.ledgers.length,
-                            separatorBuilder: (_, __) => const Divider(height: 1),
+                            separatorBuilder: (_, __) => Divider(height: 1, color: AppColors.cardBorder(context)),
                             itemBuilder: (context, index) {
                               final ledger = ledgerNotifier.ledgers[index];
                               final isSelected =
@@ -87,6 +89,7 @@ class LedgerDropdown extends StatelessWidget {
                                 title: Text(
                                   ledger.name,
                                   style: TextStyle(
+                                    color: AppColors.text(context),
                                     fontWeight: isSelected
                                         ? FontWeight.w900
                                         : FontWeight.w600,
@@ -96,10 +99,10 @@ class LedgerDropdown extends StatelessWidget {
                                     ? Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(Icons.check),
+                                          Icon(Icons.check, color: AppColors.primary),
                                           IconButton(
-                                            icon: const Icon(Icons.delete_outline,
-                                                color: Colors.red, size: 20),
+                                            icon: Icon(Icons.delete_outline,
+                                                color: AppColors.neonPink, size: 20),
                                             onPressed: () => _showDeleteDialog(
                                                 context, ledger, ledgerNotifier),
                                             constraints:
@@ -109,8 +112,8 @@ class LedgerDropdown extends StatelessWidget {
                                         ],
                                       )
                                     : IconButton(
-                                        icon: const Icon(Icons.delete_outline,
-                                            color: Colors.red, size: 20),
+                                        icon: Icon(Icons.delete_outline,
+                                            color: AppColors.neonPink, size: 20),
                                         onPressed: () => _showDeleteDialog(
                                             context, ledger, ledgerNotifier),
                                         constraints:
@@ -125,7 +128,7 @@ class LedgerDropdown extends StatelessWidget {
                             },
                           ),
                   ),
-                  const Divider(height: 1),
+                  Divider(height: 1, color: AppColors.cardBorder(context)),
                   // New Ledger Button
                   Padding(
                     padding: const EdgeInsets.all(12),

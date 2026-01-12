@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
+import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
 class TopBar extends StatelessWidget {
@@ -17,6 +18,7 @@ class TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final txNotifier = context.read<TransactionNotifier>();
+    final iconColor = AppColors.text(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -29,15 +31,17 @@ class TopBar extends StatelessWidget {
                   Expanded(
                     child: TextField(
                       autofocus: true,
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: AppColors.text(context)),
+                      decoration: InputDecoration(
                         hintText: "Search transactions...",
+                        hintStyle: TextStyle(color: AppColors.subtitleText(context)),
                         border: InputBorder.none,
                       ),
                       onChanged: txNotifier.updateSearchQuery,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: Icon(Icons.close, color: iconColor),
                     onPressed: () {
                       txNotifier.updateSearchQuery('');
                       onSearchToggle();
@@ -50,18 +54,18 @@ class TopBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.account_balance_wallet_outlined),
+                    icon: Icon(Icons.account_balance_wallet_outlined, color: iconColor),
                     iconSize: 28,
                     onPressed: onLedgerTap,
                   ),
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.search, size: 26),
+                        icon: Icon(Icons.search, size: 26, color: iconColor),
                         onPressed: onSearchToggle,
                       ),
                       IconButton(
-                        icon: const Icon(Icons.notifications_outlined, size: 26),
+                        icon: Icon(Icons.notifications_outlined, size: 26, color: iconColor),
                         onPressed: () {},
                       ),
                     ],

@@ -80,10 +80,10 @@ class _HomePageState extends State<HomePage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                const Text(
+                                Text(
                                   "Daily Goals",
                                   style: TextStyle(
-                                    color: AppColors.textDark,
+                                    color: AppColors.text(context),
                                     fontSize: 22,
                                     fontWeight: FontWeight.w900,
                                   ),
@@ -99,48 +99,51 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                             const SizedBox(height: 16),
-                            GridView.count(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                              childAspectRatio: 1.1,
-                              children: [
-                                DailyGoalCard(
-                                  icon: Symbols.restaurant_rounded,
-                                  label: "Food",
-                                  current: 12,
-                                  target: 20,
-                                  color: AppColors.secondaryYellow,
-                                  colorDark: AppColors.secondaryYellowDark,
-                                ),
-                                DailyGoalCard(
-                                  icon: Symbols.directions_car_rounded,
-                                  label: "Travel",
-                                  current: 5,
-                                  target: 15,
-                                  color: AppColors.secondaryBlue,
-                                  colorDark: AppColors.secondaryBlueDark,
-                                ),
-                                DailyGoalCard(
-                                  icon: Symbols.confirmation_number_rounded,
-                                  label: "Fun",
-                                  current: 8,
-                                  target: 10,
-                                  color: AppColors.primary,
-                                  colorDark: AppColors.primaryDark,
-                                ),
-                                const AddGoalCard(),
-                              ],
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: GridView.count(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 24,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 2,
+                                children: [
+                                  DailyGoalCard(
+                                    icon: Symbols.restaurant_rounded,
+                                    label: "Food",
+                                    current: 12,
+                                    target: 20,
+                                    color: AppColors.secondaryYellow,
+                                    colorDark: AppColors.secondaryYellowDark,
+                                  ),
+                                  DailyGoalCard(
+                                    icon: Symbols.directions_car_rounded,
+                                    label: "Travel",
+                                    current: 5,
+                                    target: 15,
+                                    color: AppColors.secondaryBlue,
+                                    colorDark: AppColors.secondaryBlueDark,
+                                  ),
+                                  DailyGoalCard(
+                                    icon: Symbols.confirmation_number_rounded,
+                                    label: "Fun",
+                                    current: 8,
+                                    target: 10,
+                                    color: AppColors.primary,
+                                    colorDark: AppColors.primaryDark,
+                                  ),
+                                  const AddGoalCard(),
+                                ],
+                              ),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 8),
                             Row(
                               children: [
-                                const Text(
+                                Text(
                                   "Recent Activity",
                                   style: TextStyle(
-                                    color: AppColors.textDark,
+                                    color: AppColors.text(context),
                                     fontSize: 20,
                                     fontWeight: FontWeight.w900,
                                   ),

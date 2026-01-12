@@ -7,6 +7,7 @@ import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/domain/utility/math_helper.dart';
 import 'package:harcama_app/presentation/widgets/Keypad.dart';
+import 'package:harcama_app/presentation/theme/app_colors.dart';
 
 class ExpenseDetailPage extends StatefulWidget {
   final Transaction transaction;
@@ -110,11 +111,12 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _iconButton(context, Icons.close, () => Navigator.pop(context)),
-                    const Text(
+                    Text(
                       "Expense Details",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: AppColors.text(context),
                       ),
                     ),
                     Row(
@@ -148,13 +150,13 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
 
               Column(
                 children: [
-                  const Text(
+                  Text(
                     "AMOUNT",
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2,
-                      color: Colors.grey,
+                      color: AppColors.subtitleText(context),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -178,10 +180,11 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             amount,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 56,
                               fontWeight: FontWeight.w900,
                               height: 1,
+                              color: AppColors.text(context),
                             ),
                           ),
                         ),
@@ -256,8 +259,9 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: theme.cardColor,
+                    color: AppColors.card(context),
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.cardBorder(context), width: 2),
                   ),
                   child: Column(
                     children: [
@@ -319,15 +323,15 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected ? theme.colorScheme.primary : theme.cardColor,
+          color: isSelected ? theme.colorScheme.primary : AppColors.card(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? theme.colorScheme.primary : Colors.grey.withOpacity(0.15)),
+          border: Border.all(color: isSelected ? theme.colorScheme.primary : AppColors.cardBorder(context), width: 2),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: isSelected ? Colors.white : Colors.grey),
+            Icon(icon, size: 16, color: isSelected ? Colors.white : AppColors.subtitleText(context)),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(fontWeight: FontWeight.bold, color: isSelected ? Colors.white : Colors.grey)),
+            Text(label, style: TextStyle(fontWeight: FontWeight.bold, color: isSelected ? Colors.white : AppColors.subtitleText(context))),
           ],
         ),
       ),
@@ -342,16 +346,17 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: AppColors.card(context),
           shape: BoxShape.circle,
+          border: Border.all(color: AppColors.cardBorder(context), width: 2),
         ),
-        child: Icon(icon),
+        child: Icon(icon, color: AppColors.text(context)),
       ),
     );
   }
 
   Widget _divider() {
-    return Divider(height: 1, color: Colors.grey.withOpacity(0.15));
+    return Divider(height: 1, color: AppColors.cardBorder(context));
   }
 
   Widget _inputRow(
@@ -366,12 +371,13 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey),
+          Icon(icon, color: AppColors.subtitleText(context)),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
               controller: controller,
-              decoration: InputDecoration(hintText: hint, border: InputBorder.none),
+              style: TextStyle(color: AppColors.text(context)),
+              decoration: InputDecoration(hintText: hint, hintStyle: TextStyle(color: AppColors.subtitleText(context)), border: InputBorder.none),
               onChanged: onChanged,
             ),
           ),
@@ -393,13 +399,13 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(icon, color: Colors.grey),
+            Icon(icon, color: AppColors.subtitleText(context)),
             const SizedBox(width: 12),
-            Text(title),
+            Text(title, style: TextStyle(color: AppColors.text(context))),
             const Spacer(),
-            Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(value, style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.text(context))),
             const SizedBox(width: 6),
-            const Icon(Icons.chevron_right, size: 18),
+            Icon(Icons.chevron_right, size: 18, color: AppColors.subtitleText(context)),
           ],
         ),
       ),

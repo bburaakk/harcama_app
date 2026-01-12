@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:harcama_app/domain/entities/category.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/domain/utility/math_helper.dart';
+import 'package:harcama_app/presentation/widgets/Keypad.dart';
 
 class ExpenseDetailPage extends StatefulWidget {
   final Transaction transaction;
@@ -298,46 +300,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
               const SizedBox(height: 24),
 
               Expanded(
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 28),
-                  itemCount: 16,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 1.3,
-                  ),
-                  itemBuilder: (context, index) {
-                    final keys = [
-                      "1","2","3","⌫",
-                      "4","5","6","-",
-                      "7","8","9","/",
-                      ".","0","+","="
-                    ];
-                    final key = keys[index];
-
-                    return GestureDetector(
-                      onTap: () => onKeyTap(key),
-                      child: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.transparent,
-                        ),
-                        child: key == "⌫"
-                            ? const Icon(Icons.backspace_outlined)
-                            : Text(
-                                key,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                      ),
-                    );
-                  },
-                ),
+                child: KeyPad(onTap: onKeyTap),
               ),
             ],
           ),

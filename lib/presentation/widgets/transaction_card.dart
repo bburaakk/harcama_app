@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/pages/expense_detail.dart';
+import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-class TransactionCard extends StatefulWidget {
+class TransactionCard extends StatelessWidget {
   final Transaction t;
   final bool isDark;
   final DateFormat dateFormat;
@@ -17,18 +19,11 @@ class TransactionCard extends StatefulWidget {
   });
 
   @override
-  State<TransactionCard> createState() => _TransactionCardState();
-}
-
-class _TransactionCardState extends State<TransactionCard> {
-  bool _pressed = false;
-
-  @override
   Widget build(BuildContext context) {
     IconData typeIcon;
     Color typeColor;
 
-    switch (widget.t.type) {
+    switch (t.type) {
       case TransactionType.income:
         typeIcon = Symbols.arrow_downward_rounded;
         typeColor = Colors.greenAccent;
@@ -43,61 +38,44 @@ class _TransactionCardState extends State<TransactionCard> {
         break;
     }
 
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) async {
-        await Future.delayed(const Duration(milliseconds: 90));
-
-        if (!mounted) return;
-
-        setState(() => _pressed = false);
-
-        await Future.delayed(const Duration(milliseconds: 40));
-
-        if (!mounted) return;
-
+    return PressableContainer(
+      onPressed: () {
         Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
-            builder: (_) => ExpenseDetailPage(transaction: widget.t),
+            builder: (_) => ExpenseDetailPage(transaction: t),
           ),
         );
       },
-
-      onTapCancel: () => setState(() => _pressed = false),
-
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 90),
-        curve: Curves.easeOut,
-        transform: Matrix4.translationValues(0, _pressed ? 6 : 0, 0),
-        margin: const EdgeInsets.only(bottom: 14),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          color: widget.isDark
-              ? Colors.white.withOpacity(0.06)
-              : const Color.fromARGB(255, 59, 193, 168),
-          boxShadow: _pressed
-              ? []
-              : [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.10),
-                    blurRadius: 18,
-                    offset: const Offset(0, 10),
-                  ),
-                  BoxShadow(
-                    color: const Color.fromARGB(255, 12, 119, 121),
-                    offset: const Offset(0, 10),
-                  ),
-                ],
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: Colors.black.withOpacity(0.3),
+          width: 4,
         ),
-
-        child: Row(
+        color: isDark
+            ? Colors.white.withOpacity(0.06)
+            : AppColors.primaryCardColor,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.10),
+          blurRadius: 18,
+          offset: const Offset(0, 10),
+        ),
+        const BoxShadow(
+          color: AppColors.primaryCardShadow,
+          offset: Offset(0, 10),
+        ),
+      ],
+      child: Row(
           children: [
             Expanded(
               child: Row(
                 children: [
                   Text(
-                    widget.t.category?.icon ?? _fallbackIcon(widget.t.type),
+                    t.category?.icon ?? _fallbackIcon(t.type),
                     style: const TextStyle(fontSize: 28),
                   ),
                   const SizedBox(width: 12),
@@ -106,7 +84,7 @@ class _TransactionCardState extends State<TransactionCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.t.title,
+                          t.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -117,7 +95,7 @@ class _TransactionCardState extends State<TransactionCard> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          widget.dateFormat.format(widget.t.entryDate),
+                          dateFormat.format(t.entryDate),
                           style: Theme.of(context).textTheme.labelLarge
                               ?.copyWith(color: Colors.white70),
                         ),
@@ -147,7 +125,7 @@ class _TransactionCardState extends State<TransactionCard> {
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  "${widget.t.type == TransactionType.expense ? "-" : "+"}₺${widget.t.amount.toStringAsFixed(2)}",
+                  "${t.type == TransactionType.expense ? "-" : "+"}₺${t.amount.toStringAsFixed(2)}",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -160,8 +138,7 @@ class _TransactionCardState extends State<TransactionCard> {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   String _fallbackIcon(TransactionType type) {

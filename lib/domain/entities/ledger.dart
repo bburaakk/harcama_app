@@ -28,4 +28,19 @@ class Ledger extends Equatable implements BaseEntity {
   @override
   List<Object?> get props => [id, accountID, name, balance, icon];
 
+  Ledger copyWith({
+    String? id,
+    String? accountID,
+    String? name,
+    double? balance,
+    String? icon,
+  }) {
+    return Ledger(
+      id: id ?? this.id,
+      accountID: accountID ?? this.accountID,
+      name: name ?? this.name,
+      balance: balance ?? this.balance,
+      icon: icon ?? this.icon,
+    );
+  }
 }

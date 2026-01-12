@@ -1,13 +1,17 @@
 import 'package:harcama_app/domain/entities/category.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/notifiers/base_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 
 class TransactionNotifier extends BaseNotifier<Transaction> {
+  final LedgerNotifier? ledgerNotifier;
+
   TransactionNotifier({
     required super.createUseCase,
     required super.updateUseCase,
     required super.deleteUseCase,
     required super.getAllUseCase,
+    this.ledgerNotifier,
   });
 
   String _searchQuery = '';
@@ -30,6 +34,31 @@ class TransactionNotifier extends BaseNotifier<Transaction> {
   void updateSearchQuery(String query) {
     _searchQuery = query;
     notifyListeners();
+  }
+
+  @override
+  Future<void> addItem(Transaction item) async {
+    await super.addItem(item);
+    _updateLedgerBalance(item.ledgerID);
+  }
+
+  @override
+  Future<void> updateItem(Transaction item) async {
+    await super.updateItem(item);
+    _updateLedgerBalance(item.ledgerID);
+  }
+
+  @override
+  Future<void> deleteItem(String id) async {
+    final transaction = items.firstWhere((t) => t.id == id);
+    await super.deleteItem(id);
+    _updateLedgerBalance(transaction.ledgerID);
+  }
+
+  void _updateLedgerBalance(String ledgerId) {
+    if (ledgerNotifier != null) {
+      ledgerNotifier!.updateLedgerBalance(ledgerId, items);
+    }
   }
   
   void setMonthlyBudget(double amount) {

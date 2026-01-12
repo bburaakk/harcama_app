@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:harcama_app/domain/entities/category.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/domain/utility/math_helper.dart';
 import 'package:harcama_app/presentation/widgets/keypad.dart';
 
@@ -84,23 +85,26 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 12),
-            _topBar(context),
-            const SizedBox(height: 20),
-            _typeSelector(),
-            const SizedBox(height: 16),
-            _amountView(theme),
-            const SizedBox(height: 20),
-            _categoryList(theme),
-            const SizedBox(height: 16),
-            _detailsCard(context, theme),
-            const SizedBox(height: 8),
-            Expanded(child: KeyPad(onTap: onKeyTap)),
-          ],
-        ),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              const SizedBox(height: 36),
+              _topBar(context),
+              const SizedBox(height: 20),
+              _typeSelector(),
+              const SizedBox(height: 16),
+              _amountView(theme),
+              const SizedBox(height: 20),
+              _categoryList(theme),
+              const SizedBox(height: 16),
+              _detailsCard(context, theme),
+              const SizedBox(height: 24),
+              Expanded(child: KeyPad(onTap: onKeyTap)),
+            ],
+          ),
+          const SizedBox(height: 24),
+        ],
       ),
     );
   }
@@ -245,6 +249,13 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 if (picked != null) setState(() => selectedDate = picked);
               },
             ),
+            _divider(),
+            _selectRow(
+              icon: Icons.account_balance_wallet,
+              title: "Payment",
+              value: "VISA 4242",
+              onTap: () {},
+            ),
           ],
         ),
       ),
@@ -343,11 +354,14 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   // ---------------- SAVE ----------------
 
   Future<void> _saveNewTransaction() async {
-    final notifier = context.read<TransactionNotifier>();
+    final txNotifier = context.read<TransactionNotifier>();
+    final ledgerNotifier = context.read<LedgerNotifier>();
+    
+    final selectedLedgerId = ledgerNotifier.selectedLedger?.id ?? 'default';
 
     final tx = Transaction(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
-      ledgerID: "",
+      ledgerID: selectedLedgerId,
       accountID: "",
       title: note.isEmpty ? "Transaction" : note,
       amount: _evaluateAmount(),
@@ -357,7 +371,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       type: selectedType,
     );
 
-    await notifier.addItem(tx);
+    await txNotifier.addItem(tx);
     if (context.mounted) Navigator.pop(context);
   }
 

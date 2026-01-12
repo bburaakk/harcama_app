@@ -9,5 +9,35 @@ class LedgerNotifier extends BaseNotifier<Ledger> {
     required super.getAllUseCase,
   });
 
+  Ledger? selectedLedger;
+
   List<Ledger> get ledgers => items;
+
+  @override
+  Future<void> fetchItems() async {
+    await super.fetchItems();
+
+    if (items.isEmpty) {
+      final defaultLedger = Ledger(
+        accountID: "default",
+        id: 'default',
+        name: 'All',
+        icon: '📒',
+        balance: 0,
+      );
+
+      items = [defaultLedger];
+      selectedLedger = defaultLedger;
+      notifyListeners();
+      return;
+    }
+
+    selectedLedger ??= items.first;
+    notifyListeners();
+  }
+
+  void selectLedger(Ledger ledger) {
+    selectedLedger = ledger;
+    notifyListeners();
+  }
 }

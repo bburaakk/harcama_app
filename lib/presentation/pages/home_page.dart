@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
+import 'package:harcama_app/presentation/widgets/transaction_card.dart';
 import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:intl/intl.dart';
-import 'package:harcama_app/presentation/pages/expense_detail.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,17 +15,33 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isSearching = false;
+  bool showLedgerSheet = false;
+
+  void _toggleLedgerSheet() {
+    setState(() {
+      showLedgerSheet = !showLedgerSheet;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final notifier = context.watch<TransactionNotifier>();
+    final txNotifier = context.watch<TransactionNotifier>();
+    final ledgerNotifier = context.watch<LedgerNotifier>();
 
-    final income = notifier.transactions
+    final activeLedgerId = ledgerNotifier.selectedLedger?.id;
+
+    final visibleTx = activeLedgerId == null || activeLedgerId == 'default'
+        ? txNotifier.transactions
+        : txNotifier.transactions
+            .where((t) => t.ledgerID == activeLedgerId)
+            .toList();
+
+    final income = visibleTx
         .where((t) => t.type == TransactionType.income)
         .fold(0.0, (sum, t) => sum + t.amount);
 
-    final expense = notifier.transactions
+    final expense = visibleTx
         .where((t) => t.type == TransactionType.expense)
         .fold(0.0, (sum, t) => sum + t.amount);
 
@@ -36,39 +53,24 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             _topBar(context),
+
+            _ledgerDropdown(context, ledgerNotifier),
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
                     const SizedBox(height: 8),
-
                     if (!isSearching) ...[
                       _heroCard(context, balance, income, expense),
-                      const SizedBox(height: 20),
-                      _insights(context, notifier),
-
                       const SizedBox(height: 24),
-
-                      // subtle separator between boxes and list
-                      Container(
-                        height: 10,
-                        margin: const EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.72),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
                     ],
-
-                    // Make only the transactions area scrollable
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(
                           children: [
-                            _transactions(context, notifier),
+                            _transactions(context, visibleTx, txNotifier),
                             const SizedBox(height: 100),
                           ],
                         ),
@@ -84,10 +86,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // TOP BAR WITH SEARCH
+  // ---------------- TOP BAR ----------------
+
   Widget _topBar(BuildContext context) {
-    final notifier = context.read<TransactionNotifier>();
-    final theme = Theme.of(context);
+    final txNotifier = context.read<TransactionNotifier>();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -104,13 +106,13 @@ class _HomePageState extends State<HomePage> {
                         hintText: "Search transactions...",
                         border: InputBorder.none,
                       ),
-                      onChanged: notifier.updateSearchQuery,
+                      onChanged: txNotifier.updateSearchQuery,
                     ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () {
-                      notifier.updateSearchQuery('');
+                      txNotifier.updateSearchQuery('');
                       setState(() => isSearching = false);
                     },
                   ),
@@ -120,37 +122,21 @@ class _HomePageState extends State<HomePage> {
                 key: const ValueKey('normal'),
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const CircleAvatar(radius: 20),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Welcome back",
-                            style: theme.textTheme.labelSmall,
-                          ),
-                          Text(
-                            "Alex Morgan",
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  IconButton(
+                    icon: const Icon(Icons.account_balance_wallet_outlined),
+                    iconSize: 28,
+                    onPressed: _toggleLedgerSheet,
                   ),
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.search),
+                        icon: const Icon(Icons.search, size: 26),
                         onPressed: () {
                           setState(() => isSearching = true);
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.notifications_outlined),
+                        icon: const Icon(Icons.notifications_outlined, size: 26),
                         onPressed: () {},
                       ),
                     ],
@@ -161,32 +147,100 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // HERO CARD
+  // ---------------- LEDGER DROPDOWN ----------------
+
+  Widget _ledgerDropdown(
+    BuildContext context,
+    LedgerNotifier ledgerNotifier,
+  ) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+      height: showLedgerSheet ? 220 : 0,
+      child: ClipRRect(
+        borderRadius:
+            const BorderRadius.vertical(bottom: Radius.circular(24)),
+        child: Material(
+          elevation: 8,
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: ledgerNotifier.ledgers.isEmpty
+              ? const Center(child: Text("Ledger yok"))
+              : ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  itemCount: ledgerNotifier.ledgers.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final ledger = ledgerNotifier.ledgers[index];
+                    final isSelected =
+                        ledger.id == ledgerNotifier.selectedLedger?.id;
+
+                    return ListTile(
+                      leading: Text(
+                        ledger.icon,
+                        style: const TextStyle(fontSize: 22),
+                      ),
+                      title: Text(
+                        ledger.name,
+                        style: TextStyle(
+                          fontWeight: isSelected
+                              ? FontWeight.w900
+                              : FontWeight.w600,
+                        ),
+                      ),
+                      trailing:
+                          isSelected ? const Icon(Icons.check) : null,
+                      onTap: () {
+                        ledgerNotifier.selectLedger(ledger);
+                        _toggleLedgerSheet();
+                      },
+                    );
+                  },
+                ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------- HERO CARD ----------------
+
   Widget _heroCard(
     BuildContext context,
     double balance,
     double income,
     double expense,
   ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
-        color: isDark ? const Color(0xFF1A2C26) : Colors.white,
+        color: const Color.fromARGB(255, 59, 193, 168),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromARGB(255, 12, 119, 121),
+            offset: Offset(0, 12),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          const Text("Total Balance"),
-          const SizedBox(height: 6),
+          Text(
+            "Total Balance",
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
           Text(
             "₺${balance.toStringAsFixed(2)}",
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  fontSize: 38,
                 ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           Row(
             children: [
               _miniStat(
@@ -194,7 +248,7 @@ class _HomePageState extends State<HomePage> {
                 icon: Icons.arrow_downward,
                 label: "Income",
                 value: income,
-                color: Colors.green,
+                color: Colors.white,
               ),
               const SizedBox(width: 12),
               _miniStat(
@@ -202,7 +256,7 @@ class _HomePageState extends State<HomePage> {
                 icon: Icons.arrow_upward,
                 label: "Expenses",
                 value: expense,
-                color: Colors.redAccent,
+                color: Colors.white,
               ),
             ],
           ),
@@ -220,21 +274,30 @@ class _HomePageState extends State<HomePage> {
   }) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: color.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(24),
+          color: Colors.white.withOpacity(0.18),
         ),
         child: Column(
           children: [
-            Icon(icon, size: 18, color: color),
-            const SizedBox(height: 6),
-            Text(label),
+            Icon(icon, size: 22, color: color),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 2),
             Text(
               "₺${value.toStringAsFixed(0)}",
               style: TextStyle(
                 color: color,
-                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
               ),
             ),
           ],
@@ -243,239 +306,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // INSIGHTS
-  Widget _insights(BuildContext context, TransactionNotifier notifier) {
-    final now = DateTime.now();
-    final theme = Theme.of(context);
+  // ---------------- TRANSACTIONS ----------------
 
-    final mostExpensive = notifier.getMostExpensiveCategoryInfo(now.month, now.year);
-    final topCategory = mostExpensive == null ? null : (mostExpensive['category'] as dynamic);
-    final topAmount = mostExpensive == null ? 0.0 : (mostExpensive['amount'] as double);
-
-    final budgetInfo = notifier.getBudgetOverview(now.month, now.year);
-    final dailyAvailable = budgetInfo['dailyAvailable'] as double;
-    final remainingBudget = budgetInfo['remaining'] as double;
-
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            height: 140,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              color: Colors.orange.withOpacity(0.1),
-            ),
-            child: mostExpensive == null
-                ? Center(
-                    child: Text(
-                      "No expenses\nthis month",
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.hintColor,
-                      ),
-                    ),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.trending_up,
-                                color: Colors.red, size: 20),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            "Top Spending",
-                            style: theme.textTheme.labelSmall,
-                          ),
-                        ],
-                      ),
-
-                      // Show category icon + name and the amount
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Text(
-                                topCategory?.icon ?? _fallbackIcon(TransactionType.expense),
-                                style: const TextStyle(fontSize: 18),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  topCategory?.title ?? "-",
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  "₺${topAmount.toStringAsFixed(2)}",
-                                  style: theme.textTheme.headlineSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ], 
-                  ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        
-        // Daily Budget Limit Card
-        Expanded(
-          child: GestureDetector(
-            onTap: () => _showBudgetDialog(context, notifier),
-            child: Container(
-              height: 140,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                color: const Color(0xFFE0F7FA),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.cyan.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.savings_outlined,
-                                color: Colors.cyan, size: 20),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            "Daily Limit",
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: Colors.cyan[900],
-                              fontWeight: FontWeight.bold
-                            ),
-                          ),
-                        ],
-                      ),
-                      Icon(Icons.edit, size: 16, color: Colors.cyan[900]),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (remainingBudget < 0)
-                         Text(
-                          "Over Budget!",
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red,
-                          ),
-                        )
-                      else
-                        Text(
-                          "₺${dailyAvailable.toStringAsFixed(0)}",
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.cyan[900],
-                          ),
-                        ),
-                      
-                      const SizedBox(height: 4),
-                      Text(
-                        remainingBudget < 0 
-                          ? "₺${remainingBudget.abs().toStringAsFixed(0)} excess"
-                          : "left for ${budgetInfo['daysLeft']} days",
-                        style: theme.textTheme.labelSmall?.copyWith(
-                           color: remainingBudget < 0 ? Colors.red : Colors.cyan[800],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _showBudgetDialog(BuildContext context, TransactionNotifier notifier) {
-    final controller = TextEditingController(
-      text: notifier.monthlyBudget.toStringAsFixed(0)
-    );
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Set Monthly Budget"),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          autofocus: true,
-          decoration: const InputDecoration(
-            labelText: "Budget Amount",
-            prefixText: "₺",
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          FilledButton(
-            onPressed: () {
-              final amount = double.tryParse(controller.text);
-              if (amount != null) {
-                notifier.setMonthlyBudget(amount);
-                Navigator.pop(context);
-              }
-            },
-            child: const Text("Save"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // TRANSACTIONS LIST
   Widget _transactions(
     BuildContext context,
+    List<Transaction> transactions,
     TransactionNotifier notifier,
   ) {
     final dateFormat = DateFormat('dd MMM, HH:mm');
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     if (notifier.isLoading) {
       return const Padding(
@@ -484,7 +324,7 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    if (notifier.transactions.isEmpty) {
+    if (transactions.isEmpty) {
       return const Padding(
         padding: EdgeInsets.all(40),
         child: Text("No transactions found"),
@@ -492,67 +332,9 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Column(
-      children: notifier.transactions.reversed.map((t) {
-        return InkWell(
-          borderRadius: BorderRadius.circular(24),
-          onTap: () => Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (_) => ExpenseDetailPage(transaction: t))),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              color: Colors.grey.withOpacity(0.1),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  child: Text(
-                    t.category?.icon ?? _fallbackIcon(t.type),
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        t.title,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        dateFormat.format(t.entryDate),
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  "${t.type == TransactionType.expense ? "-" : "+"}₺${t.amount.toStringAsFixed(2)}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: t.type == TransactionType.expense
-                        ? Colors.red
-                        : Colors.green,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+      children: transactions.reversed.map((t) {
+        return TransactionCard(t: t, isDark: isDark, dateFormat: dateFormat);
       }).toList(),
     );
-  }
-
-  String _fallbackIcon(TransactionType type) {
-    switch (type) {
-      case TransactionType.expense:
-        return "💸";
-      case TransactionType.income:
-        return "💰";
-      case TransactionType.transfer:
-        return "🔁";
-    }
   }
 }

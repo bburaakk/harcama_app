@@ -16,16 +16,14 @@ class NavBar extends StatelessWidget {
 
     return Container(
       height: 70,
-      margin: const EdgeInsets.symmetric(horizontal: 12),
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: theme.cardColor.withOpacity(0.97),
-        borderRadius: BorderRadius.circular(40),
+        color: theme.cardColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.12),
-            blurRadius: 28,
-            offset: const Offset(0, 10),
+            blurRadius: 4,
+            offset: const Offset(0, -2),
           ),
         ],
       ),
@@ -35,7 +33,7 @@ class NavBar extends StatelessWidget {
           _item(icon: Icons.home, i: 0),
           _item(icon: Icons.pie_chart, i: 1),
 
-          const SizedBox(width: 64),
+          const SizedBox(width: 80),
 
           _item(icon: Icons.account_balance_wallet, i: 2),
           _item(icon: Icons.person, i: 3),

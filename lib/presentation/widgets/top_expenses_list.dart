@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:harcama_app/domain/utility/currency_helper.dart';
 import 'package:intl/intl.dart';
 
 class TopExpensesList extends StatelessWidget {
@@ -121,7 +122,7 @@ class TopExpensesList extends StatelessWidget {
             ),
           ),
           Text(
-            '-₺${tx.amount.toStringAsFixed(2)}',
+            '-₺${CurrencyHelper.format(tx.amount)}',
             style: TextStyle(
               color: AppColors.expenseColor(context),
               fontWeight: FontWeight.w900,

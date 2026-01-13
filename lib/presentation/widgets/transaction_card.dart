@@ -3,6 +3,7 @@ import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/pages/expense_detail.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
+import 'package:harcama_app/domain/utility/currency_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -126,7 +127,7 @@ class TransactionCard extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  "${t.type == TransactionType.expense ? "-" : "+"}₺${t.amount.toStringAsFixed(2)}",
+                  "${t.type == TransactionType.expense ? "-" : "+"}₺${CurrencyHelper.format(t.amount)}",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

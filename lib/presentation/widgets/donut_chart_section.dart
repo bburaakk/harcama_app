@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:harcama_app/domain/utility/currency_helper.dart';
 
 class DonutChartSection extends StatefulWidget {
   final double totalSpent;
@@ -27,17 +28,8 @@ class _DonutChartSectionState extends State<DonutChartSection> {
     List<PieChartSectionData> sections = [];
     List<PieChartSectionData> shadowSections = [];
 
-    // Format amount with 2 decimal places if needed, otherwise 0
-    String formatAmount(double amount) {
-      if (amount % 1 == 0) {
-        return '₺${amount.toStringAsFixed(0)}';
-      } else {
-        return '₺${amount.toStringAsFixed(2)}';
-      }
-    }
-
     String centerLabel = 'TOTAL SPENT';
-    String centerAmount = formatAmount(widget.totalSpent);
+    String centerAmount = "₺${CurrencyHelper.format(widget.totalSpent)}";
 
     if (expenses.isNotEmpty && widget.totalSpent > 0) {
       final Map<String, double> categoryTotals = {};
@@ -53,14 +45,14 @@ class _DonutChartSectionState extends State<DonutChartSection> {
         if (_touchedIndex < 4 && _touchedIndex < sortedCategories.length) {
           final entry = sortedCategories[_touchedIndex];
           centerLabel = entry.key.toUpperCase();
-          centerAmount = formatAmount(entry.value);
+          centerAmount = "₺${CurrencyHelper.format(entry.value)}";
         } else if (_touchedIndex == 4 && sortedCategories.length > 4) {
           double otherTotal = 0;
           for (int i = 4; i < sortedCategories.length; i++) {
             otherTotal += sortedCategories[i].value;
           }
           centerLabel = 'OTHERS';
-          centerAmount = formatAmount(otherTotal);
+          centerAmount = "₺${CurrencyHelper.format(otherTotal)}";
         }
       }
 
@@ -106,7 +98,7 @@ class _DonutChartSectionState extends State<DonutChartSection> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: SizedBox(
-        height: 250,
+        height: 300, // Yüksekliği artırdım (250 -> 300)
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -115,7 +107,7 @@ class _DonutChartSectionState extends State<DonutChartSection> {
               child: PieChart(
                 PieChartData(
                   sectionsSpace: 0,
-                  centerSpaceRadius: 80,
+                  centerSpaceRadius: 100, // İç yarıçapı artırdım (80 -> 100)
                   startDegreeOffset: -90,
                   sections: shadowSections,
                   pieTouchData: PieTouchData(enabled: false),
@@ -126,7 +118,7 @@ class _DonutChartSectionState extends State<DonutChartSection> {
             PieChart(
               PieChartData(
                 sectionsSpace: 0,
-                centerSpaceRadius: 80,
+                centerSpaceRadius: 100, // İç yarıçapı artırdım (80 -> 100)
                 startDegreeOffset: -90,
                 sections: sections,
                 pieTouchData: PieTouchData(
@@ -162,7 +154,7 @@ class _DonutChartSectionState extends State<DonutChartSection> {
                   centerAmount,
                   style: TextStyle(
                     color: AppColors.text(context),
-                    fontSize: 32,
+                    fontSize: 28, // Yazı boyutunu biraz küçülttüm (32 -> 28) taşmayı önlemek için
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -179,7 +171,7 @@ class _DonutChartSectionState extends State<DonutChartSection> {
       color: color,
       value: value,
       title: '',
-      radius: isTouched ? 32 : 24,
+      radius: isTouched ? 36 : 28, // Dış halka kalınlığını artırdım (32/24 -> 36/28)
       showTitle: false,
       badgeWidget: null,
     );

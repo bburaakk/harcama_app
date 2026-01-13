@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
+import 'package:harcama_app/domain/utility/currency_helper.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class RemainingBalanceCard extends StatelessWidget {
@@ -45,7 +46,7 @@ class RemainingBalanceCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                "₺${balance.toStringAsFixed(2)}",
+                "₺${CurrencyHelper.format(balance)}",
                 style: const TextStyle(
                   color: AppColors.textDark,
                   fontSize: 28,

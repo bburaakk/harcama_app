@@ -65,6 +65,7 @@ class _HomePageState extends State<HomePage> {
             // Ana İçerik
             GestureDetector(
               onTap: showLedgerSheet ? _toggleLedgerSheet : null,
+              behavior: HitTestBehavior.translucent, // Boşluklara tıklamayı da algıla
               child: Column(
                 children: [
                   // Üst Bar
@@ -206,10 +207,20 @@ class _HomePageState extends State<HomePage> {
 
             // Ledger Seçim Ekranı (Overlay)
             if (showLedgerSheet)
-              LedgerDropdown(
-                isVisible: showLedgerSheet,
-                ledgerNotifier: ledgerNotifier,
-                onToggle: _toggleLedgerSheet,
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: _toggleLedgerSheet,
+                  behavior: HitTestBehavior.translucent,
+                  child: Stack(
+                    children: [
+                      LedgerDropdown(
+                        isVisible: showLedgerSheet,
+                        ledgerNotifier: ledgerNotifier,
+                        onToggle: _toggleLedgerSheet,
+                      ),
+                    ],
+                  ),
+                ),
               ),
           ],
         ),
@@ -217,4 +228,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

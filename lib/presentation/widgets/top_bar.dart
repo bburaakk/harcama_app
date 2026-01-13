@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class TopBar extends StatelessWidget {
   final bool isSearching;
@@ -18,7 +19,7 @@ class TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final txNotifier = context.read<TransactionNotifier>();
-    final iconColor = AppColors.text(context);
+    final iconColor = AppColors.subtitleText(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -41,7 +42,7 @@ class TopBar extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close, color: iconColor),
+                    icon: Icon(Symbols.close_rounded, color: iconColor),
                     onPressed: () {
                       txNotifier.updateSearchQuery('');
                       onSearchToggle();
@@ -53,25 +54,84 @@ class TopBar extends StatelessWidget {
                 key: const ValueKey('normal'),
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Icon(Icons.account_balance_wallet_outlined, color: iconColor),
-                    iconSize: 28,
-                    onPressed: onLedgerTap,
+                  // Ledger Menu Button
+                  GestureDetector(
+                    onTap: onLedgerTap,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: AppColors.primaryDark.withOpacity(0.3),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryDark.withOpacity(0.2),
+                            offset: const Offset(0, 4),
+                            blurRadius: 0,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Symbols.menu_book_rounded,
+                        color: Colors.white,
+                        size: 24,
+                        weight: 700,
+                      ),
+                    ),
                   ),
+                  
+                  // Right Side Buttons
                   Row(
                     children: [
-                      IconButton(
-                        icon: Icon(Icons.search, size: 26, color: iconColor),
-                        onPressed: onSearchToggle,
+                      _buildSquareButton(
+                        context,
+                        icon: Symbols.search_rounded,
+                        onTap: onSearchToggle,
                       ),
-                      IconButton(
-                        icon: Icon(Icons.notifications_outlined, size: 26, color: iconColor),
-                        onPressed: () {},
+                      const SizedBox(width: 10),
+                      _buildSquareButton(
+                        context,
+                        icon: Symbols.calendar_today_rounded,
+                        onTap: () {},
                       ),
                     ],
                   ),
                 ],
               ),
+      ),
+    );
+  }
+
+  Widget _buildSquareButton(BuildContext context, {required IconData icon, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: AppColors.card(context),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: AppColors.cardBorder(context),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.cardBorder(context),
+              offset: const Offset(0, 4),
+              blurRadius: 0,
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          color: AppColors.subtitleText(context),
+          size: 24,
+          weight: 600,
+        ),
       ),
     );
   }

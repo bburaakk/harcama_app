@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
+import 'package:harcama_app/domain/utility/currency_helper.dart';
 
 class ChartLegend extends StatelessWidget {
   final List<Transaction> transactions;
@@ -32,15 +33,6 @@ class ChartLegend extends StatelessWidget {
       ..sort((a, b) => b.value.compareTo(a.value));
 
     final topCategories = sortedCategories.take(4).toList();
-
-    // Helper for formatting
-    String formatAmount(double amount) {
-      if (amount % 1 == 0) {
-        return '₺${amount.toStringAsFixed(0)}';
-      } else {
-        return '₺${amount.toStringAsFixed(2)}';
-      }
-    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -87,7 +79,7 @@ class ChartLegend extends StatelessWidget {
             iconWidget = Icon(iconData, color: Colors.white, size: 20);
           }
 
-          return _legendItem(context, iconWidget, entry.key.toUpperCase(), formatAmount(entry.value), color);
+          return _legendItem(context, iconWidget, entry.key.toUpperCase(), "₺${CurrencyHelper.format(entry.value)}", color);
         },
       ),
     );

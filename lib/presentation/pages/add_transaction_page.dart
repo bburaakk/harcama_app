@@ -6,6 +6,7 @@ import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/domain/utility/math_helper.dart';
+import 'package:harcama_app/domain/utility/currency_helper.dart';
 import 'package:harcama_app/presentation/widgets/Keypad.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
@@ -67,13 +68,28 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       return;
     }
 
-    if (value == ".") {
+    if (value == ",") {
       final parts = RegExp(r"[^+\-\*/]+").allMatches(a);
       final last = parts.isNotEmpty ? parts.last.group(0)! : a;
       if (last.contains('.')) return;
+      value = "."; 
     }
 
-    if (a == "0") {
+    // --- Kuruş Kontrolü (Max 2 basamak) ---
+    if (!"+-*/".contains(value) && value != ",") {
+      final parts = RegExp(r"[^+\-\*/]+").allMatches(a);
+      final last = parts.isNotEmpty ? parts.last.group(0)! : a;
+      
+      if (last.contains('.')) {
+        final decimalPart = last.split('.')[1];
+        if (decimalPart.length >= 2) {
+          return; // Zaten 2 basamak var, daha fazla ekleme
+        }
+      }
+    }
+    // --------------------------------------
+
+    if (a == "0" && value != ".") {
       a = value;
     } else {
       a += value;
@@ -90,14 +106,11 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        // LayoutBuilder: Ekranın anlık boyutlarını alır
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              // physics: Ekran büyükse yaylanma efektini kapat, küçükse kaydır
               physics: const ClampingScrollPhysics(),
               child: ConstrainedBox(
-                // İçerik en az ekran boyu kadar olsun
                 constraints: BoxConstraints(
                   minHeight: constraints.maxHeight,
                 ),
@@ -107,13 +120,8 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // 1. Header (Kapatma ikonu)
                         _buildHeader(context),
-
-                        // Küçük ekranlarda boşlukları kısmak için esnek yapılar kullanıyoruz
                         const SizedBox(height: 10),
-
-                        // 2. Başlık
                         const FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
@@ -125,62 +133,37 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 15),
-
-                        // 3. Açıklama ve Tarih
                         SizedBox(
                           height: 50,
                           child: _buildDescriptionDateRow(context),
                         ),
-
                         const SizedBox(height: 20),
-
-                        // 4. Tutar Göstergesi
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           child: _buildAmountDisplay(context),
                         ),
-
                         const SizedBox(height: 20),
-
-                        // 5. Gelir/Gider Seçimi
                         SizedBox(
                           height: 45,
                           child: _buildTypeSelector(context),
                         ),
-
                         const SizedBox(height: 20),
-
-                        // 6. Kategoriler
                         SizedBox(
                           height: 90,
                           child: _buildCategorySection(context),
                         ),
-
-                        // --- KRİTİK NOKTA: Spacer ---
-                        // Ekran büyükse arayı açar, küçükse yok olur.
-                        // const Spacer(),
-                        // const SizedBox(height: 10),
-
-                        // 7. Keypad (Boyut Sınırlaması)
-                        // Ekranın en fazla %35'ini kaplasın, taşarsa keypad'in kendisi küçülsün
                         SizedBox(
                           height: constraints.maxHeight * 0.40,
                           child: FittedBox(
-                            fit: BoxFit.contain, // Keypad çok büyükse orantılı küçült
+                            fit: BoxFit.contain,
                             child: SizedBox(
-                              width: constraints.maxWidth, // Genişliği koru
-                              height: 300, // Keypad'in ideal 'sanal' yüksekliği
+                              width: constraints.maxWidth,
+                              height: 300,
                               child: KeyPad(onTap: onKeyTap),
                             ),
                           ),
                         ),
-
-                        // const SizedBox(height: 15),
-
-                        // 8. Kaydet Butonu
-                        // Ekranın en altına yapışık kalır (Spacer sayesinde)
                         _buildSaveButton(context),
                       ],
                     ),
@@ -317,6 +300,9 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     return ValueListenableBuilder<String>(
       valueListenable: amount,
       builder: (_, value, __) {
+        // Formatlama işlemi burada yapılıyor
+        String displayValue = CurrencyHelper.formatInput(value);
+        
         return FittedBox(
           fit: BoxFit.scaleDown,
           child: Row(
@@ -334,7 +320,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               ),
               const SizedBox(width: 4),
               Text(
-                value,
+                displayValue,
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.w800,

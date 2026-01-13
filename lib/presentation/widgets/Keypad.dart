@@ -39,9 +39,9 @@ class KeyPad extends StatelessWidget {
         ]),
         const SizedBox(height: 12),
 
-        // Row 4: ., 0, = (spans 3)
+        // Row 4: ,, 0, = (spans 3)
         _buildRow(context, [
-          _KeyItem("."),
+          _KeyItem(","), // Nokta yerine virgül
           _KeyItem("0"),
           _KeyItem("=", flex: 3, isEquals: true),
         ]),
@@ -58,7 +58,7 @@ class KeyPad extends StatelessWidget {
         return Expanded(
           flex: item.flex,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 6),
             child: _buildKey(context, item),
           ),
         );

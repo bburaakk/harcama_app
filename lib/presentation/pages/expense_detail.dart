@@ -6,7 +6,7 @@ import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/domain/utility/math_helper.dart';
-import 'package:harcama_app/presentation/widgets/Keypad.dart';
+import 'package:harcama_app/presentation/widgets/keypad.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 
 class ExpenseDetailPage extends StatefulWidget {

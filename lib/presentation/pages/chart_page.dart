@@ -3,9 +3,11 @@ import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/chart_header.dart';
 import 'package:harcama_app/presentation/widgets/chart_legend.dart';
+import 'package:harcama_app/presentation/widgets/date_button.dart';
 import 'package:harcama_app/presentation/widgets/donut_chart_section.dart';
 import 'package:harcama_app/presentation/widgets/timeframe_selector.dart';
 import 'package:harcama_app/presentation/widgets/top_expenses_list.dart';
+import 'package:harcama_app/presentation/widgets/weekly_date_card.dart';
 import 'package:harcama_app/presentation/widgets/weekly_spending_chart.dart';
 import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
@@ -119,25 +121,37 @@ class _ChartContentState extends State<_ChartContent> {
     return false;
   }
 
+  int weekNumber(DateTime date) {
+    final firstDayOfYear = DateTime(date.year, 1, 1);
+    final daysOffset = firstDayOfYear.weekday - 1;
+    final firstMonday = firstDayOfYear.subtract(Duration(days: daysOffset));
+    return ((date.difference(firstMonday).inDays) / 7).floor() + 1;
+  }
+
+  Map<String, String> _getWeeklyDateInfo(DateTime date) {
+    final now = DateTime.now();
+    final startOfWeek = date.subtract(Duration(days: date.weekday - 1));
+    final endOfWeek = startOfWeek.add(const Duration(days: 6));
+
+    final weekNum = weekNumber(startOfWeek).toString();
+    final year = startOfWeek.year.toString();
+    final startStr = DateFormat('d MMM', 'tr_TR').format(startOfWeek);
+    final endStr = DateFormat('d MMM', 'tr_TR').format(endOfWeek);
+
+    // Check if this week is current week
+    final isCurrentWeek = _isSamePeriod(date, now);
+
+    return {
+      'year': year,
+      'week': isCurrentWeek ? 'BU HAFTA' : 'Hafta $weekNum',
+      'range': '$startStr - $endStr',
+    };
+  }
+
   String _getFormattedDateLabel(DateTime date) {
     final now = DateTime.now();
 
-    // --- WEEKLY İÇİN ÖZEL FORMAT (Başlık + Alt Başlık için) ---
-    if (widget.timeframe == 'Weekly') {
-      final startOfWeek = date.subtract(Duration(days: date.weekday - 1));
-      final endOfWeek = startOfWeek.add(const Duration(days: 6));
-
-      final weekNum = int.parse(DateFormat('w').format(startOfWeek));
-      final year = startOfWeek.year;
-      final startStr = DateFormat('d MMM', 'tr_TR').format(startOfWeek);
-      final endStr = DateFormat('d MMM', 'tr_TR').format(endOfWeek);
-
-      // Araya \n koyuyoruz ki aşağıdaki Widget bunu bölüp kullansın
-      return '$year - Hafta $weekNum\n$startStr - $endStr';
-    }
-
-    // --- MONTHLY & YEARLY İÇİN ESKİ FORMAT (Tek Satır) ---
-    else if (widget.timeframe == 'Monthly') {
+    if (widget.timeframe == 'Monthly') {
       if (date.year == now.year && date.month == now.month) {
         return 'BU AY';
       }
@@ -176,32 +190,8 @@ class _ChartContentState extends State<_ChartContent> {
     return dates;
   }
 
-  // Tarih seçiciyi duruma göre değiştiren fonksiyon
   Widget _buildDateNavigator(List<DateTime> dates) {
-    // 1. Durum: HAFTALIK GÖRÜNÜM (Yeni Tasarım)
     if (widget.timeframe == 'Weekly') {
-      return Container(
-        height: 60,
-        width: double.infinity,
-        color: Colors.transparent,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          reverse: true,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: dates.length,
-          itemBuilder: (context, index) {
-            final date = dates[index];
-            return _DateTabItem(
-              label: _getFormattedDateLabel(date),
-              isSelected: _isSamePeriod(date, _selectedDate),
-              onTap: () => _setDate(date),
-            );
-          },
-        ),
-      );
-    }
-    // 2. Durum: AYLIK ve YILLIK (Eski Buton Tasarımı)
-    else {
       return SizedBox(
         height: 75,
         child: ListView.separated(
@@ -212,7 +202,29 @@ class _ChartContentState extends State<_ChartContent> {
           separatorBuilder: (context, index) => const SizedBox(width: 8),
           itemBuilder: (context, index) {
             final date = dates[index];
-            return _DateButton(
+            final info = _getWeeklyDateInfo(date);
+            return WeeklyDateCard(
+              year: info['year']!,
+              weekNumber: info['week']!,
+              dateRange: info['range']!,
+              isSelected: _isSamePeriod(date, _selectedDate),
+              onTap: () => _setDate(date),
+            );
+          },
+        ),
+      );
+    } else {
+      return SizedBox(
+        height: 75,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          reverse: true,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          itemCount: dates.length,
+          separatorBuilder: (context, index) => const SizedBox(width: 8),
+          itemBuilder: (context, index) {
+            final date = dates[index];
+            return DateButton(
               label: _getFormattedDateLabel(date),
               isSelected: _isSamePeriod(date, _selectedDate),
               onTap: () => _setDate(date),
@@ -233,7 +245,10 @@ class _ChartContentState extends State<_ChartContent> {
         final notifier = context.read<TransactionNotifier>();
         final monthlyBudget = notifier.monthlyBudget;
 
-        final filteredTransactions = notifier.getFilteredTransactions(widget.timeframe, referenceDate: _selectedDate);
+        final filteredTransactions = notifier.getFilteredTransactions(
+          widget.timeframe,
+          referenceDate: _selectedDate,
+        );
 
         final totalSpent = filteredTransactions
             .where((t) => t.type == TransactionType.expense)
@@ -244,23 +259,22 @@ class _ChartContentState extends State<_ChartContent> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-
-              // Seçiciyi burada dinamik olarak çağırıyoruz
               _buildDateNavigator(dates),
-
               const SizedBox(height: 10),
-
               if (totalSpent > 0) ...[
-                DonutChartSection(totalSpent: totalSpent, transactions: filteredTransactions),
+                DonutChartSection(
+                  totalSpent: totalSpent,
+                  transactions: filteredTransactions,
+                ),
                 ChartLegend(transactions: filteredTransactions),
               ] else ...[
                 const SizedBox(height: 50),
                 Text(
                   "No expenses yet",
                   style: TextStyle(
-                      color: AppColors.subtitleText(context),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold
+                    color: AppColors.subtitleText(context),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 50),
@@ -270,135 +284,15 @@ class _ChartContentState extends State<_ChartContent> {
                 monthlyBudget: monthlyBudget,
                 referenceDate: _selectedDate,
               ),
-
-              if (allTransactions.any((t) => t.type == TransactionType.expense)) ...[
+              if (allTransactions.any(
+                (t) => t.type == TransactionType.expense,
+              )) ...[
                 TopExpensesList(transactions: allTransactions),
               ],
             ],
           ),
         );
       },
-    );
-  }
-}
-
-// --- YENİ WIDGET (SADECE WEEKLY İÇİN) ---
-class _DateTabItem extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _DateTabItem({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Label string'ini \n karakterine göre bölüyoruz
-    final parts = label.split('\n');
-    final title = parts.isNotEmpty ? parts[0] : label;
-    final subtitle = parts.length > 1 ? parts[1] : null;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          border: isSelected
-              ? const Border(bottom: BorderSide(color: Color(0xFFFFD500), width: 3))
-              : null,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.grey.shade600,
-                fontSize: 15,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-            if (isSelected && subtitle != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  color: Colors.grey.shade400,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// --- ESKİ WIDGET (MONTHLY ve YEARLY İÇİN GERİ GELDİ) ---
-class _DateButton extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _DateButton({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final primaryColor = const Color(0xFF7BDE12);
-    final primaryDarkColor = const Color(0xFF5FB30D);
-
-    final inactiveText = isDark ? const Color(0xFFA0C47D) : const Color(0xFF749A4C);
-    final inactiveBg = isDark ? const Color(0xFF253218) : Colors.white;
-    final inactiveBorder = isDark ? const Color(0xFF2D3A1E) : const Color(0xFFE5E5E5);
-    final inactiveShadow = Colors.black.withValues(alpha: 0.1);
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? primaryColor
-              : inactiveBg,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? Colors.transparent : inactiveBorder,
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected ? primaryDarkColor : inactiveShadow,
-              offset: const Offset(0, 4),
-              blurRadius: 0,
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            label.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected
-                  ? Colors.white
-                  : inactiveText,
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

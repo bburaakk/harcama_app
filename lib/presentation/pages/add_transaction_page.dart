@@ -90,98 +90,105 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Column(
-          children: [
-            // 1. Header (Fixed Height)
-            _buildHeader(context),
-            
-            // 2. Main Content (Proportional Layout)
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final availableHeight = constraints.maxHeight;
-                  final screenWidth = MediaQuery.of(context).size.width;
-                  
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+        // LayoutBuilder: Ekranın anlık boyutlarını alır
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              // physics: Ekran büyükse yaylanma efektini kapat, küçükse kaydır
+              physics: const ClampingScrollPhysics(),
+              child: ConstrainedBox(
+                // İçerik en az ekran boyu kadar olsun
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Title
-                        SizedBox(
-                          height: availableHeight * 0.06,
-                          child: Center(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                "How much did you spend?",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.text(context),
-                                ),
-                              ),
+                        // 1. Header (Kapatma ikonu)
+                        _buildHeader(context),
+
+                        // Küçük ekranlarda boşlukları kısmak için esnek yapılar kullanıyoruz
+                        const SizedBox(height: 10),
+
+                        // 2. Başlık
+                        const FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "How much did you spend?",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ),
-                        
-                        SizedBox(height: availableHeight * 0.01),
-                        
-                        // Description + Date
+
+                        const SizedBox(height: 15),
+
+                        // 3. Açıklama ve Tarih
                         SizedBox(
-                          height: availableHeight * 0.08,
+                          height: 50,
                           child: _buildDescriptionDateRow(context),
                         ),
-                        
-                        SizedBox(height: availableHeight * 0.02),
-                        
-                        // Amount Display
-                        SizedBox(
-                          height: availableHeight * 0.10,
-                          child: Center(child: _buildAmountDisplay(context)),
+
+                        const SizedBox(height: 20),
+
+                        // 4. Tutar Göstergesi
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: _buildAmountDisplay(context),
                         ),
-                        
-                        SizedBox(height: availableHeight * 0.02),
-                        
-                        // Type Selector
+
+                        const SizedBox(height: 20),
+
+                        // 5. Gelir/Gider Seçimi
                         SizedBox(
-                          height: availableHeight * 0.08,
+                          height: 45,
                           child: _buildTypeSelector(context),
                         ),
-                        
-                        SizedBox(height: availableHeight * 0.02),
-                        
-                        // Category Section
+
+                        const SizedBox(height: 20),
+
+                        // 6. Kategoriler
                         SizedBox(
-                          height: availableHeight * 0.14,
+                          height: 90,
                           child: _buildCategorySection(context),
                         ),
-                        
-                        SizedBox(height: availableHeight * 0.02),
-                        
-                        // Keypad
-                        Expanded(
-                          child: LayoutBuilder(
-                            builder: (context, keypadConstraints) {
-                              return Center(
-                                child: SizedBox(
-                                  width: screenWidth * 0.9,
-                                  height: keypadConstraints.maxHeight,
-                                  child: KeyPad(onTap: onKeyTap),
-                                ),
-                              );
-                            },
+
+                        // --- KRİTİK NOKTA: Spacer ---
+                        // Ekran büyükse arayı açar, küçükse yok olur.
+                        // const Spacer(),
+                        // const SizedBox(height: 10),
+
+                        // 7. Keypad (Boyut Sınırlaması)
+                        // Ekranın en fazla %35'ini kaplasın, taşarsa keypad'in kendisi küçülsün
+                        SizedBox(
+                          height: constraints.maxHeight * 0.40,
+                          child: FittedBox(
+                            fit: BoxFit.contain, // Keypad çok büyükse orantılı küçült
+                            child: SizedBox(
+                              width: constraints.maxWidth, // Genişliği koru
+                              height: 300, // Keypad'in ideal 'sanal' yüksekliği
+                              child: KeyPad(onTap: onKeyTap),
+                            ),
                           ),
                         ),
+
+                        // const SizedBox(height: 15),
+
+                        // 8. Kaydet Butonu
+                        // Ekranın en altına yapışık kalır (Spacer sayesinde)
+                        _buildSaveButton(context),
                       ],
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
-            ),
-            
-            // 3. Save Button (Fixed Height)
-            _buildSaveButton(context),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -394,32 +401,40 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   }) {
     final isSelected = selectedType == type;
 
-    return PressableContainer(
-      onPressed: () => setState(() => selectedType = type),
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(14),
-        border: isSelected
-            ? Border.all(color: Colors.white, width: 2)
-            : null,
-      ),
-      boxShadow: [
-        BoxShadow(
-          color: darkColor,
-          offset: const Offset(0, 4),
+    return GestureDetector(
+      onTap: () => setState(() => selectedType = type),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        transform: Matrix4.translationValues(0, isSelected ? 4 : 0, 0),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? color : AppColors.progressBackground(context),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? darkColor : AppColors.gray300,
+            width: 2,
+          ),
+          boxShadow: isSelected
+              ? []
+              : [
+            BoxShadow(
+              color: AppColors.gray300,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-      ],
-      child: Center(
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              letterSpacing: 0.5,
+        child: Center(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: isSelected ? Colors.white : AppColors.subtitleText(context),
+                letterSpacing: 0.5,
+              ),
             ),
           ),
         ),

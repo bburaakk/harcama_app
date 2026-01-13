@@ -11,6 +11,10 @@ import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+// Eğer AddGoalCard widget'ı ayrı bir dosyadaysa import etmeyi unutmayın.
+// Yoksa ve aynı dosyadaysa aşağıya dummy bir class ekledim, onu kullanabilirsiniz.
+// import 'package:harcama_app/presentation/widgets/add_goal_card.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -36,11 +40,12 @@ class _HomePageState extends State<HomePage> {
 
     final activeLedgerId = ledgerNotifier.selectedLedger?.id;
 
+    // Filtreleme işlemleri
     final visibleTx = activeLedgerId == null || activeLedgerId == 'default'
         ? txNotifier.transactions
         : txNotifier.transactions
-              .where((t) => t.ledgerID == activeLedgerId)
-              .toList();
+        .where((t) => t.ledgerID == activeLedgerId)
+        .toList();
 
     final income = visibleTx
         .where((t) => t.type == TransactionType.income)
@@ -57,25 +62,35 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Stack(
           children: [
+            // Ana İçerik
             GestureDetector(
               onTap: showLedgerSheet ? _toggleLedgerSheet : null,
               child: Column(
                 children: [
+                  // Üst Bar
                   TopBar(
                     isSearching: isSearching,
                     onSearchToggle: () =>
                         setState(() => isSearching = !isSearching),
                     onLedgerTap: _toggleLedgerSheet,
                   ),
+
+                  // Kaydırılabilir İçerik Alanı
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
                         children: [
                           const SizedBox(height: 8),
+
+                          // Arama yapılmıyorsa Üst Widget'ları Göster
                           if (!isSearching) ...[
+                            // Bakiye Kartı
                             RemainingBalanceCard(balance: balance),
+
                             const SizedBox(height: 24),
+
+                            // Hedefler Başlığı
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.end,
@@ -98,16 +113,22 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ],
                             ),
+
                             const SizedBox(height: 16),
+
+                            // --- DÜZELTİLEN GRID ALANI ---
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: GridView.count(
+                              child: GridView(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 24,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: 2,
+                                // GridDelegate ile sabit yükseklik veriyoruz:
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,       // Yan yana 2 tane
+                                  crossAxisSpacing: 24,    // Yatay boşluk
+                                  mainAxisSpacing: 12,     // Dikey boşluk
+                                  mainAxisExtent: 80,     // [ÖNEMLİ] Sabit Yükseklik (100px)
+                                ),
                                 children: [
                                   DailyGoalCard(
                                     icon: Symbols.restaurant_rounded,
@@ -133,11 +154,15 @@ class _HomePageState extends State<HomePage> {
                                     color: AppColors.primary,
                                     colorDark: AppColors.primaryDark,
                                   ),
+                                  // AddGoalCard widget'ınızın import edildiğinden emin olun
                                   const AddGoalCard(),
                                 ],
                               ),
                             ),
+
                             const SizedBox(height: 8),
+
+                            // Son Aktiviteler Başlığı
                             Row(
                               children: [
                                 Text(
@@ -152,14 +177,20 @@ class _HomePageState extends State<HomePage> {
                             ),
                             const SizedBox(height: 8),
                           ],
+
+                          // Alt Liste (İşlemler)
+                          // Listeyi Expanded içine alarak kalan tüm alanı kaplamasını sağlıyoruz
                           Expanded(
                             child: SingleChildScrollView(
+                              // Liste içinde liste kaydırma sorununu çözmek için:
+                              physics: const BouncingScrollPhysics(),
                               child: Column(
                                 children: [
                                   TransactionList(
                                     transactions: visibleTx,
                                     notifier: txNotifier,
                                   ),
+                                  // Listenin altında biraz boşluk bırakır (FAB veya bottom bar için)
                                   const SizedBox(height: 100),
                                 ],
                               ),
@@ -172,6 +203,8 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
+
+            // Ledger Seçim Ekranı (Overlay)
             if (showLedgerSheet)
               LedgerDropdown(
                 isVisible: showLedgerSheet,
@@ -184,3 +217,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+

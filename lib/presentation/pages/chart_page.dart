@@ -5,7 +5,6 @@ import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
-import 'package:harcama_app/domain/entities/category.dart';
 import 'dart:math' as math;
 
 class ChartPage extends StatefulWidget {

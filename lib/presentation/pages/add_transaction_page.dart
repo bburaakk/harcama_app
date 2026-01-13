@@ -88,71 +88,89 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      // Use LayoutBuilder to adapt to screen height
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final screenHeight = constraints.maxHeight;
-          final isSmallScreen = screenHeight < 700;
-          
-          return SafeArea(
-            child: Column(
-              children: [
-                // Header
-                _buildHeader(context),
-                
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      children: [
-                        SizedBox(height: isSmallScreen ? 4 : 8),
-                        
-                        // Title
-                        Text(
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // 1. Header (Fixed Height)
+            _buildHeader(context),
+            
+            // 2. Main Content (Proportional Layout)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Distribute space evenly
+                  children: [
+                    // Title (Flex 1)
+                    Flexible(
+                      flex: 1,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
                           "How much did you spend?",
                           style: TextStyle(
-                            fontSize: isSmallScreen ? 18 : 22,
+                            fontSize: 20,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text(context),
                           ),
                         ),
-                        
-                        SizedBox(height: isSmallScreen ? 8 : 16),
-                        
-                        // Description + Date Row
-                        _buildDescriptionDateRow(context),
-                        
-                        SizedBox(height: isSmallScreen ? 8 : 16),
-                        
-                        // Amount Display
-                        _buildAmountDisplay(context, isSmallScreen),
-                        
-                        SizedBox(height: isSmallScreen ? 8 : 16),
-                        
-                        // Type Selector
-                        _buildTypeSelector(context),
-                        
-                        SizedBox(height: isSmallScreen ? 8 : 16),
-                        
-                        // Category Section
-                        _buildCategorySection(context),
-                        
-                        SizedBox(height: isSmallScreen ? 8 : 12),
-                        
-                        // Keypad
-                        // Use constrained height for keypad on small screens if needed
-                        KeyPad(onTap: onKeyTap),
-                      ],
+                      ),
                     ),
-                  ),
+                    
+                    // Description + Date (Flex 2)
+                    Flexible(
+                      flex: 2,
+                      child: Center(child: _buildDescriptionDateRow(context)),
+                    ),
+                    
+                    // Amount Display (Flex 2)
+                    Flexible(
+                      flex: 2,
+                      child: Center(child: _buildAmountDisplay(context)),
+                    ),
+                    
+                    // Type Selector (Flex 2)
+                    Flexible(
+                      flex: 2,
+                      child: Center(child: _buildTypeSelector(context)),
+                    ),
+                    
+                    // Category Section (Flex 3)
+                    Flexible(
+                      flex: 3,
+                      child: Center(child: _buildCategorySection(context)),
+                    ),
+                    
+                    // Keypad (Flex 10 - Largest Area)
+                    Expanded( // Use Expanded to force taking available space
+                      flex: 10,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return SizedBox(
+                            width: double.infinity,
+                            height: constraints.maxHeight,
+                            child: FittedBox( // Scale keypad to fit available height/width
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width - 40, // Base width constraint
+                                child: KeyPad(onTap: onKeyTap),
+                              ),
+                            ),
+                          );
+                        }
+                      ),
+                    ),
+                  ],
                 ),
-                
-                // Save Button
-                _buildSaveButton(context),
-              ],
+              ),
             ),
-          );
-        }
+            
+            // 3. Save Button (Fixed Height)
+            _buildSaveButton(context),
+          ],
+        ),
       ),
     );
   }
@@ -186,72 +204,74 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   }
 
   Widget _buildDescriptionDateRow(BuildContext context) {
-    return Row(
-      children: [
-        // Description Input
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+    return SizedBox(
+      height: 50,
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: AppColors.card(context),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.cardBorder(context), width: 2),
+              ),
+              child: TextField(
+                controller: descriptionController,
+                onChanged: (v) => note = v,
+                style: TextStyle(
+                  color: AppColors.text(context),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+                decoration: InputDecoration(
+                  hintText: "Description",
+                  hintStyle: TextStyle(color: AppColors.subtitleText(context), fontSize: 14),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.only(bottom: 8),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          PressableContainer(
+            onPressed: _selectDate,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
             decoration: BoxDecoration(
               color: AppColors.card(context),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.cardBorder(context), width: 2),
             ),
-            child: TextField(
-              controller: descriptionController,
-              onChanged: (v) => note = v,
-              style: TextStyle(
-                color: AppColors.text(context),
-                fontWeight: FontWeight.w600,
-              ),
-              decoration: InputDecoration(
-                hintText: "Description (e.g. Lunch)",
-                hintStyle: TextStyle(color: AppColors.subtitleText(context)),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-            ),
-          ),
-        ),
-        
-        const SizedBox(width: 12),
-        
-        // Date Button
-        PressableContainer(
-          onPressed: _selectDate,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: AppColors.card(context),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.cardBorder(context), width: 2),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.cardBorder(context),
-              offset: const Offset(0, 3),
-            ),
-          ],
-          child: Row(
-            children: [
-              Icon(
-                Symbols.calendar_today_rounded,
-                color: AppColors.primary,
-                size: 20,
-                weight: 600,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                _getDateLabel(),
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.text(context),
-                ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cardBorder(context),
+                offset: const Offset(0, 3),
               ),
             ],
+            child: Center(
+              child: Row(
+                children: [
+                  Icon(
+                    Symbols.calendar_today_rounded,
+                    color: AppColors.primary,
+                    size: 18,
+                    weight: 600,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _getDateLabel(),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.text(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -275,13 +295,13 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     if (picked != null) setState(() => selectedDate = picked);
   }
 
-  Widget _buildAmountDisplay(BuildContext context, bool isSmallScreen) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: ValueListenableBuilder<String>(
-        valueListenable: amount,
-        builder: (_, value, __) {
-          return Row(
+  Widget _buildAmountDisplay(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: amount,
+      builder: (_, value, __) {
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
@@ -289,7 +309,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               Text(
                 "₺",
                 style: TextStyle(
-                  fontSize: isSmallScreen ? 18 : 22,
+                  fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: AppColors.subtitleText(context),
                 ),
@@ -298,16 +318,16 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: isSmallScreen ? 32 : 42,
+                  fontSize: 36,
                   fontWeight: FontWeight.w800,
                   color: _getTypeColor(),
-                  letterSpacing: -2,
+                  letterSpacing: -1,
                 ),
               ),
             ],
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -323,35 +343,38 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   }
 
   Widget _buildTypeSelector(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildTypeButton(
-            type: TransactionType.income,
-            label: "INCOME",
-            color: AppColors.primary,
-            darkColor: AppColors.primaryDark,
+    return SizedBox(
+      height: 44,
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildTypeButton(
+              type: TransactionType.income,
+              label: "INCOME",
+              color: AppColors.primary,
+              darkColor: AppColors.primaryDark,
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _buildTypeButton(
-            type: TransactionType.expense,
-            label: "EXPENSE",
-            color: const Color(0xFFFF4B4B),
-            darkColor: const Color(0xFFD33131),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _buildTypeButton(
+              type: TransactionType.expense,
+              label: "EXPENSE",
+              color: const Color(0xFFFF4B4B),
+              darkColor: const Color(0xFFD33131),
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _buildTypeButton(
-            type: TransactionType.transfer,
-            label: "TRANSFER",
-            color: AppColors.secondaryBlue,
-            darkColor: AppColors.secondaryBlueDark,
+          const SizedBox(width: 10),
+          Expanded(
+            child: _buildTypeButton(
+              type: TransactionType.transfer,
+              label: "TRANSFER",
+              color: AppColors.secondaryBlue,
+              darkColor: AppColors.secondaryBlueDark,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -365,10 +388,10 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
     return PressableContainer(
       onPressed: () => setState(() => selectedType = type),
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: EdgeInsets.zero,
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: isSelected
             ? Border.all(color: Colors.white, width: 2)
             : null,
@@ -383,7 +406,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         child: Text(
           label,
           style: const TextStyle(
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: FontWeight.w800,
             color: Colors.white,
             letterSpacing: 0.5,
@@ -396,25 +419,26 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   Widget _buildCategorySection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(
             "SELECT CATEGORY",
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: FontWeight.w800,
               color: AppColors.subtitleText(context),
-              letterSpacing: 1.5,
+              letterSpacing: 1.2,
             ),
           ),
         ),
         SizedBox(
-          height: 90,
+          height: 80,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: categories.length + 1,
-            separatorBuilder: (_, __) => const SizedBox(width: 16),
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
               if (index == categories.length) {
                 return _buildMoreCategoryButton(context);
@@ -435,10 +459,11 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     return GestureDetector(
       onTap: () => setState(() => selectedCategory = cat),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 64,
-            height: 64,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.card(context),
@@ -449,19 +474,19 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               boxShadow: [
                 BoxShadow(
                   color: isActive ? AppColors.primaryDark : AppColors.cardBorder(context),
-                  offset: const Offset(0, 4),
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
             child: Center(
-              child: Text(cat.icon, style: const TextStyle(fontSize: 28)),
+              child: Text(cat.icon, style: const TextStyle(fontSize: 24)),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             cat.title,
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: FontWeight.w800,
               color: isActive ? AppColors.text(context) : AppColors.subtitleText(context),
             ),
@@ -473,10 +498,11 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
   Widget _buildMoreCategoryButton(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          width: 64,
-          height: 64,
+          width: 56,
+          height: 56,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: AppColors.progressBackground(context),
@@ -487,21 +513,21 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.cardBorder(context),
-                offset: const Offset(0, 4),
+                offset: const Offset(0, 3),
               ),
             ],
           ),
           child: Icon(
             Symbols.grid_view_rounded,
             color: AppColors.subtitleText(context),
-            size: 28,
+            size: 24,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         Text(
           "MORE",
           style: TextStyle(
-            fontSize: 10,
+            fontSize: 9,
             fontWeight: FontWeight.w800,
             color: AppColors.subtitleText(context),
             letterSpacing: -0.5,
@@ -513,10 +539,10 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
   Widget _buildSaveButton(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
       child: PressableContainer(
         onPressed: _saveNewTransaction,
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: AppColors.primary,
           borderRadius: BorderRadius.circular(16),
@@ -524,14 +550,14 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         boxShadow: const [
           BoxShadow(
             color: AppColors.primaryDark,
-            offset: Offset(0, 6),
+            offset: Offset(0, 4),
           ),
         ],
         child: const Center(
           child: Text(
             "SAVE",
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.w800,
               color: Colors.white,
               letterSpacing: 2,

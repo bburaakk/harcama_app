@@ -9,6 +9,7 @@ import 'package:harcama_app/domain/usecases/generic_usecase.dart';
 import 'package:harcama_app/presentation/notifiers/account_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/category_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/premium_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -42,6 +43,9 @@ void main() async {
       providers: [
         ChangeNotifierProvider(
           create: (_) => ThemeNotifier(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => PremiumNotifier(),
         ),
         ChangeNotifierProvider(
           create: (_) => TransactionNotifier(

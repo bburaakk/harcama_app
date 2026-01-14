@@ -55,6 +55,45 @@ class TransactionNotifier extends BaseNotifier<Transaction> {
     _updateLedgerBalance(transaction.ledgerID);
   }
 
+  Future<void> clearAllTransactions() async {
+    setLoading(true);
+    try {
+      // Create a copy of the list to avoid concurrent modification issues if fetchItems is called
+      final List<Transaction> allTransactions = List.from(items);
+      
+      for (var transaction in allTransactions) {
+        await deleteUseCase(transaction.id);
+        // We can update ledger balance after each deletion or once at the end.
+        // Updating after each might be safer for consistency if something fails midway,
+        // but slower. Let's do it here to be safe.
+        // However, since we are clearing ALL, maybe we should just reset ledgers?
+        // But ledgers might have initial balances.
+        // So deleting transactions one by one and updating ledger is correct logic.
+      }
+      
+      // After deleting all, fetch items to ensure empty state and update UI
+      await fetchItems();
+      
+      // Also need to update ledgers for all affected ledgers.
+      // Since we deleted everything, we can just trigger an update for all ledgers involved.
+      // But since items is now empty, _updateLedgerBalance might not work as expected if it relies on 'items'.
+      // Actually _updateLedgerBalance calls ledgerNotifier.updateLedgerBalance(ledgerId, items).
+      // If items is empty, it should calculate balance as 0 (or initial balance).
+      
+      // Let's collect unique ledger IDs from the deleted transactions
+      final uniqueLedgerIds = allTransactions.map((t) => t.ledgerID).toSet();
+      for (var ledgerId in uniqueLedgerIds) {
+        _updateLedgerBalance(ledgerId);
+      }
+      
+    } catch (e) {
+      // Handle error
+      print("Error clearing transactions: $e");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   void _updateLedgerBalance(String ledgerId) {
     if (ledgerNotifier != null) {
       ledgerNotifier!.updateLedgerBalance(ledgerId, items);

@@ -4,10 +4,15 @@ class AppColors {
   // ============ LIGHT THEME ============
   // Background Colors
   static const Color scaffoldBackground = Color(0xFFFFFFFF);
+  static const Color premiumScaffoldBackground = Color(0xFFF9F9FB);
   
   // Primary Colors - Green
   static const Color primary = Color(0xFF58CC02);
   static const Color primaryDark = Color(0xFF46A302);
+  
+  // Premium Primary Colors (Lighter Green)
+  static const Color premiumPrimary = Color(0xFF7BDE12);
+  static const Color premiumPrimaryDark = Color(0xFF5EB00E);
   
   // Secondary Blue
   static const Color secondaryBlue = Color(0xFF1CB0F6);
@@ -16,6 +21,14 @@ class AppColors {
   // Secondary Yellow
   static const Color secondaryYellow = Color(0xFFFFC800);
   static const Color secondaryYellowDark = Color(0xFFE5A400);
+  
+  // Premium Gold Colors
+  static const Color premiumGold = Color(0xFFFFC107);
+  static const Color premiumGoldDark = Color(0xFFE6AD00);
+  
+  // Danger Colors
+  static const Color danger = Color(0xFFFF4B4B);
+  static const Color dangerDark = Color(0xFFD33131);
   
   // Neon Pink (for expenses)
   static const Color neonPink = Color(0xFFFF4B91);
@@ -36,11 +49,16 @@ class AppColors {
   // ============ DARK THEME ============
   // Background Colors (Dark)
   static const Color scaffoldBackgroundDark = Color(0xFF131F24);
+  static const Color premiumScaffoldBackgroundDark = Color(0xFF1B293C);
   
   // Card Colors (Dark)
   static const Color cardDark = Color(0xFF1F2D33);
+  static const Color premiumCardDark = Color(0xFF2A3B4F);
+  static const Color premiumCardDark2 = Color(0xFF2D2D32); // For upgrade page
   static const Color cardBorderDark = Color(0xFF37464F);
+  static const Color premiumCardBorderDark = Color(0xFF334155);
   static const Color cardShadowDark = Color(0xFF151B1F);
+  static const Color premiumCardShadowDark = Color(0xFF0F172A);
   
   // Gray Colors (Dark)
   static const Color grayDark100 = Color(0xFF37464F);
@@ -71,6 +89,22 @@ class AppColors {
   
   static Color expenseColor(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark ? neonPink : Colors.red.shade500;
+  
+  // Premium Helpers
+  static Color premiumBackground(bool isDark) =>
+      isDark ? premiumScaffoldBackgroundDark : premiumScaffoldBackground;
+      
+  static Color premiumSurface(bool isDark) =>
+      isDark ? premiumCardDark : cardLight;
+      
+  static Color premiumBorder(bool isDark) =>
+      isDark ? premiumCardBorderDark : cardBorderLight;
+      
+  static Color premiumText(bool isDark) =>
+      isDark ? textLight : textDark;
+      
+  static Color premiumSubText(bool isDark) =>
+      isDark ? gray400 : gray500;
   
   // ============ LEGACY (keeping for compatibility) ============
   static const Color primaryCardColor = Color(0xFF58CC02);

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
-import 'package:harcama_app/presentation/widgets/chart_header.dart';
 import 'package:harcama_app/presentation/widgets/chart_legend.dart';
 import 'package:harcama_app/presentation/widgets/date_button.dart';
 import 'package:harcama_app/presentation/widgets/donut_chart_section.dart';
@@ -58,7 +57,7 @@ class _ChartPageState extends State<ChartPage> {
       body: SafeArea(
         child: Column(
           children: [
-            const ChartHeader(),
+            const SizedBox(height: 16),
             TimeframeSelector(
               selectedIndex: _selectedIndex,
               timeframes: _timeframes,

@@ -7,19 +7,35 @@ import 'package:material_symbols_icons/symbols.dart';
 class TopBar extends StatelessWidget {
   final bool isSearching;
   final VoidCallback onSearchToggle;
-  final VoidCallback onLedgerTap;
+  final VoidCallback? onLedgerTap;
+  final String searchHint;
+  final Function(String)? onSearchChanged;
+  final VoidCallback? onSearchClear;
 
   const TopBar({
     super.key,
     required this.isSearching,
     required this.onSearchToggle,
-    required this.onLedgerTap,
+    this.onLedgerTap,
+    this.searchHint = "Search...",
+    this.onSearchChanged,
+    this.onSearchClear,
   });
 
   @override
   Widget build(BuildContext context) {
-    final txNotifier = context.read<TransactionNotifier>();
     final iconColor = AppColors.subtitleText(context);
+    
+    // Default handlers if not provided
+    final searchChanged = onSearchChanged ?? (query) {
+      final txNotifier = context.read<TransactionNotifier>();
+      txNotifier.updateSearchQuery(query);
+    };
+    
+    final searchClear = onSearchClear ?? () {
+      final txNotifier = context.read<TransactionNotifier>();
+      txNotifier.updateSearchQuery('');
+    };
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -34,17 +50,17 @@ class TopBar extends StatelessWidget {
                       autofocus: true,
                       style: TextStyle(color: AppColors.text(context)),
                       decoration: InputDecoration(
-                        hintText: "Search transactions...",
+                        hintText: searchHint,
                         hintStyle: TextStyle(color: AppColors.subtitleText(context)),
                         border: InputBorder.none,
                       ),
-                      onChanged: txNotifier.updateSearchQuery,
+                      onChanged: searchChanged,
                     ),
                   ),
                   IconButton(
                     icon: Icon(Symbols.close_rounded, color: iconColor),
                     onPressed: () {
-                      txNotifier.updateSearchQuery('');
+                      searchClear();
                       onSearchToggle();
                     },
                   ),
@@ -54,14 +70,15 @@ class TopBar extends StatelessWidget {
                 key: const ValueKey('normal'),
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Ledger Menu Button
-                  GestureDetector(
-                    onTap: onLedgerTap,
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(14),
+                  // Ledger Menu Button (optional)
+                  if (onLedgerTap != null)
+                    GestureDetector(
+                      onTap: onLedgerTap,
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: AppColors.primaryDark.withOpacity(0.3),
                           width: 2,
@@ -81,7 +98,9 @@ class TopBar extends StatelessWidget {
                         weight: 700,
                       ),
                     ),
-                  ),
+                  )
+                  else
+                    const SizedBox.shrink(),
                   
                   // Right Side Buttons
                   Row(

@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/goal_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/top_bar.dart';
 import 'package:harcama_app/presentation/widgets/ledger_dropdown.dart';
 import 'package:harcama_app/presentation/widgets/remaining_balance_card.dart';
-import 'package:harcama_app/presentation/widgets/daily_goal_card.dart';
 import 'package:harcama_app/presentation/widgets/transaction_list.dart';
-import 'package:provider/provider.dart';
+import 'package:harcama_app/presentation/widgets/create_goal_dialog.dart';
+import 'package:harcama_app/presentation/widgets/pressable_container.dart';
+import 'package:harcama_app/presentation/pages/goal_page.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
-import 'package:material_symbols_icons/symbols.dart';
-
-// Eğer AddGoalCard widget'ı ayrı bir dosyadaysa import etmeyi unutmayın.
-// Yoksa ve aynı dosyadaysa aşağıya dummy bir class ekledim, onu kullanabilirsiniz.
-// import 'package:harcama_app/presentation/widgets/add_goal_card.dart';
+import 'package:harcama_app/domain/entities/goal.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,25 +28,22 @@ class _HomePageState extends State<HomePage> {
   bool showLedgerSheet = false;
 
   void _toggleLedgerSheet() {
-    setState(() {
-      showLedgerSheet = !showLedgerSheet;
-    });
+    setState(() => showLedgerSheet = !showLedgerSheet);
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final txNotifier = context.watch<TransactionNotifier>();
     final ledgerNotifier = context.watch<LedgerNotifier>();
+    final goalNotifier = context.watch<GoalNotifier>();
 
     final activeLedgerId = ledgerNotifier.selectedLedger?.id;
 
-    // Filtreleme işlemleri
     final visibleTx = activeLedgerId == null || activeLedgerId == 'default'
         ? txNotifier.transactions
         : txNotifier.transactions
-        .where((t) => t.ledgerID == activeLedgerId)
-        .toList();
+              .where((t) => t.ledgerID == activeLedgerId)
+              .toList();
 
     final income = visibleTx
         .where((t) => t.type == TransactionType.income)
@@ -58,132 +56,102 @@ class _HomePageState extends State<HomePage> {
     final balance = income - expense;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Stack(
           children: [
-            // Ana İçerik
-            GestureDetector(
-              onTap: showLedgerSheet ? _toggleLedgerSheet : null,
-              behavior: HitTestBehavior.translucent, // Boşluklara tıklamayı da algıla
-              child: Column(
+            Column(
                 children: [
-                  // Üst Bar
                   TopBar(
                     isSearching: isSearching,
                     onSearchToggle: () =>
                         setState(() => isSearching = !isSearching),
                     onLedgerTap: _toggleLedgerSheet,
+                    searchHint: 'Search transactions...',
+                    onSearchChanged: txNotifier.updateSearchQuery,
+                    onSearchClear: () => txNotifier.updateSearchQuery(''),
                   ),
-
-                  // Kaydırılabilir İçerik Alanı
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
                         children: [
                           const SizedBox(height: 8),
-
-                          // Arama yapılmıyorsa Üst Widget'ları Göster
                           if (!isSearching) ...[
-                            // Bakiye Kartı
                             RemainingBalanceCard(balance: balance),
-
                             const SizedBox(height: 24),
-
-                            // Hedefler Başlığı
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  "Daily Goals",
+                                  'Your Goals',
                                   style: TextStyle(
                                     color: AppColors.text(context),
                                     fontSize: 22,
                                     fontWeight: FontWeight.w900,
                                   ),
                                 ),
-                                Text(
-                                  "See All",
-                                  style: TextStyle(
-                                    color: AppColors.primaryDark,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const GoalPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'See All',
+                                    style: TextStyle(
+                                      color: AppColors.primaryDark,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-
                             const SizedBox(height: 16),
-
-                            // --- DÜZELTİLEN GRID ALANI ---
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: GridView(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                // GridDelegate ile sabit yükseklik veriyoruz:
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,       // Yan yana 2 tane
-                                  crossAxisSpacing: 24,    // Yatay boşluk
-                                  mainAxisSpacing: 12,     // Dikey boşluk
-                                  mainAxisExtent: 80,     // [ÖNEMLİ] Sabit Yükseklik (100px)
-                                ),
-                                children: [
-                                  DailyGoalCard(
-                                    icon: Symbols.restaurant_rounded,
-                                    label: "Food",
-                                    current: 12,
-                                    target: 20,
-                                    color: AppColors.secondaryYellow,
-                                    colorDark: AppColors.secondaryYellowDark,
-                                  ),
-                                  DailyGoalCard(
-                                    icon: Symbols.directions_car_rounded,
-                                    label: "Travel",
-                                    current: 5,
-                                    target: 15,
-                                    color: AppColors.secondaryBlue,
-                                    colorDark: AppColors.secondaryBlueDark,
-                                  ),
-                                  DailyGoalCard(
-                                    icon: Symbols.confirmation_number_rounded,
-                                    label: "Fun",
-                                    current: 8,
-                                    target: 10,
-                                    color: AppColors.primary,
-                                    colorDark: AppColors.primaryDark,
-                                  ),
-                                  // AddGoalCard widget'ınızın import edildiğinden emin olun
-                                  const AddGoalCard(),
-                                ],
+                            SizedBox(
+                              height: 200, // Increased height to prevent clipping
+                              child: GridView.builder(
+                                physics: const BouncingScrollPhysics(),
+                                padding: const EdgeInsets.only(bottom: 16), // Bottom padding
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 24,
+                                      mainAxisSpacing: 12,
+                                      mainAxisExtent: 80,
+                                    ),
+                                itemCount: goalNotifier.goals.length + 1,
+                                itemBuilder: (context, index) {
+                                  if (index == goalNotifier.goals.length) {
+                                    return _addGoalCard(context);
+                                  }
+                                  return _goalCard(
+                                    context: context,
+                                    goal: goalNotifier.goals[index],
+                                  );
+                                },
                               ),
                             ),
-
-                            const SizedBox(height: 8),
-
-                            // Son Aktiviteler Başlığı
-                            Row(
-                              children: [
-                                Text(
-                                  "Recent Activity",
-                                  style: TextStyle(
-                                    color: AppColors.text(context),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w900,
-                                  ),
+                            const SizedBox(height: 16),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Recent Activity',
+                                style: TextStyle(
+                                  color: AppColors.text(context),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
                                 ),
-                              ],
+                              ),
                             ),
                             const SizedBox(height: 8),
                           ],
-
-                          // Alt Liste (İşlemler)
-                          // Listeyi Expanded içine alarak kalan tüm alanı kaplamasını sağlıyoruz
                           Expanded(
                             child: SingleChildScrollView(
-                              // Liste içinde liste kaydırma sorununu çözmek için:
                               physics: const BouncingScrollPhysics(),
                               child: Column(
                                 children: [
@@ -191,7 +159,6 @@ class _HomePageState extends State<HomePage> {
                                     transactions: visibleTx,
                                     notifier: txNotifier,
                                   ),
-                                  // Listenin altında biraz boşluk bırakır (FAB veya bottom bar için)
                                   const SizedBox(height: 100),
                                 ],
                               ),
@@ -203,27 +170,158 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
+            
+            LedgerDropdown(
+              isVisible: showLedgerSheet,
+              ledgerNotifier: ledgerNotifier,
+              onToggle: _toggleLedgerSheet,
             ),
-
-            // Ledger Seçim Ekranı (Overlay)
-            if (showLedgerSheet)
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: _toggleLedgerSheet,
-                  behavior: HitTestBehavior.translucent,
-                  child: Stack(
-                    children: [
-                      LedgerDropdown(
-                        isVisible: showLedgerSheet,
-                        ledgerNotifier: ledgerNotifier,
-                        onToggle: _toggleLedgerSheet,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _goalCard({required BuildContext context, required Goal goal}) {
+    final iconMap = {
+      '🏖️': Symbols.beach_access_rounded,
+      '🛡️': Symbols.shield_with_heart_rounded,
+      '💻': Symbols.laptop_mac_rounded,
+      '🚗': Symbols.directions_car_rounded,
+      '🏠': Symbols.home_rounded,
+      '🎯': Symbols.target_rounded,
+    };
+
+    final colorMap = {
+      'orange': AppColors.secondaryYellow,
+      'blue': AppColors.secondaryBlue,
+      'purple': AppColors.primary,
+      'green': AppColors.primary,
+      'red': Colors.red,
+      'yellow': AppColors.secondaryYellow,
+    };
+
+    final iconData = iconMap[goal.icon] ?? Symbols.target_rounded;
+    final color = colorMap[goal.color] ?? AppColors.primary;
+    final colorDark = color == AppColors.primary
+        ? AppColors.primaryDark
+        : color == AppColors.secondaryYellow
+        ? AppColors.secondaryYellowDark
+        : color == AppColors.secondaryBlue
+        ? AppColors.secondaryBlueDark
+        : color;
+
+    return PressableContainer(
+      onPressed: () {},
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: AppColors.card(context),
+        border: Border.all(color: AppColors.cardBorder(context), width: 2),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: AppColors.cardShadow(context),
+          offset: const Offset(0, 4),
+        ),
+      ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(iconData, color: colorDark, size: 20, weight: 700),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    goal.title.toUpperCase(),
+                    style: TextStyle(
+                      color: AppColors.subtitleText(context),
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    "₺${goal.currentAmount.toStringAsFixed(0)}/₺${goal.targetAmount.toStringAsFixed(0)}",
+                    style: TextStyle(
+                      color: AppColors.text(context),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const Spacer(),
+          Container(
+            height: 10,
+            decoration: BoxDecoration(
+              color: AppColors.progressBackground(context),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: goal.progress,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _addGoalCard(BuildContext context) {
+    return PressableContainer(
+      onPressed: () async {
+        final result = await showDialog<Goal>(
+          context: context,
+          builder: (_) => const CreateGoalDialog(),
+        );
+
+        if (result != null) {
+          context.read<GoalNotifier>().addItem(result);
+        }
+      },
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: AppColors.progressBackground(context).withOpacity(0.5),
+        border: Border.all(color: AppColors.cardBorder(context), width: 2),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.add_circle_outline,
+            color: AppColors.subtitleText(context),
+            size: 28,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'New Goal',
+            style: TextStyle(
+              color: AppColors.subtitleText(context),
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }

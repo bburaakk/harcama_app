@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/pages/home_page.dart';
 import 'package:harcama_app/presentation/pages/chart_page.dart';
 import 'package:harcama_app/presentation/pages/profile_page.dart';
-import 'package:harcama_app/presentation/pages/report_page.dart';
+import 'package:harcama_app/presentation/pages/goal_page.dart';
 import 'package:harcama_app/presentation/viewmodels/nav_model.dart';
 import 'package:harcama_app/presentation/widgets/nav_bar.dart';
 import 'package:harcama_app/presentation/widgets/floating_add_button.dart';
@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
     items = [
       NavModel(page: const HomePage(), navKey: homeKey),
       NavModel(page: const ChartPage(), navKey: chartKey),
-      NavModel(page: const ReportPage(), navKey: reportKey),
+      NavModel(page: const GoalPage(), navKey: reportKey),
       NavModel(page: const ProfilePage(), navKey: profileKey),
     ];
   }

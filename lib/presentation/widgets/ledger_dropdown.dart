@@ -53,12 +53,13 @@ class LedgerDropdown extends StatelessWidget {
               },
               color: AppColors.primary,
             ),
-            
+
             // User Ledgers
             if (ledgerNotifier.ledgers.isNotEmpty) ...[
               const SizedBox(height: 4),
               ...ledgerNotifier.ledgers.map((ledger) {
-                final isSelected = ledger.id == ledgerNotifier.selectedLedger?.id;
+                final isSelected =
+                    ledger.id == ledgerNotifier.selectedLedger?.id;
                 return Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: _buildLedgerItem(
@@ -70,7 +71,8 @@ class LedgerDropdown extends StatelessWidget {
                       ledgerNotifier.selectLedger(ledger);
                       onToggle();
                     },
-                    onDelete: () => _showDeleteDialog(context, ledger, ledgerNotifier),
+                    onDelete: () =>
+                        _showDeleteDialog(context, ledger, ledgerNotifier),
                     color: _getLedgerColor(ledger.id),
                   ),
                 );
@@ -150,7 +152,7 @@ class LedgerDropdown extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
-          border: isSelected 
+          border: isSelected
               ? Border.all(color: color.withOpacity(0.2), width: 2)
               : Border.all(color: Colors.transparent, width: 2),
         ),
@@ -163,39 +165,44 @@ class LedgerDropdown extends StatelessWidget {
                 color: color,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: 20,
-              ),
+              child: Icon(icon, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 name,
                 style: TextStyle(
-                  color: isSelected ? AppColors.text(context) : AppColors.subtitleText(context),
+                  color: isSelected
+                      ? AppColors.text(context)
+                      : AppColors.subtitleText(context),
                   fontWeight: FontWeight.w900,
                   fontSize: 14,
                 ),
               ),
             ),
-            if (isSelected)
-              Icon(
-                Symbols.check_circle_rounded,
-                color: color,
-                fill: 1,
-                size: 24,
-              ),
-             if (!isSelected && onDelete != null)
-               InkWell(
-                 onTap: onDelete,
-                 child: Icon(
-                   Symbols.delete_rounded,
-                   color: AppColors.expenseColor(context),
-                   size: 20,
-                 ),
-               ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isSelected)
+                  Icon(
+                    Symbols.check_circle_rounded,
+                    color: color,
+                    fill: 1,
+                    size: 24,
+                  ),
+                if (onDelete != null) ...[
+                  if (isSelected) const SizedBox(width: 8),
+                  InkWell(
+                    onTap: onDelete,
+                    child: Icon(
+                      Symbols.delete_rounded,
+                      color: AppColors.expenseColor(context),
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ],
         ),
       ),
@@ -204,19 +211,32 @@ class LedgerDropdown extends StatelessWidget {
 
   IconData _getIconData(String iconString) {
     switch (iconString) {
-      case 'flight': return Symbols.flight_rounded;
-      case 'pets': return Symbols.pets_rounded;
-      case 'home': return Symbols.home_rounded;
-      case 'shopping_cart': return Symbols.shopping_cart_rounded;
-      case 'school': return Symbols.school_rounded;
-      case 'fitness_center': return Symbols.fitness_center_rounded;
-      case 'work': return Symbols.work_rounded;
-      case 'restaurant': return Symbols.restaurant_rounded;
-      case 'savings': return Symbols.savings_rounded;
-      case 'celebration': return Symbols.celebration_rounded;
-      case 'person': return Symbols.person_rounded;
-      case 'group': return Symbols.group_rounded;
-      default: return Symbols.menu_book_rounded;
+      case 'flight':
+        return Symbols.flight_rounded;
+      case 'pets':
+        return Symbols.pets_rounded;
+      case 'home':
+        return Symbols.home_rounded;
+      case 'shopping_cart':
+        return Symbols.shopping_cart_rounded;
+      case 'school':
+        return Symbols.school_rounded;
+      case 'fitness_center':
+        return Symbols.fitness_center_rounded;
+      case 'work':
+        return Symbols.work_rounded;
+      case 'restaurant':
+        return Symbols.restaurant_rounded;
+      case 'savings':
+        return Symbols.savings_rounded;
+      case 'celebration':
+        return Symbols.celebration_rounded;
+      case 'person':
+        return Symbols.person_rounded;
+      case 'group':
+        return Symbols.group_rounded;
+      default:
+        return Symbols.menu_book_rounded;
     }
   }
 
@@ -229,7 +249,10 @@ class LedgerDropdown extends StatelessWidget {
   }
 
   void _showDeleteDialog(
-      BuildContext context, var ledger, LedgerNotifier ledgerNotifier) {
+    BuildContext context,
+    var ledger,
+    LedgerNotifier ledgerNotifier,
+  ) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -242,7 +265,17 @@ class LedgerDropdown extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
+              // Check if the ledger being deleted is currently selected
+              final isCurrentlySelected =
+                  ledger.id == ledgerNotifier.selectedLedger?.id;
+
               await ledgerNotifier.deleteItem(ledger.id);
+
+              // If the deleted ledger was selected, switch to All Ledger
+              if (isCurrentlySelected) {
+                ledgerNotifier.selectLedger(ledgerNotifier.allLedger);
+              }
+
               if (context.mounted) Navigator.pop(ctx);
             },
             child: const Text('Delete', style: TextStyle(color: Colors.red)),

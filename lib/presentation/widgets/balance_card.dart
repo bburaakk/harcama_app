@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:harcama_app/presentation/widgets/stat_box.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class BalanceCard extends StatelessWidget {
   final double balance;
@@ -17,6 +18,8 @@ class BalanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return PressableContainer(
       onPressed: () {
         // TODO: Add functionality
@@ -39,7 +42,7 @@ class BalanceCard extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            "Total Balance",
+            l10n.totalBalance,
             style: TextStyle(
               color: AppColors.primaryTextOnCard.withOpacity(0.9),
               fontSize: 16,
@@ -63,13 +66,13 @@ class BalanceCard extends StatelessWidget {
               children: [
                 StatBox(
                   icon: Icons.arrow_downward,
-                  label: "Income",
+                  label: l10n.incomeLabel,
                   value: income,
                 ),
                 const SizedBox(width: 12),
                 StatBox(
                   icon: Icons.arrow_upward,
-                  label: "Expenses",
+                  label: l10n.expensesLabel,
                   value: expense,
                 ),
               ],

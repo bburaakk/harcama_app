@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 import 'package:harcama_app/data/repositories/account_repository_impl.dart';
 import 'package:harcama_app/data/repositories/category_repository_impl.dart';
 import 'package:harcama_app/data/repositories/ledger_repository_impl.dart';
@@ -109,6 +111,13 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
       themeMode: themeNotifier.currentTheme,
       theme: ThemeData(
         brightness: Brightness.light,

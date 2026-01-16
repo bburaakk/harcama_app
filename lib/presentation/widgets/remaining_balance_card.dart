@@ -3,6 +3,7 @@ import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class RemainingBalanceCard extends StatelessWidget {
   final double balance;
@@ -36,7 +37,7 @@ class RemainingBalanceCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "REMAINING BALANCE",
+                AppLocalizations.of(context)!.remainingBalance,
                 style: TextStyle(
                   color: AppColors.textDark.withOpacity(0.7),
                   fontSize: 11,

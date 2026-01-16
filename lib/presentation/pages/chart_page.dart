@@ -9,7 +9,7 @@ import 'package:harcama_app/presentation/widgets/spending_chart.dart';
 import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class ChartPage extends StatefulWidget {
   const ChartPage({super.key});
@@ -20,7 +20,8 @@ class ChartPage extends StatefulWidget {
 
 class _ChartPageState extends State<ChartPage> {
   int _selectedIndex = 0;
-  final List<String> _timeframes = ['Weekly', 'Monthly', 'Yearly'];
+  
+  // Timeframes listesini build içinde oluşturacağız çünkü context'e ihtiyacımız var
 
   void _onTimeframeSelected(int index) {
     setState(() {
@@ -31,6 +32,16 @@ class _ChartPageState extends State<ChartPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    
+    // Timeframes listesini yerelleştirilmiş olarak oluşturuyoruz
+    // Ancak _ChartContent widget'ı "Weekly", "Monthly", "Yearly" stringlerine göre mantık kuruyor.
+    // Bu yüzden UI'da gösterilen ile mantıkta kullanılanı ayırmamız gerekebilir.
+    // Şimdilik basitçe UI'da gösterilen listeyi oluşturup, mantık kısmına index veya sabit key gönderebiliriz.
+    // Mevcut yapıyı bozmamak için _ChartContent'e key gönderip, UI'da localized string göstereceğiz.
+    
+    final timeframesKeys = ['Weekly', 'Monthly', 'Yearly'];
+    final timeframesDisplay = [l10n.weekly, l10n.monthly, l10n.yearly];
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -40,11 +51,11 @@ class _ChartPageState extends State<ChartPage> {
             const SizedBox(height: 16),
             TimeframeSelector(
               selectedIndex: _selectedIndex,
-              timeframes: _timeframes,
+              timeframes: timeframesDisplay, // UI'da gösterilecek liste
               onTimeframeSelected: _onTimeframeSelected,
             ),
             Expanded(
-              child: _ChartContent(timeframe: _timeframes[_selectedIndex]),
+              child: _ChartContent(timeframe: timeframesKeys[_selectedIndex]), // Mantık için key gönderiyoruz
             ),
           ],
         ),
@@ -71,10 +82,6 @@ class _ChartContentState extends State<_ChartContent> {
     super.initState();
     _initialDate = DateTime.now();
     _pageController = PageController(initialPage: _initialPage);
-    // initializeDateFormatting çağrısını kaldırdık veya dinamik hale getirebiliriz
-    // Ancak main.dart'ta zaten locale desteği eklendiği için burada gerek kalmayabilir
-    // Yine de garanti olsun diye boş bir initialize bırakabiliriz veya kaldırabiliriz.
-    // Şimdilik kaldırıyorum çünkü main.dart hallediyor.
   }
 
   @override
@@ -112,12 +119,10 @@ class _ChartContentState extends State<_ChartContent> {
     return ((date.difference(firstMonday).inDays) / 7).floor() + 1;
   }
 
-  String _getDateLabel(DateTime date) {
+  String _getDateLabel(BuildContext context, DateTime date) {
     final now = DateTime.now();
-    // Cihazın locale'ini al (veya varsayılan olarak 'en_US' kullan)
-    // Ancak DateFormat constructor'ında locale belirtmezsek, Intl.defaultLocale kullanılır.
-    // Intl.defaultLocale ise main.dart'taki yapılandırma sayesinde cihaz diliyle uyumlu olmalı.
-    // Yine de garanti olsun diye null geçiyoruz (varsayılanı kullanması için).
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).toString();
 
     if (widget.timeframe == 'Weekly') {
       final startOfWeek = date.subtract(Duration(days: date.weekday - 1));
@@ -128,38 +133,38 @@ class _ChartContentState extends State<_ChartContent> {
       if (startOfWeek.year == currentStart.year && 
           startOfWeek.month == currentStart.month && 
           startOfWeek.day == currentStart.day) {
-        return 'THIS WEEK'; // Bunu da yerelleştirmek lazım ama şimdilik kalsın
+        return l10n.thisWeek;
       }
 
       if (startOfWeek.year != endOfWeek.year) {
         // Yıl değişiyorsa: 2023 29 Dec - 2024 4 Jan
-        final start = DateFormat('yyyy d MMM').format(startOfWeek);
-        final end = DateFormat('yyyy d MMM').format(endOfWeek);
+        final start = DateFormat('yyyy d MMM', locale).format(startOfWeek);
+        final end = DateFormat('yyyy d MMM', locale).format(endOfWeek);
         return '$start - $end';
       } else if (startOfWeek.month != endOfWeek.month) {
         // Ay değişiyorsa: 2024 29 Jan - 4 Feb
         final year = startOfWeek.year.toString();
-        final start = DateFormat('d MMM').format(startOfWeek);
-        final end = DateFormat('d MMM').format(endOfWeek);
+        final start = DateFormat('d MMM', locale).format(startOfWeek);
+        final end = DateFormat('d MMM', locale).format(endOfWeek);
         return '$year $start - $end';
       } else {
         // Aynı ay: 2024 19 - 25 Jan
         final year = startOfWeek.year.toString();
         final startDay = startOfWeek.day.toString();
-        final end = DateFormat('d MMM').format(endOfWeek);
+        final end = DateFormat('d MMM', locale).format(endOfWeek);
         return '$year $startDay - $end';
       }
 
     } else if (widget.timeframe == 'Monthly') {
       if (date.year == now.year && date.month == now.month) {
-        return 'THIS MONTH';
+        return l10n.thisMonth;
       }
-      return DateFormat('MMMM yyyy').format(date);
+      return DateFormat('MMMM yyyy', locale).format(date);
     } else { // Yearly
       if (date.year == now.year) {
-        return 'THIS YEAR';
+        return l10n.thisYear;
       }
-      return DateFormat('yyyy').format(date);
+      return DateFormat('yyyy', locale).format(date);
     }
   }
 
@@ -233,6 +238,8 @@ class _ChartContentState extends State<_ChartContent> {
   }
 
   Widget _buildPageContent(BuildContext context, DateTime date) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Selector<TransactionNotifier, List<Transaction>>(
       selector: (context, notifier) => notifier.transactions,
       builder: (context, allTransactions, _) {
@@ -276,7 +283,7 @@ class _ChartContentState extends State<_ChartContent> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          _getDateLabel(date).toUpperCase(),
+                          _getDateLabel(context, date).toUpperCase(),
                           style: TextStyle(
                             color: AppColors.text(context),
                             fontWeight: FontWeight.w900,
@@ -305,7 +312,7 @@ class _ChartContentState extends State<_ChartContent> {
               ] else ...[
                 const SizedBox(height: 50),
                 Text(
-                  "No expenses yet",
+                  l10n.noExpensesYet,
                   style: TextStyle(
                     color: AppColors.subtitleText(context),
                     fontSize: 16,

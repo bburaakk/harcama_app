@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class DailyGoalCard extends StatelessWidget {
   final IconData icon;
@@ -118,6 +119,8 @@ class AddGoalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return GestureDetector(
       onTap: onPressed,
       child: Container(
@@ -142,7 +145,7 @@ class AddGoalCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              "New Goal",
+              l10n.newGoal,
               style: TextStyle(
                 color: AppColors.subtitleText(context),
                 fontSize: 12,

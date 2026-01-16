@@ -10,6 +10,7 @@ import 'package:harcama_app/presentation/widgets/section_header.dart';
 import 'package:harcama_app/presentation/widgets/profile_list_item.dart';
 import 'package:harcama_app/presentation/widgets/usage_bar.dart';
 import 'package:harcama_app/presentation/widgets/square_button.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -19,6 +20,7 @@ class ProfilePage extends StatelessWidget {
     final premiumNotifier = context.watch<PremiumNotifier>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isPremium = premiumNotifier.isPremium;
+    final l10n = AppLocalizations.of(context)!;
 
     // Colors from AppColors
     final backgroundColor = AppColors.premiumBackground(isDark);
@@ -49,7 +51,7 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   const SizedBox(width: 40),
                   Text(
-                    "Profile",
+                    l10n.profile,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
@@ -86,6 +88,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildGuestProfile(BuildContext context, bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     // Colors from AppColors
     final surfaceColor = AppColors.premiumSurface(isDark);
     final textColor = AppColors.premiumText(isDark);
@@ -126,17 +129,17 @@ class ProfilePage extends StatelessWidget {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Clear Local Data?"),
-          content: const Text("This will permanently delete all your transactions. This action cannot be undone."),
+          title: Text(l10n.clearLocalDataTitle),
+          content: Text(l10n.clearLocalDataContent),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text("Cancel"),
+              child: Text(l10n.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(foregroundColor: AppColors.danger),
-              child: const Text("Delete Everything"),
+              child: Text(l10n.deleteEverything),
             ),
           ],
         ),
@@ -147,7 +150,7 @@ class ProfilePage extends StatelessWidget {
           await context.read<TransactionNotifier>().clearAllTransactions();
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("All local data cleared.")),
+              SnackBar(content: Text(l10n.allLocalDataCleared)),
             );
           }
         }
@@ -172,7 +175,7 @@ class ProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              "Guest User",
+              l10n.guestUser,
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.w900,
@@ -182,7 +185,7 @@ class ProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              "Local usage (no account)",
+              l10n.localUsage,
               style: TextStyle(
                 color: subTextColor,
                 fontWeight: FontWeight.bold,
@@ -224,9 +227,9 @@ class ProfilePage extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Go Premium",
-                          style: TextStyle(
+                        Text(
+                          l10n.goPremium,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 24,
                             fontWeight: FontWeight.w900,
@@ -234,9 +237,9 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          "Unlock cloud sync, unlimited ledgers, and zero ads.",
-                          style: TextStyle(
+                        Text(
+                          l10n.unlockCloudSync,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
@@ -260,9 +263,9 @@ class ProfilePage extends StatelessWidget {
                               ],
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            child: const Text(
-                              "UPGRADE NOW",
-                              style: TextStyle(
+                            child: Text(
+                              l10n.upgradeNow,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.premiumGoldDark,
                               ),
@@ -278,7 +281,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Usage Limits
-              SectionHeader(title: "Usage Limits", color: subTextColor),
+              SectionHeader(title: l10n.usageLimits, color: subTextColor),
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -289,9 +292,9 @@ class ProfilePage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    UsageBar(label: "Ledgers", value: "1 / 1", percentage: 1.0, progressColor: AppColors.premiumPrimary, isDark: isDark),
+                    UsageBar(label: l10n.ledgers, value: "1 / 1", percentage: 1.0, progressColor: AppColors.premiumPrimary, isDark: isDark),
                     const SizedBox(height: 16),
-                    UsageBar(label: "Accounts", value: "2 / 3", percentage: 0.66, progressColor: AppColors.premiumPrimary, isDark: isDark),
+                    UsageBar(label: l10n.accounts, value: "2 / 3", percentage: 0.66, progressColor: AppColors.premiumPrimary, isDark: isDark),
                   ],
                 ),
               ),
@@ -299,7 +302,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Account
-              SectionHeader(title: "Account", color: subTextColor),
+              SectionHeader(title: l10n.account, color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -311,14 +314,14 @@ class ProfilePage extends StatelessWidget {
                   icon: Icons.login,
                   iconColor: Colors.blue[600]!,
                   iconBgColor: Colors.blue[100]!,
-                  title: "Sign in / Create account",
-                  subtitleWidget: const Row(
+                  title: l10n.signInCreateAccount,
+                  subtitleWidget: Row(
                     children: [
-                      Icon(Icons.stars, size: 14, color: AppColors.premiumGoldDark),
-                      SizedBox(width: 4),
+                      const Icon(Icons.stars, size: 14, color: AppColors.premiumGoldDark),
+                      const SizedBox(width: 4),
                       Text(
-                        "Premium only",
-                        style: TextStyle(
+                        l10n.premiumOnly,
+                        style: const TextStyle(
                           color: AppColors.premiumGoldDark,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -336,7 +339,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Data
-              SectionHeader(title: "Data", color: subTextColor),
+              SectionHeader(title: l10n.data, color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -352,8 +355,8 @@ class ProfilePage extends StatelessWidget {
                         icon: Icons.save,
                         iconColor: Colors.grey[500]!,
                         iconBgColor: isDark ? Colors.grey[700]! : Colors.grey[200]!,
-                        title: "Local data stored",
-                        subtitle: "Everything stays on this device",
+                        title: l10n.localDataStored,
+                        subtitle: l10n.everythingStaysOnDevice,
                         textColor: textColor,
                         subTextColor: subTextColor,
                         borderColor: borderColor,
@@ -365,8 +368,8 @@ class ProfilePage extends StatelessWidget {
                         icon: Icons.cloud_upload,
                         iconColor: Colors.blueGrey[400]!,
                         iconBgColor: Colors.blueGrey[100]!,
-                        title: "Online backup",
-                        subtitle: "Premium only",
+                        title: l10n.onlineBackup,
+                        subtitle: l10n.premiumOnly,
                         textColor: subTextColor,
                         subTextColor: subTextColor,
                         borderColor: borderColor,
@@ -381,8 +384,8 @@ class ProfilePage extends StatelessWidget {
                         icon: Icons.sync,
                         iconColor: Colors.blueGrey[400]!,
                         iconBgColor: Colors.blueGrey[100]!,
-                        title: "Automatic backup",
-                        subtitle: "Premium only",
+                        title: l10n.automaticBackup,
+                        subtitle: l10n.premiumOnly,
                         textColor: subTextColor,
                         subTextColor: subTextColor,
                         borderColor: borderColor,
@@ -397,8 +400,8 @@ class ProfilePage extends StatelessWidget {
                         icon: Icons.upload_file,
                         iconColor: Colors.blueGrey[400]!,
                         iconBgColor: Colors.blueGrey[100]!,
-                        title: "Export data",
-                        subtitle: "Premium only",
+                        title: l10n.exportData,
+                        subtitle: l10n.premiumOnly,
                         textColor: subTextColor,
                         subTextColor: subTextColor,
                         isLast: true,
@@ -415,7 +418,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Ads
-              SectionHeader(title: "Ads", color: subTextColor),
+              SectionHeader(title: l10n.ads, color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -427,8 +430,8 @@ class ProfilePage extends StatelessWidget {
                   icon: Icons.ad_units,
                   iconColor: AppColors.premiumGoldDark,
                   iconBgColor: AppColors.premiumGold.withOpacity(0.1),
-                  title: "Remove ads",
-                  subtitle: "Upgrade to Premium",
+                  title: l10n.removeAds,
+                  subtitle: l10n.upgradeToPremium,
                   textColor: textColor,
                   subTextColor: AppColors.premiumGoldDark,
                   isLast: true,
@@ -441,7 +444,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // About
-              SectionHeader(title: "About", color: subTextColor),
+              SectionHeader(title: l10n.about, color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -457,7 +460,7 @@ class ProfilePage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "App version",
+                            l10n.appVersion,
                             style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.w800,
@@ -480,7 +483,7 @@ class ProfilePage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Privacy policy",
+                            l10n.privacyPolicy,
                             style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.w800,
@@ -509,12 +512,12 @@ class ProfilePage extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.delete_forever, color: Colors.white),
-                    SizedBox(width: 8),
+                  children: [
+                    const Icon(Icons.delete_forever, color: Colors.white),
+                    const SizedBox(width: 8),
                     Text(
-                      "CLEAR LOCAL DATA",
-                      style: TextStyle(
+                      l10n.clearLocalData,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
                         fontSize: 16,
@@ -526,7 +529,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 16),
               Center(
                 child: Text(
-                  "THIS ACTION CANNOT BE UNDONE",
+                  l10n.thisActionCannotBeUndone,
                   style: TextStyle(
                     color: subTextColor,
                     fontSize: 10,

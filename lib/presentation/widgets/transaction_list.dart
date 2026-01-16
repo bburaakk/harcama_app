@@ -3,6 +3,7 @@ import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/widgets/transaction_card.dart';
 import 'package:intl/intl.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactions;
@@ -28,9 +29,9 @@ class TransactionList extends StatelessWidget {
     }
 
     if (transactions.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(40),
-        child: Text("No transactions found"),
+      return Padding(
+        padding: const EdgeInsets.all(40),
+        child: Text(AppLocalizations.of(context)!.noTransactionsFound),
       );
     }
 

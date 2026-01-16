@@ -10,6 +10,7 @@ import 'package:harcama_app/presentation/widgets/Keypad.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class ExpenseDetailPage extends StatefulWidget {
   final Transaction transaction;
@@ -118,6 +119,8 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       resizeToAvoidBottomInset: false,
@@ -142,12 +145,12 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                         const SizedBox(height: 10),
 
                         // 2. Başlık
-                        const FittedBox(
+                        FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            "Edit Transaction",
+                            l10n.editTransaction,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
                             ),
@@ -259,6 +262,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
   }
 
   Widget _buildDescriptionDateRow(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
@@ -279,7 +283,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                   fontSize: 14,
                 ),
                 decoration: InputDecoration(
-                  hintText: "Description",
+                  hintText: l10n.description,
                   hintStyle: TextStyle(color: AppColors.subtitleText(context), fontSize: 14),
                   border: InputBorder.none,
                   isDense: true,
@@ -315,7 +319,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
               ),
               const SizedBox(width: 8),
               Text(
-                _getDateLabel(),
+                _getDateLabel(context),
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
@@ -329,14 +333,15 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
     );
   }
 
-  String _getDateLabel() {
+  String _getDateLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final selected = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
     
-    if (selected == today) return "Today";
-    if (selected == today.subtract(const Duration(days: 1))) return "Yesterday";
-    return DateFormat("MMM d").format(selectedDate);
+    if (selected == today) return l10n.today;
+    if (selected == today.subtract(const Duration(days: 1))) return l10n.yesterday;
+    return DateFormat("MMM d", Localizations.localeOf(context).toString()).format(selectedDate);
   }
 
   Future<void> _selectDate() async {
@@ -398,12 +403,13 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
   }
 
   Widget _buildTypeSelector(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
           child: _buildTypeButton(
               type: TransactionType.income,
-              label: "INCOME",
+              label: l10n.income,
               color: AppColors.primary,
               darkColor: AppColors.primaryDark,
             ),
@@ -412,7 +418,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
           Expanded(
             child: _buildTypeButton(
               type: TransactionType.expense,
-              label: "EXPENSE",
+              label: l10n.expense,
               color: const Color(0xFFFF4B4B),
               darkColor: const Color(0xFFD33131),
             ),
@@ -421,7 +427,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
           Expanded(
             child: _buildTypeButton(
               type: TransactionType.transfer,
-              label: "TRANSFER",
+              label: l10n.transfer,
               color: AppColors.secondaryBlue,
               darkColor: AppColors.secondaryBlueDark,
             ),
@@ -480,6 +486,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
   }
 
   Widget _buildCategorySection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -488,7 +495,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              "SELECT CATEGORY",
+              l10n.selectCategory,
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
@@ -572,6 +579,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
   }
 
   Widget _buildMoreCategoryButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = constraints.maxHeight * 0.65;
@@ -605,7 +613,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
-                "MORE",
+                l10n.more,
                 style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
@@ -621,6 +629,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
   }
 
   Widget _buildSaveButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     
@@ -644,10 +653,10 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
             offset: Offset(0, 4),
           ),
         ],
-        child: const Center(
+        child: Center(
           child: Text(
-            "SAVE",
-            style: TextStyle(
+            l10n.save,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
               color: Colors.white,
@@ -662,26 +671,30 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
   // ---------------- ACTIONS ----------------
 
   Future<void> _confirmDelete() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete transaction?'),
-        content: const Text('This action cannot be undone.'),
+        title: Text(l10n.deleteTransaction),
+        content: Text(l10n.deleteTransactionConfirm),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Delete', style: TextStyle(color: Colors.red))),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.delete, style: const TextStyle(color: Colors.red))),
         ],
       ),
     );
 
     if (confirmed == true) {
-      final notifier = context.read<TransactionNotifier>();
-      await notifier.deleteItem(widget.transaction.id);
-      if (context.mounted) Navigator.pop(context);
+      if (context.mounted) {
+        final notifier = context.read<TransactionNotifier>();
+        await notifier.deleteItem(widget.transaction.id);
+        if (context.mounted) Navigator.pop(context);
+      }
     }
   }
 
   Future<void> _saveChanges() async {
+    final l10n = AppLocalizations.of(context)!;
     final notifier = context.read<TransactionNotifier>();
     final parsedAmount = _evaluateAmount();
 
@@ -689,7 +702,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
       id: widget.transaction.id,
       ledgerID: widget.transaction.ledgerID,
       accountID: widget.transaction.accountID,
-      title: note.isEmpty ? 'Transaction' : note,
+      title: note.isEmpty ? l10n.transaction : note,
       amount: parsedAmount,
       date: selectedDate,
       entryDate: widget.transaction.entryDate,

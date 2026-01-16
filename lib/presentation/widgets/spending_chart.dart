@@ -5,6 +5,7 @@ import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' as math;
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class SpendingChart extends StatelessWidget {
   final List<Transaction> transactions;
@@ -22,20 +23,29 @@ class SpendingChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final now = referenceDate ?? DateTime.now();
+    final locale = Localizations.localeOf(context).toString();
     
     List<double> chartValues = [];
     List<String> chartLabels = [];
     String title = '';
 
     if (timeframe == 'Weekly') {
-      title = 'Weekly Spending';
+      title = l10n.weeklySpendingTitle;
       final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
       final startOfWeekDate = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
       final endOfWeekDate = startOfWeekDate.add(const Duration(days: 7));
 
       chartValues = List.filled(7, 0.0);
-      chartLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+      // Yerelleştirilmiş gün isimleri (Pzt, Sal, Çar...)
+      // Ancak yer darlığı nedeniyle tek harf kullanmak daha iyi olabilir.
+      // Şimdilik basitçe İngilizce harfleri yerelleştirilmiş kısa gün adlarıyla değiştirelim.
+      // DateFormat.E(locale).format(date) -> "Mon" or "Pzt"
+      chartLabels = List.generate(7, (index) {
+        final day = startOfWeekDate.add(Duration(days: index));
+        return DateFormat.E(locale).format(day)[0]; // İlk harfi al
+      });
 
       for (var t in transactions) {
         if (t.type == TransactionType.expense) {
@@ -49,11 +59,11 @@ class SpendingChart extends StatelessWidget {
         }
       }
     } else if (timeframe == 'Monthly') {
-      title = 'Monthly Spending';
+      title = l10n.monthlySpendingTitle;
       
       // Ayın son gününü bul (Örn: 30, 31 veya 28)
       int lastDayOfMonth = DateTime(now.year, now.month + 1, 0).day;
-      String monthName = DateFormat('MMM', 'tr_TR').format(now);
+      String monthName = DateFormat('MMM', locale).format(now);
       
       // Ayı 5 parçaya böl: 1-7, 8-14, 15-21, 22-28, 29-Son
       chartValues = List.filled(5, 0.0);
@@ -86,9 +96,13 @@ class SpendingChart extends StatelessWidget {
         }
       }
     } else { // Yearly
-      title = 'Yearly Spending';
+      title = l10n.yearlySpendingTitle;
       chartValues = List.filled(12, 0.0);
-      chartLabels = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+      // Yerelleştirilmiş ay isimlerinin ilk harfleri
+      chartLabels = List.generate(12, (index) {
+        final date = DateTime(now.year, index + 1, 1);
+        return DateFormat.MMM(locale).format(date)[0];
+      });
 
       final startOfYear = DateTime(now.year, 1, 1);
       final endOfYear = DateTime(now.year + 1, 1, 1);

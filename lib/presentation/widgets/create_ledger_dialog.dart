@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:harcama_app/domain/entities/ledger.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class CreateLedgerDialog extends StatefulWidget {
   const CreateLedgerDialog({super.key});
@@ -42,6 +43,8 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(16),
@@ -71,7 +74,7 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
                 // Header
                 Center(
                   child: Text(
-                    'New Ledger',
+                    l10n.newLedger,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
@@ -86,7 +89,7 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Text(
-                    'LEDGER NAME',
+                    l10n.ledgerName,
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
@@ -110,7 +113,7 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
                       fontSize: 16,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'e.g. Vacation',
+                      hintText: l10n.ledgerNameHint,
                       hintStyle: TextStyle(
                         color: AppColors.subtitleText(context).withOpacity(0.5),
                         fontWeight: FontWeight.bold,
@@ -127,7 +130,7 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Text(
-                    'CHOOSE ICON',
+                    l10n.chooseIcon,
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
@@ -192,10 +195,10 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
                         ),
                       ],
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        'CREATE',
-                        style: TextStyle(
+                        l10n.create,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
@@ -213,7 +216,7 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
                     color: Colors.transparent,
                     child: Center(
                       child: Text(
-                        'CANCEL',
+                        l10n.cancel.toUpperCase(),
                         style: TextStyle(
                           color: AppColors.subtitleText(context),
                           fontSize: 14,

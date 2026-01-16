@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class DonutChartSection extends StatefulWidget {
   final double totalSpent;
@@ -23,18 +24,19 @@ class _DonutChartSectionState extends State<DonutChartSection> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final expenses = widget.transactions.where((t) => t.type == TransactionType.expense).toList();
 
     List<PieChartSectionData> sections = [];
     List<PieChartSectionData> shadowSections = [];
 
-    String centerLabel = 'TOTAL SPENT';
+    String centerLabel = l10n.totalSpent;
     String centerAmount = "₺${CurrencyHelper.format(widget.totalSpent)}";
 
     if (expenses.isNotEmpty && widget.totalSpent > 0) {
       final Map<String, double> categoryTotals = {};
       for (var t in expenses) {
-        final categoryName = t.category?.title ?? 'Other';
+        final categoryName = t.category?.title ?? l10n.other;
         categoryTotals[categoryName] = (categoryTotals[categoryName] ?? 0) + t.amount;
       }
 
@@ -51,7 +53,7 @@ class _DonutChartSectionState extends State<DonutChartSection> {
           for (int i = 4; i < sortedCategories.length; i++) {
             otherTotal += sortedCategories[i].value;
           }
-          centerLabel = 'OTHERS';
+          centerLabel = l10n.others;
           centerAmount = "₺${CurrencyHelper.format(otherTotal)}";
         }
       }

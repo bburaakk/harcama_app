@@ -3,6 +3,7 @@ import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/create_ledger_dialog.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class LedgerDropdown extends StatelessWidget {
   final bool isVisible;
@@ -19,6 +20,7 @@ class LedgerDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!isVisible) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
 
     return Positioned(
       top: 60,
@@ -118,7 +120,7 @@ class LedgerDropdown extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      "New Ledger",
+                      l10n.newLedger,
                       style: TextStyle(
                         color: AppColors.subtitleText(context),
                         fontWeight: FontWeight.bold,
@@ -253,15 +255,16 @@ class LedgerDropdown extends StatelessWidget {
     var ledger,
     LedgerNotifier ledgerNotifier,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Ledger?'),
-        content: Text('Are you sure you want to delete "${ledger.name}"?'),
+        title: Text(l10n.deleteLedger),
+        content: Text(l10n.deleteLedgerConfirm(ledger.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () async {
@@ -278,7 +281,7 @@ class LedgerDropdown extends StatelessWidget {
 
               if (context.mounted) Navigator.pop(ctx);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),

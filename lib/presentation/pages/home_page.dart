@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
@@ -36,6 +37,7 @@ class _HomePageState extends State<HomePage> {
     final txNotifier = context.watch<TransactionNotifier>();
     final ledgerNotifier = context.watch<LedgerNotifier>();
     final goalNotifier = context.watch<GoalNotifier>();
+    final l10n = AppLocalizations.of(context)!;
 
     final activeLedgerId = ledgerNotifier.selectedLedger?.id;
 
@@ -74,7 +76,7 @@ class _HomePageState extends State<HomePage> {
                       onSearchToggle: () =>
                           setState(() => isSearching = !isSearching),
                       onLedgerTap: _toggleLedgerSheet,
-                      searchHint: 'Search transactions...',
+                      searchHint: l10n.searchTransactions,
                       onSearchChanged: txNotifier.updateSearchQuery,
                       onSearchClear: () => txNotifier.updateSearchQuery(''),
                     ),
@@ -91,7 +93,7 @@ class _HomePageState extends State<HomePage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Your Goals',
+                                    l10n.yourGoals,
                                     style: TextStyle(
                                       color: AppColors.text(context),
                                       fontSize: 22,
@@ -108,7 +110,7 @@ class _HomePageState extends State<HomePage> {
                                       );
                                     },
                                     child: Text(
-                                      'See All',
+                                      l10n.seeAll,
                                       style: TextStyle(
                                         color: AppColors.primaryDark,
                                         fontSize: 13,
@@ -147,7 +149,7 @@ class _HomePageState extends State<HomePage> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  'Recent Activity',
+                                  l10n.recentActivity,
                                   style: TextStyle(
                                     color: AppColors.text(context),
                                     fontSize: 20,
@@ -322,7 +324,7 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(height: 6),
           Text(
-            'New Goal',
+            AppLocalizations.of(context)!.newGoal,
             style: TextStyle(
               color: AppColors.subtitleText(context),
               fontSize: 12,

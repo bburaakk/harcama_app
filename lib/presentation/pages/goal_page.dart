@@ -7,6 +7,7 @@ import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:harcama_app/presentation/widgets/create_goal_dialog.dart';
 import 'package:harcama_app/presentation/notifiers/goal_notifier.dart';
 import 'package:harcama_app/domain/entities/goal.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class GoalPage extends StatefulWidget {
   const GoalPage({super.key});
@@ -20,6 +21,7 @@ class _GoalPageState extends State<GoalPage> {
   Widget build(BuildContext context) {
     final goalNotifier = context.watch<GoalNotifier>();
     final goals = goalNotifier.goals;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -32,7 +34,7 @@ class _GoalPageState extends State<GoalPage> {
             children: [
               const SizedBox(height: 32),
               Text(
-                'You have ${goals.length} active goals!',
+                l10n.youHaveActiveGoals(goals.length),
                 style: TextStyle(
                   color: AppColors.text(context),
                   fontSize: 32,
@@ -41,7 +43,7 @@ class _GoalPageState extends State<GoalPage> {
               ),
               const SizedBox(height: 4),
               Text(
-                "You're doing great! Keep it up. 🚀",
+                l10n.youreDoingGreat,
                 style: TextStyle(
                   color: AppColors.subtitleText(context),
                   fontSize: 16,
@@ -55,9 +57,9 @@ class _GoalPageState extends State<GoalPage> {
                     child: _statCard(
                       context: context,
                       icon: Symbols.analytics_rounded,
-                      title: 'Total Progress',
+                      title: l10n.totalProgress,
                       value: '${(goalNotifier.totalProgress * 100).toInt()}%',
-                      subtitle: '+5% this week',
+                      subtitle: l10n.thisWeekProgress,
                       backgroundColor: AppColors.secondaryBlue.withOpacity(0.1),
                       borderColor: AppColors.secondaryBlue.withOpacity(0.2),
                       iconColor: AppColors.secondaryBlue,
@@ -69,9 +71,9 @@ class _GoalPageState extends State<GoalPage> {
                     child: _statCard(
                       context: context,
                       icon: Symbols.local_fire_department_rounded,
-                      title: 'Active Streak',
-                      value: '${goalNotifier.activeStreakDays} Days',
-                      subtitle: 'Keep the fire burning!',
+                      title: l10n.activeStreak,
+                      value: '${goalNotifier.activeStreakDays} ${l10n.days}',
+                      subtitle: l10n.keepTheFireBurning,
                       backgroundColor: AppColors.secondaryYellow.withOpacity(
                         0.1,
                       ),
@@ -84,7 +86,7 @@ class _GoalPageState extends State<GoalPage> {
               ),
               const SizedBox(height: 40),
               Text(
-                'Your Goals',
+                l10n.yourGoals,
                 style: TextStyle(
                   color: AppColors.text(context),
                   fontSize: 22,
@@ -284,6 +286,7 @@ class _GoalPageState extends State<GoalPage> {
   }
 
   Widget _addGoalCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PressableContainer(
       onPressed: () async {
         final result = await showDialog<Goal>(
@@ -311,7 +314,7 @@ class _GoalPageState extends State<GoalPage> {
           ),
           const SizedBox(height: 6),
           Text(
-            "New Goal",
+            l10n.newGoal,
             style: TextStyle(
               color: AppColors.subtitleText(context),
               fontSize: 12,

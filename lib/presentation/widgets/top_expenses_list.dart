@@ -3,6 +3,7 @@ import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
 import 'package:intl/intl.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class TopExpensesList extends StatelessWidget {
   final List<Transaction> transactions;
@@ -11,6 +12,7 @@ class TopExpensesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final expenses = transactions
         .where((t) => t.type == TransactionType.expense)
         .toList()
@@ -29,7 +31,7 @@ class TopExpensesList extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Top Expenses',
+              l10n.topExpenses,
               style: TextStyle(
                 color: AppColors.text(context),
                 fontSize: 24,
@@ -49,7 +51,8 @@ class TopExpensesList extends StatelessWidget {
   }
 
   Widget _buildExpenseItem(BuildContext context, Transaction tx) {
-    final dateFormat = DateFormat('MMM d, yyyy');
+    final l10n = AppLocalizations.of(context)!;
+    final dateFormat = DateFormat('MMM d, yyyy', Localizations.localeOf(context).toString());
 
     String iconString = tx.category?.icon ?? '';
     Widget iconWidget;
@@ -103,7 +106,7 @@ class TopExpensesList extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  tx.title.isNotEmpty ? tx.title : (tx.category?.title ?? 'Expense'),
+                  tx.title.isNotEmpty ? tx.title : (tx.category?.title ?? l10n.expense),
                   style: TextStyle(
                     color: AppColors.text(context),
                     fontWeight: FontWeight.bold,

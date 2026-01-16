@@ -4,6 +4,7 @@ import 'package:harcama_app/domain/entities/goal.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class CreateGoalDialog extends StatefulWidget {
   const CreateGoalDialog({super.key});
@@ -65,6 +66,8 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(16),
@@ -92,7 +95,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                 // Header
                 Center(
                   child: Text(
-                    'New Goal',
+                    l10n.newGoal,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
@@ -105,11 +108,11 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
 
                 // Goal Title
                 _buildInputSection(
-                  'GOAL TITLE',
+                  l10n.goalTitle,
                   TextField(
                     controller: titleController,
                     style: _inputTextStyle(context),
-                    decoration: _inputDecoration(context, 'e.g. Vacation Trip'),
+                    decoration: _inputDecoration(context, l10n.goalTitleHint),
                   ),
                 ),
 
@@ -117,13 +120,13 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
 
                 // Goal Description
                 _buildInputSection(
-                  'DESCRIPTION (OPTIONAL)',
+                  l10n.descriptionOptional,
                   TextField(
                     controller: descriptionController,
                     style: _inputTextStyle(context),
                     decoration: _inputDecoration(
                       context,
-                      'What are you saving for?',
+                      l10n.descriptionHint,
                     ),
                     maxLines: 2,
                   ),
@@ -133,13 +136,13 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
 
                 // Target Amount
                 _buildInputSection(
-                  'TARGET AMOUNT',
+                  l10n.targetAmount,
                   TextField(
                     controller: targetAmountController,
                     style: _inputTextStyle(context),
                     decoration: _inputDecoration(
                       context,
-                      'e.g. 5000',
+                      l10n.targetAmountHint,
                     ).copyWith(prefixText: '₺ '),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -150,13 +153,13 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
 
                 // Current Amount
                 _buildInputSection(
-                  'CURRENT AMOUNT',
+                  l10n.currentAmount,
                   TextField(
                     controller: currentAmountController,
                     style: _inputTextStyle(context),
                     decoration: _inputDecoration(
                       context,
-                      'How much do you have?',
+                      l10n.currentAmountHint,
                     ).copyWith(prefixText: '₺ '),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -167,7 +170,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
 
                 // Deadline
                 _buildInputSection(
-                  'DEADLINE (OPTIONAL)',
+                  l10n.deadlineOptional,
                   GestureDetector(
                     onTap: _selectDate,
                     child: Container(
@@ -193,7 +196,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                           const SizedBox(width: 12),
                           Text(
                             selectedDeadline == null
-                                ? 'Select a deadline'
+                                ? l10n.selectDeadline
                                 : '${selectedDeadline!.day}/${selectedDeadline!.month}/${selectedDeadline!.year}',
                             style: TextStyle(
                               color: selectedDeadline == null
@@ -215,7 +218,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
 
                 // Icon Selection
                 _buildInputSection(
-                  'CHOOSE ICON',
+                  l10n.chooseIcon,
                   SizedBox(
                     height: 50,
                     child: ListView.separated(
@@ -260,7 +263,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
 
                 // Color Selection
                 _buildInputSection(
-                  'CHOOSE COLOR',
+                  l10n.chooseColor,
                   SizedBox(
                     height: 50,
                     child: ListView.separated(
@@ -321,10 +324,10 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                   ],
                   child: Container(
                     height: 56,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        'CREATE',
-                        style: TextStyle(
+                        l10n.create,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
@@ -342,7 +345,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                     color: Colors.transparent,
                     child: Center(
                       child: Text(
-                        'CANCEL',
+                        l10n.cancel.toUpperCase(),
                         style: TextStyle(
                           color: AppColors.subtitleText(context),
                           fontSize: 14,

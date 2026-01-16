@@ -4,6 +4,7 @@ import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
 import 'dart:math' as math;
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class WeeklySpendingChart extends StatelessWidget {
   final List<Transaction> transactions;
@@ -19,6 +20,7 @@ class WeeklySpendingChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final now = referenceDate ?? DateTime.now();
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
     final startOfWeekDate = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
@@ -55,7 +57,7 @@ class WeeklySpendingChart extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Weekly Spending',
+              l10n.weeklySpending,
               style: TextStyle(
                 color: AppColors.text(context),
                 fontSize: 24,

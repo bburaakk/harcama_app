@@ -5,6 +5,7 @@ import 'package:harcama_app/presentation/notifiers/premium_notifier.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/premium_feature_item.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class PremiumUpgradePage extends StatefulWidget {
   const PremiumUpgradePage({super.key});
@@ -19,6 +20,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     // Colors from AppColors
     final backgroundColor = AppColors.premiumBackground(isDark);
@@ -45,7 +47,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                     child: Padding(
                       padding: const EdgeInsets.only(right: 48), // Balance the close button
                       child: Text(
-                        "Premium",
+                        l10n.premium,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 18,
@@ -108,9 +110,9 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                                     ),
                                   ],
                                 ),
-                                child: const Text(
-                                  "HUGE VALUE",
-                                  style: TextStyle(
+                                child: Text(
+                                  l10n.hugeValue,
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
@@ -123,7 +125,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        "Unlock the Best",
+                        l10n.unlockTheBest,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 28,
@@ -133,7 +135,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        "Take control of your finances with zero limits.",
+                        l10n.takeControl,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
@@ -151,8 +153,8 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                     icon: Icons.cloud_upload,
                     iconColor: Colors.blue[600]!,
                     iconBgColor: isDark ? Colors.blue[900]!.withOpacity(0.4) : Colors.blue[100]!,
-                    title: "Cloud Backup & Sync",
-                    subtitle: "Never lose your transaction data.",
+                    title: l10n.cloudBackupSync,
+                    subtitle: l10n.neverLoseData,
                     textColor: textColor,
                     subTextColor: subTextColor,
                     cardColor: cardColor,
@@ -162,8 +164,8 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                     icon: Icons.analytics,
                     iconColor: Colors.purple[600]!,
                     iconBgColor: isDark ? Colors.purple[900]!.withOpacity(0.4) : Colors.purple[100]!,
-                    title: "Advanced Analytics",
-                    subtitle: "Deep dive into your spending habits.",
+                    title: l10n.advancedAnalytics,
+                    subtitle: l10n.deepDiveSpending,
                     textColor: textColor,
                     subTextColor: subTextColor,
                     cardColor: cardColor,
@@ -173,8 +175,8 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                     icon: Icons.block,
                     iconColor: Colors.red[600]!,
                     iconBgColor: isDark ? Colors.red[900]!.withOpacity(0.4) : Colors.red[100]!,
-                    title: "Ad-Free Experience",
-                    subtitle: "No interruptions, just tracking.",
+                    title: l10n.adFreeExperience,
+                    subtitle: l10n.noInterruptions,
                     textColor: textColor,
                     subTextColor: subTextColor,
                     cardColor: cardColor,
@@ -184,8 +186,8 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                     icon: Icons.construction,
                     iconColor: Colors.orange[600]!,
                     iconBgColor: isDark ? Colors.orange[900]!.withOpacity(0.4) : Colors.orange[100]!,
-                    title: "Smart Finance Tools",
-                    subtitle: "AI-powered budgeting insights.",
+                    title: l10n.smartFinanceTools,
+                    subtitle: l10n.aiBudgeting,
                     textColor: textColor,
                     subTextColor: subTextColor,
                     cardColor: cardColor,
@@ -216,8 +218,8 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "YEARLY ACCESS",
-                                style: TextStyle(
+                                l10n.yearlyAccess,
+                                style: const TextStyle(
                                   color: AppColors.premiumPrimary,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -226,7 +228,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                "₺249.99 / year",
+                                l10n.yearlyPrice,
                                 style: TextStyle(
                                   color: textColor,
                                   fontSize: 18,
@@ -244,9 +246,9 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                                   color: AppColors.premiumPrimary,
                                   borderRadius: BorderRadius.circular(999),
                                 ),
-                                child: const Text(
-                                  "SAVE 30%",
-                                  style: TextStyle(
+                                child: Text(
+                                  l10n.savePercent,
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w900,
@@ -255,7 +257,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                "₺20.83 / mo",
+                                l10n.monthlyPrice,
                                 style: TextStyle(
                                   color: subTextColor,
                                   fontSize: 14,
@@ -291,7 +293,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "MONTHLY",
+                                l10n.monthly,
                                 style: TextStyle(
                                   color: subTextColor,
                                   fontSize: 10,
@@ -301,7 +303,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                "₺29.99 / month",
+                                l10n.monthlyFullPrice,
                                 style: TextStyle(
                                   color: textColor,
                                   fontSize: 18,
@@ -328,7 +330,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                       context.read<PremiumNotifier>().activatePremium();
                       Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("DOSTUM ARTIK SENDE PREMİUMSUN HOŞGELDİN ARAMIZA 🤙")),
+                        SnackBar(content: Text(l10n.premiumWelcomeMessage)),
                       );
                     },
                     decoration: BoxDecoration(
@@ -346,9 +348,9 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                     child: Container(
                       width: double.infinity,
                       alignment: Alignment.center,
-                      child: const Text(
-                        "CONTINUE",
-                        style: TextStyle(
+                      child: Text(
+                        l10n.continueText,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.0,
@@ -362,7 +364,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                   
                   Center(
                     child: Text(
-                      "CANCEL ANYTIME",
+                      l10n.cancelAnytime,
                       style: TextStyle(
                         color: subTextColor,
                         fontSize: 12,
@@ -378,7 +380,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "TERMS OF SERVICE",
+                        l10n.termsOfService,
                         style: TextStyle(
                           color: subTextColor,
                           fontSize: 10,
@@ -387,7 +389,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                       ),
                       const SizedBox(width: 24),
                       Text(
-                        "PRIVACY POLICY",
+                        l10n.privacyPolicy.toUpperCase(),
                         style: TextStyle(
                           color: subTextColor,
                           fontSize: 10,

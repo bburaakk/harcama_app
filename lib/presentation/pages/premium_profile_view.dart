@@ -5,6 +5,7 @@ import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/section_header.dart';
 import 'package:harcama_app/presentation/widgets/profile_list_item.dart';
+import 'package:harcama_app/l10n/app_localizations.dart';
 
 class PremiumProfileView extends StatelessWidget {
   final bool isDark;
@@ -13,6 +14,7 @@ class PremiumProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Colors from AppColors
     final surfaceColor = AppColors.premiumSurface(isDark);
     final textColor = AppColors.premiumText(isDark);
@@ -47,17 +49,17 @@ class PremiumProfileView extends StatelessWidget {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Clear Local Data?"),
-          content: const Text("This will permanently delete all your transactions. This action cannot be undone."),
+          title: Text(l10n.clearLocalDataTitle),
+          content: Text(l10n.clearLocalDataContent),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text("Cancel"),
+              child: Text(l10n.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(foregroundColor: AppColors.danger),
-              child: const Text("Delete Everything"),
+              child: Text(l10n.deleteEverything),
             ),
           ],
         ),
@@ -68,7 +70,7 @@ class PremiumProfileView extends StatelessWidget {
           await context.read<TransactionNotifier>().clearAllTransactions();
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("All local data cleared.")),
+              SnackBar(content: Text(l10n.allLocalDataCleared)),
             );
           }
         }
@@ -141,9 +143,9 @@ class PremiumProfileView extends StatelessWidget {
                     color: AppColors.premiumGold,
                     borderRadius: BorderRadius.circular(999),
                   ),
-                  child: const Text(
-                    "PREMIUM",
-                    style: TextStyle(
+                  child: Text(
+                    l10n.premium.toUpperCase(),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.w900,
@@ -172,7 +174,7 @@ class PremiumProfileView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Usage Status
-              SectionHeader(title: "Usage Status", color: subTextColor),
+              SectionHeader(title: l10n.usageStatus, color: subTextColor),
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -200,7 +202,7 @@ class PremiumProfileView extends StatelessWidget {
                             ),
                             const SizedBox(width: 12),
                             Text(
-                              "Ledgers",
+                              l10n.ledgers,
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 16,
@@ -209,9 +211,9 @@ class PremiumProfileView extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const Text(
-                          "Unlimited",
-                          style: TextStyle(
+                        Text(
+                          l10n.unlimited,
+                          style: const TextStyle(
                             color: AppColors.premiumPrimaryDark,
                             fontWeight: FontWeight.w900,
                           ),
@@ -236,7 +238,7 @@ class PremiumProfileView extends StatelessWidget {
                             ),
                             const SizedBox(width: 12),
                             Text(
-                              "Accounts",
+                              l10n.accounts,
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 16,
@@ -246,7 +248,7 @@ class PremiumProfileView extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          "Unlimited",
+                          l10n.unlimited,
                           style: TextStyle(
                             color: Colors.blue[600],
                             fontWeight: FontWeight.w900,
@@ -261,7 +263,7 @@ class PremiumProfileView extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Account
-              SectionHeader(title: "Account", color: subTextColor),
+              SectionHeader(title: l10n.account, color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -273,8 +275,8 @@ class PremiumProfileView extends StatelessWidget {
                   icon: Icons.check_circle,
                   iconColor: AppColors.premiumPrimaryDark,
                   iconBgColor: AppColors.premiumPrimary.withOpacity(0.1),
-                  title: "Logged in",
-                  subtitle: "Manage your cloud account",
+                  title: l10n.loggedIn,
+                  subtitle: l10n.manageCloudAccount,
                   textColor: AppColors.premiumPrimaryDark,
                   subTextColor: subTextColor,
                   borderColor: borderColor,
@@ -285,7 +287,7 @@ class PremiumProfileView extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Data Management
-              SectionHeader(title: "Data Management", color: subTextColor),
+              SectionHeader(title: l10n.dataManagement, color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -299,8 +301,8 @@ class PremiumProfileView extends StatelessWidget {
                       icon: Icons.cloud_upload,
                       iconColor: Colors.purple[600]!,
                       iconBgColor: Colors.purple[100]!,
-                      title: "Online backup",
-                      subtitle: "Safe in the cloud",
+                      title: l10n.onlineBackup,
+                      subtitle: l10n.safeInCloud,
                       textColor: textColor,
                       subTextColor: subTextColor,
                       borderColor: borderColor,
@@ -310,8 +312,8 @@ class PremiumProfileView extends StatelessWidget {
                       icon: Icons.sync,
                       iconColor: Colors.orange[600]!,
                       iconBgColor: Colors.orange[100]!,
-                      title: "Automatic backup",
-                      subtitle: "Syncing every change",
+                      title: l10n.automaticBackup,
+                      subtitle: l10n.syncingEveryChange,
                       textColor: textColor,
                       subTextColor: subTextColor,
                       borderColor: borderColor,
@@ -344,8 +346,8 @@ class PremiumProfileView extends StatelessWidget {
                       icon: Icons.upload_file,
                       iconColor: Colors.cyan[600]!,
                       iconBgColor: Colors.cyan[100]!,
-                      title: "Export data",
-                      subtitle: "CSV, JSON, PDF",
+                      title: l10n.exportData,
+                      subtitle: l10n.csvJsonPdf,
                       textColor: textColor,
                       subTextColor: subTextColor,
                       borderColor: borderColor,
@@ -359,7 +361,7 @@ class PremiumProfileView extends StatelessWidget {
               const SizedBox(height: 32),
 
               // About
-              SectionHeader(title: "About", color: subTextColor),
+              SectionHeader(title: l10n.about, color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -375,7 +377,7 @@ class PremiumProfileView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "App version",
+                            l10n.appVersion,
                             style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.w800,
@@ -398,7 +400,7 @@ class PremiumProfileView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Privacy policy",
+                            l10n.privacyPolicy,
                             style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.w800,
@@ -427,12 +429,12 @@ class PremiumProfileView extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.delete_forever, color: Colors.white),
-                    SizedBox(width: 8),
+                  children: [
+                    const Icon(Icons.delete_forever, color: Colors.white),
+                    const SizedBox(width: 8),
                     Text(
-                      "CLEAR LOCAL DATA",
-                      style: TextStyle(
+                      l10n.clearLocalData,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
                         fontSize: 16,
@@ -444,7 +446,7 @@ class PremiumProfileView extends StatelessWidget {
               const SizedBox(height: 16),
               Center(
                 child: Text(
-                  "THIS ACTION CANNOT BE UNDONE",
+                  l10n.thisActionCannotBeUndone,
                   style: TextStyle(
                     color: subTextColor,
                     fontSize: 10,

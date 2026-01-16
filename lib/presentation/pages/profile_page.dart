@@ -6,6 +6,10 @@ import 'package:harcama_app/presentation/pages/premium_upgrade_page.dart';
 import 'package:harcama_app/presentation/pages/premium_profile_view.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:harcama_app/presentation/widgets/section_header.dart';
+import 'package:harcama_app/presentation/widgets/profile_list_item.dart';
+import 'package:harcama_app/presentation/widgets/usage_bar.dart';
+import 'package:harcama_app/presentation/widgets/square_button.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -52,14 +56,21 @@ class ProfilePage extends StatelessWidget {
                       color: textColor,
                     ),
                   ),
-                  _buildSquareButton(Icons.settings, surfaceColor, borderColor, cardShadow, isDark, () {
-                    // Debug: Toggle premium status
-                    if (isPremium) {
-                      context.read<PremiumNotifier>().deactivatePremium();
-                    } else {
-                      context.read<PremiumNotifier>().activatePremium();
-                    }
-                  }),
+                  SquareButton(
+                    icon: Icons.settings,
+                    bgColor: surfaceColor,
+                    borderColor: borderColor,
+                    shadows: cardShadow,
+                    isDark: isDark,
+                    onTap: () {
+                      // Debug: Toggle premium status
+                      if (isPremium) {
+                        context.read<PremiumNotifier>().deactivatePremium();
+                      } else {
+                        context.read<PremiumNotifier>().activatePremium();
+                      }
+                    },
+                  ),
                 ],
               ),
             ),
@@ -267,7 +278,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Usage Limits
-              _buildSectionHeader("Usage Limits", subTextColor),
+              SectionHeader(title: "Usage Limits", color: subTextColor),
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -278,9 +289,9 @@ class ProfilePage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildUsageBar("Ledgers", "1 / 1", 1.0, AppColors.premiumPrimary, isDark),
+                    UsageBar(label: "Ledgers", value: "1 / 1", percentage: 1.0, progressColor: AppColors.premiumPrimary, isDark: isDark),
                     const SizedBox(height: 16),
-                    _buildUsageBar("Accounts", "2 / 3", 0.66, AppColors.premiumPrimary, isDark),
+                    UsageBar(label: "Accounts", value: "2 / 3", percentage: 0.66, progressColor: AppColors.premiumPrimary, isDark: isDark),
                   ],
                 ),
               ),
@@ -288,7 +299,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Account
-              _buildSectionHeader("Account", subTextColor),
+              SectionHeader(title: "Account", color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -296,7 +307,7 @@ class ProfilePage extends StatelessWidget {
                   border: Border.all(color: borderColor, width: 2),
                   boxShadow: cardShadow,
                 ),
-                child: _buildListItem(
+                child: ProfileListItem(
                   icon: Icons.login,
                   iconColor: Colors.blue[600]!,
                   iconBgColor: Colors.blue[100]!,
@@ -325,7 +336,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Data
-              _buildSectionHeader("Data", subTextColor),
+              SectionHeader(title: "Data", color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -337,7 +348,7 @@ class ProfilePage extends StatelessWidget {
                   children: [
                     Container(
                       color: isDark ? Colors.blueGrey.shade800.withOpacity(0.5) : Colors.grey[50],
-                      child: _buildListItem(
+                      child: ProfileListItem(
                         icon: Icons.save,
                         iconColor: Colors.grey[500]!,
                         iconBgColor: isDark ? Colors.grey[700]! : Colors.grey[200]!,
@@ -350,7 +361,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                     Opacity(
                       opacity: 0.5,
-                      child: _buildListItem(
+                      child: ProfileListItem(
                         icon: Icons.cloud_upload,
                         iconColor: Colors.blueGrey[400]!,
                         iconBgColor: Colors.blueGrey[100]!,
@@ -366,7 +377,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                     Opacity(
                       opacity: 0.5,
-                      child: _buildListItem(
+                      child: ProfileListItem(
                         icon: Icons.sync,
                         iconColor: Colors.blueGrey[400]!,
                         iconBgColor: Colors.blueGrey[100]!,
@@ -382,7 +393,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                     Opacity(
                       opacity: 0.5,
-                      child: _buildListItem(
+                      child: ProfileListItem(
                         icon: Icons.upload_file,
                         iconColor: Colors.blueGrey[400]!,
                         iconBgColor: Colors.blueGrey[100]!,
@@ -404,7 +415,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Ads
-              _buildSectionHeader("Ads", subTextColor),
+              SectionHeader(title: "Ads", color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -412,7 +423,7 @@ class ProfilePage extends StatelessWidget {
                   border: Border.all(color: borderColor, width: 2),
                   boxShadow: cardShadow,
                 ),
-                child: _buildListItem(
+                child: ProfileListItem(
                   icon: Icons.ad_units,
                   iconColor: AppColors.premiumGoldDark,
                   iconBgColor: AppColors.premiumGold.withOpacity(0.1),
@@ -430,7 +441,7 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // About
-              _buildSectionHeader("About", subTextColor),
+              SectionHeader(title: "About", color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -530,178 +541,6 @@ class ProfilePage extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildSquareButton(IconData icon, Color bgColor, Color borderColor, List<BoxShadow> shadows, bool isDark, VoidCallback onTap) {
-    return PressableContainer(
-      onPressed: onTap,
-      pressOffset: 4.0,
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border(
-          top: BorderSide(color: borderColor, width: 2),
-          left: BorderSide(color: borderColor, width: 2),
-          right: BorderSide(color: borderColor, width: 2),
-          bottom: BorderSide(color: borderColor, width: 4),
-        ),
-        boxShadow: shadows,
-      ),
-      child: SizedBox(
-        width: 40,
-        height: 40,
-        child: Icon(icon, color: isDark ? Colors.grey[300] : Colors.grey[600], size: 20),
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title, Color? color) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, bottom: 16),
-      child: Text(
-        title.toUpperCase(),
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w800,
-          fontSize: 14,
-          letterSpacing: 1.5,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUsageBar(String label, String value, double percentage, Color progressColor, bool isDark) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 14,
-                color: isDark ? Colors.white : const Color(0xFF151B0D),
-              ),
-            ),
-            Text(
-              value,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: isDark ? Colors.grey[400] : Colors.grey[500],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Container(
-          height: 12,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: isDark ? Colors.grey[800] : Colors.grey[100],
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[200]!, width: 2),
-          ),
-          child: FractionallySizedBox(
-            alignment: Alignment.centerLeft,
-            widthFactor: percentage,
-            child: Container(
-              decoration: BoxDecoration(
-                color: progressColor,
-                borderRadius: BorderRadius.circular(999),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildListItem({
-    required IconData icon,
-    required Color iconColor,
-    required Color iconBgColor,
-    required String title,
-    String? subtitle,
-    Widget? subtitleWidget,
-    required Color textColor,
-    Color? subTextColor,
-    IconData? trailingIcon,
-    Color? trailingIconColor,
-    bool isLast = false,
-    Color borderColor = Colors.grey,
-    VoidCallback? onTap,
-    Widget? customTrailing,
-  }) {
-    Widget content = Row(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: iconBgColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: iconColor.withOpacity(0.2), width: 2),
-          ),
-          child: Icon(icon, color: iconColor),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  color: textColor,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16,
-                ),
-              ),
-              if (subtitleWidget != null)
-                subtitleWidget
-              else if (subtitle != null)
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: subTextColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-            ],
-          ),
-        ),
-        if (customTrailing != null)
-          customTrailing
-        else if (onTap != null)
-          Icon(trailingIcon ?? Icons.chevron_right, color: trailingIconColor ?? Colors.grey[300])
-        else if (trailingIcon != null)
-          Icon(trailingIcon, color: trailingIconColor ?? Colors.grey[300]),
-      ],
-    );
-
-    if (onTap == null) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          border: isLast ? null : Border(bottom: BorderSide(color: borderColor, width: 2)),
-        ),
-        child: content,
-      );
-    }
-
-    return PressableContainer(
-      onPressed: onTap,
-      pressOffset: 2.0,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        border: isLast ? null : Border(bottom: BorderSide(color: borderColor, width: 2)),
-      ),
-      child: content,
     );
   }
 }

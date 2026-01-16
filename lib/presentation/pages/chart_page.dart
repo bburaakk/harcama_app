@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/chart_legend.dart';
-import 'package:harcama_app/presentation/widgets/date_button.dart';
 import 'package:harcama_app/presentation/widgets/donut_chart_section.dart';
 import 'package:harcama_app/presentation/widgets/timeframe_selector.dart';
 import 'package:harcama_app/presentation/widgets/top_expenses_list.dart';
-import 'package:harcama_app/presentation/widgets/weekly_date_card.dart';
-import 'package:harcama_app/presentation/widgets/weekly_spending_chart.dart';
+import 'package:harcama_app/presentation/widgets/spending_chart.dart';
 import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:intl/intl.dart';
@@ -21,28 +19,10 @@ class ChartPage extends StatefulWidget {
 }
 
 class _ChartPageState extends State<ChartPage> {
-  final PageController _pageController = PageController(initialPage: 0);
   int _selectedIndex = 0;
   final List<String> _timeframes = ['Weekly', 'Monthly', 'Yearly'];
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
   void _onTimeframeSelected(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  void _onPageChanged(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -64,15 +44,7 @@ class _ChartPageState extends State<ChartPage> {
               onTimeframeSelected: _onTimeframeSelected,
             ),
             Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: _onPageChanged,
-                children: [
-                  _ChartContent(timeframe: 'Weekly'),
-                  _ChartContent(timeframe: 'Monthly'),
-                  _ChartContent(timeframe: 'Yearly'),
-                ],
-              ),
+              child: _ChartContent(timeframe: _timeframes[_selectedIndex]),
             ),
           ],
         ),
@@ -90,34 +62,47 @@ class _ChartContent extends StatefulWidget {
 }
 
 class _ChartContentState extends State<_ChartContent> {
-  late DateTime _selectedDate;
+  late PageController _pageController;
+  late DateTime _initialDate;
+  final int _initialPage = 1000; // Sabit başlangıç sayfası
 
   @override
   void initState() {
     super.initState();
-    _selectedDate = DateTime.now();
-    initializeDateFormatting('tr_TR', null).then((_) {
-      if (mounted) setState(() {});
-    });
+    _initialDate = DateTime.now();
+    _pageController = PageController(initialPage: _initialPage);
+    // initializeDateFormatting çağrısını kaldırdık veya dinamik hale getirebiliriz
+    // Ancak main.dart'ta zaten locale desteği eklendiği için burada gerek kalmayabilir
+    // Yine de garanti olsun diye boş bir initialize bırakabiliriz veya kaldırabiliriz.
+    // Şimdilik kaldırıyorum çünkü main.dart hallediyor.
   }
 
-  void _setDate(DateTime date) {
-    setState(() {
-      _selectedDate = date;
-    });
-  }
-
-  bool _isSamePeriod(DateTime d1, DateTime d2) {
-    if (widget.timeframe == 'Weekly') {
-      final w1 = d1.subtract(Duration(days: d1.weekday - 1));
-      final w2 = d2.subtract(Duration(days: d2.weekday - 1));
-      return w1.year == w2.year && w1.month == w2.month && w1.day == w2.day;
-    } else if (widget.timeframe == 'Monthly') {
-      return d1.year == d2.year && d1.month == d2.month;
-    } else if (widget.timeframe == 'Yearly') {
-      return d1.year == d2.year;
+  @override
+  void didUpdateWidget(_ChartContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.timeframe != widget.timeframe) {
+      // Reset to initial state when timeframe changes
+      _pageController.jumpToPage(_initialPage);
     }
-    return false;
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  DateTime _getDateForPage(int page) {
+    final diff = page - _initialPage;
+    final now = DateTime.now();
+    
+    if (widget.timeframe == 'Weekly') {
+      return now.add(Duration(days: diff * 7));
+    } else if (widget.timeframe == 'Monthly') {
+      return DateTime(now.year, now.month + diff, 1);
+    } else { // Yearly
+      return DateTime(now.year + diff, 1, 1);
+    }
   }
 
   int weekNumber(DateTime date) {
@@ -127,117 +112,127 @@ class _ChartContentState extends State<_ChartContent> {
     return ((date.difference(firstMonday).inDays) / 7).floor() + 1;
   }
 
-  Map<String, String> _getWeeklyDateInfo(DateTime date) {
+  String _getDateLabel(DateTime date) {
     final now = DateTime.now();
-    final startOfWeek = date.subtract(Duration(days: date.weekday - 1));
-    final endOfWeek = startOfWeek.add(const Duration(days: 6));
-
-    final weekNum = weekNumber(startOfWeek).toString();
-    final year = startOfWeek.year.toString();
-    final startStr = DateFormat('d MMM', 'tr_TR').format(startOfWeek);
-    final endStr = DateFormat('d MMM', 'tr_TR').format(endOfWeek);
-
-    // Check if this week is current week
-    final isCurrentWeek = _isSamePeriod(date, now);
-
-    return {
-      'year': year,
-      'week': isCurrentWeek ? 'BU HAFTA' : 'Hafta $weekNum',
-      'range': '$startStr - $endStr',
-    };
-  }
-
-  String _getFormattedDateLabel(DateTime date) {
-    final now = DateTime.now();
-
-    if (widget.timeframe == 'Monthly') {
-      if (date.year == now.year && date.month == now.month) {
-        return 'BU AY';
-      }
-      return DateFormat('MMMM yyyy', 'tr_TR').format(date);
-    } else if (widget.timeframe == 'Yearly') {
-      if (date.year == now.year) {
-        return 'BU YIL';
-      }
-      return DateFormat('yyyy', 'tr_TR').format(date);
-    }
-    return '';
-  }
-
-  List<DateTime> _getPreviousDates() {
-    final now = DateTime.now();
-    List<DateTime> dates = [];
-    int count = 0;
+    // Cihazın locale'ini al (veya varsayılan olarak 'en_US' kullan)
+    // Ancak DateFormat constructor'ında locale belirtmezsek, Intl.defaultLocale kullanılır.
+    // Intl.defaultLocale ise main.dart'taki yapılandırma sayesinde cihaz diliyle uyumlu olmalı.
+    // Yine de garanti olsun diye null geçiyoruz (varsayılanı kullanması için).
 
     if (widget.timeframe == 'Weekly') {
-      count = 52;
+      final startOfWeek = date.subtract(Duration(days: date.weekday - 1));
+      final endOfWeek = startOfWeek.add(const Duration(days: 6));
+      
+      // Check if current week
+      final currentStart = now.subtract(Duration(days: now.weekday - 1));
+      if (startOfWeek.year == currentStart.year && 
+          startOfWeek.month == currentStart.month && 
+          startOfWeek.day == currentStart.day) {
+        return 'THIS WEEK'; // Bunu da yerelleştirmek lazım ama şimdilik kalsın
+      }
+
+      if (startOfWeek.year != endOfWeek.year) {
+        // Yıl değişiyorsa: 2023 29 Dec - 2024 4 Jan
+        final start = DateFormat('yyyy d MMM').format(startOfWeek);
+        final end = DateFormat('yyyy d MMM').format(endOfWeek);
+        return '$start - $end';
+      } else if (startOfWeek.month != endOfWeek.month) {
+        // Ay değişiyorsa: 2024 29 Jan - 4 Feb
+        final year = startOfWeek.year.toString();
+        final start = DateFormat('d MMM').format(startOfWeek);
+        final end = DateFormat('d MMM').format(endOfWeek);
+        return '$year $start - $end';
+      } else {
+        // Aynı ay: 2024 19 - 25 Jan
+        final year = startOfWeek.year.toString();
+        final startDay = startOfWeek.day.toString();
+        final end = DateFormat('d MMM').format(endOfWeek);
+        return '$year $startDay - $end';
+      }
+
     } else if (widget.timeframe == 'Monthly') {
-      count = 24;
-    } else if (widget.timeframe == 'Yearly') {
-      count = 5;
-    }
-
-    for (int i = 0; i < count; i++) {
-      if (widget.timeframe == 'Weekly') {
-        dates.add(now.subtract(Duration(days: i * 7)));
-      } else if (widget.timeframe == 'Monthly') {
-        dates.add(DateTime(now.year, now.month - i, 1));
-      } else if (widget.timeframe == 'Yearly') {
-        dates.add(DateTime(now.year - i, 1, 1));
+      if (date.year == now.year && date.month == now.month) {
+        return 'THIS MONTH';
       }
+      return DateFormat('MMMM yyyy').format(date);
+    } else { // Yearly
+      if (date.year == now.year) {
+        return 'THIS YEAR';
+      }
+      return DateFormat('yyyy').format(date);
     }
-    return dates;
   }
 
-  Widget _buildDateNavigator(List<DateTime> dates) {
-    if (widget.timeframe == 'Weekly') {
-      return SizedBox(
-        height: 75,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          reverse: true,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          itemCount: dates.length,
-          separatorBuilder: (context, index) => const SizedBox(width: 8),
-          itemBuilder: (context, index) {
-            final date = dates[index];
-            final info = _getWeeklyDateInfo(date);
-            return WeeklyDateCard(
-              year: info['year']!,
-              weekNumber: info['week']!,
-              dateRange: info['range']!,
-              isSelected: _isSamePeriod(date, _selectedDate),
-              onTap: () => _setDate(date),
-            );
-          },
-        ),
-      );
-    } else {
-      return SizedBox(
-        height: 75,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          reverse: true,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          itemCount: dates.length,
-          separatorBuilder: (context, index) => const SizedBox(width: 8),
-          itemBuilder: (context, index) {
-            final date = dates[index];
-            return DateButton(
-              label: _getFormattedDateLabel(date),
-              isSelected: _isSamePeriod(date, _selectedDate),
-              onTap: () => _setDate(date),
-            );
-          },
-        ),
-      );
+  Future<void> _onDateHeaderTap(BuildContext context, DateTime currentDate) async {
+    final now = DateTime.now();
+    
+    // Pick a date
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: currentDate,
+      firstDate: DateTime(2000), // Reasonable past limit
+      lastDate: now, // Prevent future selection
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: AppColors.primary,
+              onPrimary: Colors.white,
+              surface: AppColors.card(context),
+              onSurface: AppColors.text(context),
+            ),
+            dialogBackgroundColor: AppColors.card(context),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      int offset = 0;
+
+      if (widget.timeframe == 'Weekly') {
+        // Calculate week difference
+        // Normalize to start of week (Monday) to ensure correct diff
+        final currentWeekStart = now.subtract(Duration(days: now.weekday - 1));
+        final pickedWeekStart = picked.subtract(Duration(days: picked.weekday - 1));
+        
+        // Difference in days / 7 gives the week offset
+        offset = (currentWeekStart.difference(pickedWeekStart).inDays / 7).round();
+      } else if (widget.timeframe == 'Monthly') {
+        // Calculate month difference
+        offset = (now.year - picked.year) * 12 + now.month - picked.month;
+      } else { // Yearly
+        // Calculate year difference
+        offset = now.year - picked.year;
+      }
+
+      // Calculate target page (subtract offset because pages go back in time)
+      final targetPage = _initialPage - offset;
+
+      // Ensure we don't go out of bounds (future or too far past)
+      if (targetPage >= 0 && targetPage <= _initialPage) {
+        _pageController.jumpToPage(targetPage);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<DateTime> dates = _getPreviousDates();
+    return PageView.builder(
+      controller: _pageController,
+      itemCount: _initialPage + 1, // 0 to 1000
+      onPageChanged: (page) {
+        setState(() {}); 
+      },
+      itemBuilder: (context, index) {
+        final date = _getDateForPage(index);
+        return _buildPageContent(context, date);
+      },
+    );
+  }
 
+  Widget _buildPageContent(BuildContext context, DateTime date) {
     return Selector<TransactionNotifier, List<Transaction>>(
       selector: (context, notifier) => notifier.transactions,
       builder: (context, allTransactions, _) {
@@ -246,7 +241,7 @@ class _ChartContentState extends State<_ChartContent> {
 
         final filteredTransactions = notifier.getFilteredTransactions(
           widget.timeframe,
-          referenceDate: _selectedDate,
+          referenceDate: date,
         );
 
         final totalSpent = filteredTransactions
@@ -258,8 +253,49 @@ class _ChartContentState extends State<_ChartContent> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _buildDateNavigator(dates),
-              const SizedBox(height: 10),
+              // Date Header
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: GestureDetector(
+                  onTap: () => _onDateHeaderTap(context, date),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.card(context),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.cardBorder(context), width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          offset: const Offset(0, 4),
+                          blurRadius: 0,
+                        )
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _getDateLabel(date).toUpperCase(),
+                          style: TextStyle(
+                            color: AppColors.text(context),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.calendar_today_rounded,
+                          size: 16,
+                          color: AppColors.subtitleText(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
               if (totalSpent > 0) ...[
                 DonutChartSection(
                   totalSpent: totalSpent,
@@ -278,15 +314,18 @@ class _ChartContentState extends State<_ChartContent> {
                 ),
                 const SizedBox(height: 50),
               ],
-              WeeklySpendingChart(
+              
+              SpendingChart(
                 transactions: allTransactions,
                 monthlyBudget: monthlyBudget,
-                referenceDate: _selectedDate,
+                referenceDate: date,
+                timeframe: widget.timeframe,
               ),
-              if (allTransactions.any(
+              
+              if (filteredTransactions.any(
                 (t) => t.type == TransactionType.expense,
               )) ...[
-                TopExpensesList(transactions: allTransactions),
+                TopExpensesList(transactions: filteredTransactions),
               ],
             ],
           ),

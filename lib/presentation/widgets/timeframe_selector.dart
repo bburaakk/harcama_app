@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 
 class TimeframeSelector extends StatelessWidget {
   final int selectedIndex;
@@ -41,24 +42,23 @@ class TimeframeSelector extends StatelessWidget {
             final isSelected = selectedIndex == index;
 
             return Expanded(
-              child: GestureDetector(
-                onTap: () => onTimeframeSelected(index),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primary : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: isSelected
-                        ? [
-                            const BoxShadow(
-                              color: AppColors.primaryDark,
-                              offset: Offset(0, 4),
-                              blurRadius: 0,
-                            )
-                          ]
-                        : null,
-                  ),
+              child: PressableContainer(
+                onPressed: () => onTimeframeSelected(index),
+                pressOffset: 2.0,
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: isSelected
+                      ? [
+                          const BoxShadow(
+                            color: AppColors.primaryDark,
+                            offset: Offset(0, 4),
+                            blurRadius: 0,
+                          )
+                        ]
+                      : null,
+                ),
+                child: Center(
                   child: Text(
                     timeframe.toUpperCase(),
                     style: TextStyle(

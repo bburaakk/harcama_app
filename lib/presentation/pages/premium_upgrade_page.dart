@@ -4,6 +4,7 @@ import 'package:harcama_app/presentation/notifiers/theme_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/premium_notifier.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:harcama_app/presentation/widgets/premium_feature_item.dart';
 
 class PremiumUpgradePage extends StatefulWidget {
   const PremiumUpgradePage({super.key});
@@ -146,7 +147,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                   const SizedBox(height: 32),
 
                   // Features List
-                  _buildFeatureItem(
+                  PremiumFeatureItem(
                     icon: Icons.cloud_upload,
                     iconColor: Colors.blue[600]!,
                     iconBgColor: isDark ? Colors.blue[900]!.withOpacity(0.4) : Colors.blue[100]!,
@@ -157,7 +158,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                     cardColor: cardColor,
                   ),
                   const SizedBox(height: 16),
-                  _buildFeatureItem(
+                  PremiumFeatureItem(
                     icon: Icons.analytics,
                     iconColor: Colors.purple[600]!,
                     iconBgColor: isDark ? Colors.purple[900]!.withOpacity(0.4) : Colors.purple[100]!,
@@ -168,7 +169,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                     cardColor: cardColor,
                   ),
                   const SizedBox(height: 16),
-                  _buildFeatureItem(
+                  PremiumFeatureItem(
                     icon: Icons.block,
                     iconColor: Colors.red[600]!,
                     iconBgColor: isDark ? Colors.red[900]!.withOpacity(0.4) : Colors.red[100]!,
@@ -179,7 +180,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                     cardColor: cardColor,
                   ),
                   const SizedBox(height: 16),
-                  _buildFeatureItem(
+                  PremiumFeatureItem(
                     icon: Icons.construction,
                     iconColor: Colors.orange[600]!,
                     iconBgColor: isDark ? Colors.orange[900]!.withOpacity(0.4) : Colors.orange[100]!,
@@ -402,69 +403,6 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildFeatureItem({
-    required IconData icon,
-    required Color iconColor,
-    required Color iconBgColor,
-    required String title,
-    required String subtitle,
-    required Color textColor,
-    required Color subTextColor,
-    required Color cardColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: iconBgColor,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 2,
-                  offset: const Offset(0, 1) // inset shadow simulation
-                )
-              ]
-            ),
-            child: Icon(icon, color: iconColor),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: subTextColor,
-                    fontWeight: FontWeight.normal,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

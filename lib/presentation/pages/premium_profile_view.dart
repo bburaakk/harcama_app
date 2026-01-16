@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:harcama_app/presentation/widgets/section_header.dart';
+import 'package:harcama_app/presentation/widgets/profile_list_item.dart';
 
 class PremiumProfileView extends StatelessWidget {
   final bool isDark;
@@ -170,7 +172,7 @@ class PremiumProfileView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Usage Status
-              _buildSectionHeader("Usage Status", subTextColor),
+              SectionHeader(title: "Usage Status", color: subTextColor),
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -259,7 +261,7 @@ class PremiumProfileView extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Account
-              _buildSectionHeader("Account", subTextColor),
+              SectionHeader(title: "Account", color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -267,7 +269,7 @@ class PremiumProfileView extends StatelessWidget {
                   border: Border.all(color: borderColor, width: 2),
                   boxShadow: cardShadow,
                 ),
-                child: _buildListItem(
+                child: ProfileListItem(
                   icon: Icons.check_circle,
                   iconColor: AppColors.premiumPrimaryDark,
                   iconBgColor: AppColors.premiumPrimary.withOpacity(0.1),
@@ -283,7 +285,7 @@ class PremiumProfileView extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Data Management
-              _buildSectionHeader("Data Management", subTextColor),
+              SectionHeader(title: "Data Management", color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -293,7 +295,7 @@ class PremiumProfileView extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildListItem(
+                    ProfileListItem(
                       icon: Icons.cloud_upload,
                       iconColor: Colors.purple[600]!,
                       iconBgColor: Colors.purple[100]!,
@@ -304,7 +306,7 @@ class PremiumProfileView extends StatelessWidget {
                       borderColor: borderColor,
                       onTap: () {},
                     ),
-                    _buildListItem(
+                    ProfileListItem(
                       icon: Icons.sync,
                       iconColor: Colors.orange[600]!,
                       iconBgColor: Colors.orange[100]!,
@@ -338,7 +340,7 @@ class PremiumProfileView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    _buildListItem(
+                    ProfileListItem(
                       icon: Icons.upload_file,
                       iconColor: Colors.cyan[600]!,
                       iconBgColor: Colors.cyan[100]!,
@@ -357,7 +359,7 @@ class PremiumProfileView extends StatelessWidget {
               const SizedBox(height: 32),
 
               // About
-              _buildSectionHeader("About", subTextColor),
+              SectionHeader(title: "About", color: subTextColor),
               Container(
                 decoration: BoxDecoration(
                   color: surfaceColor,
@@ -457,107 +459,6 @@ class PremiumProfileView extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildSectionHeader(String title, Color? color) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, bottom: 16),
-      child: Text(
-        title.toUpperCase(),
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w800,
-          fontSize: 14,
-          letterSpacing: 1.5,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildListItem({
-    required IconData icon,
-    required Color iconColor,
-    required Color iconBgColor,
-    required String title,
-    String? subtitle,
-    Widget? subtitleWidget,
-    required Color textColor,
-    Color? subTextColor,
-    IconData? trailingIcon,
-    Color? trailingIconColor,
-    bool isLast = false,
-    Color borderColor = Colors.grey,
-    VoidCallback? onTap,
-    Widget? customTrailing,
-  }) {
-    Widget content = Row(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: iconBgColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: iconColor.withOpacity(0.2), width: 2),
-          ),
-          child: Icon(icon, color: iconColor),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  color: textColor,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16,
-                ),
-              ),
-              if (subtitleWidget != null)
-                subtitleWidget
-              else if (subtitle != null)
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: subTextColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-            ],
-          ),
-        ),
-        if (customTrailing != null)
-          customTrailing
-        else if (onTap != null)
-          Icon(trailingIcon ?? Icons.chevron_right, color: trailingIconColor ?? Colors.grey[300])
-        else if (trailingIcon != null)
-          Icon(trailingIcon, color: trailingIconColor ?? Colors.grey[300]),
-      ],
-    );
-
-    if (onTap == null) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          border: isLast ? null : Border(bottom: BorderSide(color: borderColor, width: 2)),
-        ),
-        child: content,
-      );
-    }
-
-    return PressableContainer(
-      onPressed: onTap,
-      pressOffset: 2.0,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        border: isLast ? null : Border(bottom: BorderSide(color: borderColor, width: 2)),
-      ),
-      child: content,
     );
   }
 }

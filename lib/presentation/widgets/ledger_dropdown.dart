@@ -47,7 +47,7 @@ class LedgerDropdown extends StatelessWidget {
             _buildLedgerItem(
               context,
               icon: Symbols.menu_book_rounded,
-              name: ledgerNotifier.allLedger.name,
+              name: l10n.allLedgers, // Localized name for "All Ledgers"
               isSelected: ledgerNotifier.selectedLedger?.id == 'default',
               onTap: () {
                 ledgerNotifier.selectLedger(ledgerNotifier.allLedger);

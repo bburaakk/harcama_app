@@ -105,6 +105,29 @@ class AppColors {
       
   static Color premiumSubText(bool isDark) =>
       isDark ? gray400 : gray500;
+
+  // Icon Background Helpers
+  static Color iconBackground(bool isDark, Color baseColor) {
+    if (isDark) {
+      // Dark mode: Darker, transparent version of the base color
+      // If baseColor is very light, we might need to darken it significantly
+      if (baseColor == Colors.white) return Colors.grey[800]!;
+      return baseColor.withOpacity(0.2); 
+    } else {
+      // Light mode: Very light version of the base color
+      // We can mix with white or use a predefined light shade if available
+      // Since we don't have all light shades defined, we'll use opacity for now
+      // or specific logic for known colors.
+      if (baseColor == Colors.blue[600]) return Colors.blue[100]!;
+      if (baseColor == Colors.purple[600]) return Colors.purple[100]!;
+      if (baseColor == Colors.orange[600]) return Colors.orange[100]!;
+      if (baseColor == Colors.cyan[600]) return Colors.cyan[100]!;
+      if (baseColor == Colors.grey[500]) return Colors.grey[200]!;
+      if (baseColor == AppColors.premiumGoldDark) return AppColors.premiumGold.withOpacity(0.1);
+      
+      return baseColor.withOpacity(0.1);
+    }
+  }
   
   // ============ LEGACY (keeping for compatibility) ============
   static const Color primaryCardColor = Color(0xFF58CC02);

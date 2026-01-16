@@ -128,5 +128,6 @@
   "monthlySpendingTitle": "Aylık Harcama",
   "yearlySpendingTitle": "Yıllık Harcama",
   "incomeLabel": "Gelir",
-  "expensesLabel": "Giderler"
+  "expensesLabel": "Giderler",
+  "allLedgers": "Tüm Defterler"
 }

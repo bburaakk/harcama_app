@@ -31,7 +31,7 @@ class ProfilePage extends StatelessWidget {
     // Shadow styles
     final cardShadow = [
       BoxShadow(
-        color: isDark ? AppColors.premiumCardShadowDark.withOpacity(0.5) : AppColors.cardShadowLight,
+        color: isDark ? AppColors.cardBorder(context) : AppColors.cardShadowLight,
         offset: const Offset(0, 4),
         blurRadius: 0,
       )
@@ -97,7 +97,7 @@ class ProfilePage extends StatelessWidget {
 
     final cardShadow = [
       BoxShadow(
-        color: isDark ? AppColors.premiumCardShadowDark.withOpacity(0.5) : AppColors.cardShadowLight,
+        color: isDark ? AppColors.cardBorder(context) : AppColors.cardShadowLight,
         offset: const Offset(0, 4),
         blurRadius: 0,
       )
@@ -249,11 +249,11 @@ class ProfilePage extends StatelessWidget {
                         Center(
                           child: PressableContainer(
                             onPressed: navigateToPremium,
-                            pressOffset: 4.0, // Match border width
+                            pressOffset: 4.0,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Colors.white, // Always white for contrast
                               borderRadius: BorderRadius.circular(16),
-                              border: Border(bottom: BorderSide(color: Colors.grey[300]!, width: 4)),
+                              border: Border.all(color: Colors.grey[300]!, width: 2), // Always light grey border
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.1),
@@ -267,7 +267,7 @@ class ProfilePage extends StatelessWidget {
                               l10n.upgradeNow,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w800,
-                                color: AppColors.premiumGoldDark,
+                                color: AppColors.premiumGoldDark, // Always gold text
                               ),
                             ),
                           ),
@@ -303,142 +303,99 @@ class ProfilePage extends StatelessWidget {
 
               // Account
               SectionHeader(title: l10n.account, color: subTextColor),
-              Container(
-                decoration: BoxDecoration(
-                  color: surfaceColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: borderColor, width: 2),
-                  boxShadow: cardShadow,
-                ),
-                child: ProfileListItem(
-                  icon: Icons.login,
-                  iconColor: Colors.blue[600]!,
-                  iconBgColor: Colors.blue[100]!,
-                  title: l10n.signInCreateAccount,
-                  subtitleWidget: Row(
-                    children: [
-                      const Icon(Icons.stars, size: 14, color: AppColors.premiumGoldDark),
-                      const SizedBox(width: 4),
-                      Text(
-                        l10n.premiumOnly,
-                        style: const TextStyle(
-                          color: AppColors.premiumGoldDark,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
+              ProfileListItem(
+                icon: Icons.login,
+                iconColor: Colors.blue[600]!,
+                iconBgColor: AppColors.iconBackground(isDark, Colors.blue[600]!),
+                title: l10n.signInCreateAccount,
+                subtitleWidget: Row(
+                  children: [
+                    const Icon(Icons.stars, size: 14, color: AppColors.premiumGoldDark),
+                    const SizedBox(width: 4),
+                    Text(
+                      l10n.premiumOnly,
+                      style: const TextStyle(
+                        color: AppColors.premiumGoldDark,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
-                    ],
-                  ),
-                  textColor: textColor,
-                  isLast: true,
-                  onTap: navigateToPremium,
-                  borderColor: borderColor,
+                    ),
+                  ],
                 ),
+                textColor: textColor,
+                onTap: navigateToPremium,
               ),
 
               const SizedBox(height: 32),
 
               // Data
               SectionHeader(title: l10n.data, color: subTextColor),
-              Container(
-                decoration: BoxDecoration(
-                  color: surfaceColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: borderColor, width: 2),
-                  boxShadow: cardShadow,
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      color: isDark ? Colors.blueGrey.shade800.withOpacity(0.5) : Colors.grey[50],
-                      child: ProfileListItem(
-                        icon: Icons.save,
-                        iconColor: Colors.grey[500]!,
-                        iconBgColor: isDark ? Colors.grey[700]! : Colors.grey[200]!,
-                        title: l10n.localDataStored,
-                        subtitle: l10n.everythingStaysOnDevice,
-                        textColor: textColor,
-                        subTextColor: subTextColor,
-                        borderColor: borderColor,
-                      ),
-                    ),
-                    Opacity(
-                      opacity: 0.5,
-                      child: ProfileListItem(
-                        icon: Icons.cloud_upload,
-                        iconColor: Colors.blueGrey[400]!,
-                        iconBgColor: Colors.blueGrey[100]!,
-                        title: l10n.onlineBackup,
-                        subtitle: l10n.premiumOnly,
-                        textColor: subTextColor,
-                        subTextColor: subTextColor,
-                        borderColor: borderColor,
-                        trailingIcon: Icons.lock,
-                        trailingIconColor: AppColors.premiumGold,
-                        onTap: navigateToPremium,
-                      ),
-                    ),
-                    Opacity(
-                      opacity: 0.5,
-                      child: ProfileListItem(
-                        icon: Icons.sync,
-                        iconColor: Colors.blueGrey[400]!,
-                        iconBgColor: Colors.blueGrey[100]!,
-                        title: l10n.automaticBackup,
-                        subtitle: l10n.premiumOnly,
-                        textColor: subTextColor,
-                        subTextColor: subTextColor,
-                        borderColor: borderColor,
-                        trailingIcon: Icons.lock,
-                        trailingIconColor: AppColors.premiumGold,
-                        onTap: navigateToPremium,
-                      ),
-                    ),
-                    Opacity(
-                      opacity: 0.5,
-                      child: ProfileListItem(
-                        icon: Icons.upload_file,
-                        iconColor: Colors.blueGrey[400]!,
-                        iconBgColor: Colors.blueGrey[100]!,
-                        title: l10n.exportData,
-                        subtitle: l10n.premiumOnly,
-                        textColor: subTextColor,
-                        subTextColor: subTextColor,
-                        isLast: true,
-                        trailingIcon: Icons.lock,
-                        trailingIconColor: AppColors.premiumGold,
-                        onTap: navigateToPremium,
-                        borderColor: borderColor,
-                      ),
-                    ),
-                  ],
-                ),
+              ProfileListItem(
+                icon: Icons.save,
+                iconColor: Colors.grey[500]!,
+                iconBgColor: AppColors.iconBackground(isDark, Colors.grey[500]!),
+                title: l10n.localDataStored,
+                subtitle: l10n.everythingStaysOnDevice,
+                textColor: textColor,
+                subTextColor: subTextColor,
+              ),
+              const SizedBox(height: 12),
+              ProfileListItem(
+                icon: Icons.cloud_upload,
+                iconColor: Colors.blueGrey[400]!,
+                iconBgColor: AppColors.iconBackground(isDark, Colors.blueGrey[400]!),
+                title: l10n.onlineBackup,
+                subtitle: l10n.premiumOnly,
+                textColor: subTextColor,
+                subTextColor: subTextColor,
+                trailingIcon: Icons.lock,
+                trailingIconColor: AppColors.premiumGold,
+                onTap: navigateToPremium,
+                opacity: 0.5,
+              ),
+              const SizedBox(height: 12),
+              ProfileListItem(
+                icon: Icons.sync,
+                iconColor: Colors.blueGrey[400]!,
+                iconBgColor: AppColors.iconBackground(isDark, Colors.blueGrey[400]!),
+                title: l10n.automaticBackup,
+                subtitle: l10n.premiumOnly,
+                textColor: subTextColor,
+                subTextColor: subTextColor,
+                trailingIcon: Icons.lock,
+                trailingIconColor: AppColors.premiumGold,
+                onTap: navigateToPremium,
+                opacity: 0.5,
+              ),
+              const SizedBox(height: 12),
+              ProfileListItem(
+                icon: Icons.upload_file,
+                iconColor: Colors.blueGrey[400]!,
+                iconBgColor: AppColors.iconBackground(isDark, Colors.blueGrey[400]!),
+                title: l10n.exportData,
+                subtitle: l10n.premiumOnly,
+                textColor: subTextColor,
+                subTextColor: subTextColor,
+                trailingIcon: Icons.lock,
+                trailingIconColor: AppColors.premiumGold,
+                onTap: navigateToPremium,
+                opacity: 0.5,
               ),
 
               const SizedBox(height: 32),
 
               // Ads
               SectionHeader(title: l10n.ads, color: subTextColor),
-              Container(
-                decoration: BoxDecoration(
-                  color: surfaceColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: borderColor, width: 2),
-                  boxShadow: cardShadow,
-                ),
-                child: ProfileListItem(
-                  icon: Icons.ad_units,
-                  iconColor: AppColors.premiumGoldDark,
-                  iconBgColor: AppColors.premiumGold.withOpacity(0.1),
-                  title: l10n.removeAds,
-                  subtitle: l10n.upgradeToPremium,
-                  textColor: textColor,
-                  subTextColor: AppColors.premiumGoldDark,
-                  isLast: true,
-                  trailingIconColor: AppColors.premiumGoldDark,
-                  onTap: navigateToPremium,
-                  borderColor: borderColor,
-                ),
+              ProfileListItem(
+                icon: Icons.ad_units,
+                iconColor: AppColors.premiumGoldDark,
+                iconBgColor: AppColors.iconBackground(isDark, AppColors.premiumGoldDark),
+                title: l10n.removeAds,
+                subtitle: l10n.upgradeToPremium,
+                textColor: textColor,
+                subTextColor: AppColors.premiumGoldDark,
+                trailingIconColor: AppColors.premiumGoldDark,
+                onTap: navigateToPremium,
               ),
 
               const SizedBox(height: 32),

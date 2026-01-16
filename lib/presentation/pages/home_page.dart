@@ -181,6 +181,18 @@ class _HomePageState extends State<HomePage> {
                 ),
             ),
             
+            // Overlay for closing dropdown
+            if (showLedgerSheet)
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () => setState(() => showLedgerSheet = false),
+                  behavior: HitTestBehavior.translucent,
+                  child: Container(
+                    color: Colors.transparent,
+                  ),
+                ),
+              ),
+
             LedgerDropdown(
               isVisible: showLedgerSheet,
               ledgerNotifier: ledgerNotifier,

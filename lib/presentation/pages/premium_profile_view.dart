@@ -23,7 +23,7 @@ class PremiumProfileView extends StatelessWidget {
 
     final cardShadow = [
       BoxShadow(
-        color: isDark ? AppColors.premiumCardShadowDark.withOpacity(0.5) : AppColors.cardShadowLight,
+        color: isDark ? AppColors.cardBorder(context) : AppColors.cardShadowLight,
         offset: const Offset(0, 4),
         blurRadius: 0,
       )
@@ -264,98 +264,75 @@ class PremiumProfileView extends StatelessWidget {
 
               // Account
               SectionHeader(title: l10n.account, color: subTextColor),
-              Container(
-                decoration: BoxDecoration(
-                  color: surfaceColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: borderColor, width: 2),
-                  boxShadow: cardShadow,
-                ),
-                child: ProfileListItem(
-                  icon: Icons.check_circle,
-                  iconColor: AppColors.premiumPrimaryDark,
-                  iconBgColor: AppColors.premiumPrimary.withOpacity(0.1),
-                  title: l10n.loggedIn,
-                  subtitle: l10n.manageCloudAccount,
-                  textColor: AppColors.premiumPrimaryDark,
-                  subTextColor: subTextColor,
-                  borderColor: borderColor,
-                  onTap: () {}, // Action for managing account
-                ),
+              ProfileListItem(
+                icon: Icons.check_circle,
+                iconColor: AppColors.premiumPrimaryDark,
+                iconBgColor: AppColors.premiumPrimary.withOpacity(0.1),
+                title: l10n.loggedIn,
+                subtitle: l10n.manageCloudAccount,
+                textColor: AppColors.premiumPrimaryDark,
+                subTextColor: subTextColor,
+                onTap: () {}, // Action for managing account
               ),
 
               const SizedBox(height: 32),
 
               // Data Management
               SectionHeader(title: l10n.dataManagement, color: subTextColor),
-              Container(
-                decoration: BoxDecoration(
-                  color: surfaceColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: borderColor, width: 2),
-                  boxShadow: cardShadow,
-                ),
-                child: Column(
-                  children: [
-                    ProfileListItem(
-                      icon: Icons.cloud_upload,
-                      iconColor: Colors.purple[600]!,
-                      iconBgColor: Colors.purple[100]!,
-                      title: l10n.onlineBackup,
-                      subtitle: l10n.safeInCloud,
-                      textColor: textColor,
-                      subTextColor: subTextColor,
-                      borderColor: borderColor,
-                      onTap: () {},
-                    ),
-                    ProfileListItem(
-                      icon: Icons.sync,
-                      iconColor: Colors.orange[600]!,
-                      iconBgColor: Colors.orange[100]!,
-                      title: l10n.automaticBackup,
-                      subtitle: l10n.syncingEveryChange,
-                      textColor: textColor,
-                      subTextColor: subTextColor,
-                      borderColor: borderColor,
-                      customTrailing: Container(
-                        width: 40,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: AppColors.premiumPrimary,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              right: 2,
-                              top: 2,
-                              child: Container(
-                                width: 16,
-                                height: 16,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                          ],
+              ProfileListItem(
+                icon: Icons.cloud_upload,
+                iconColor: Colors.purple[600]!,
+                iconBgColor: Colors.purple[100]!,
+                title: l10n.onlineBackup,
+                subtitle: l10n.safeInCloud,
+                textColor: textColor,
+                subTextColor: subTextColor,
+                onTap: () {},
+              ),
+              const SizedBox(height: 12),
+              ProfileListItem(
+                icon: Icons.sync,
+                iconColor: Colors.orange[600]!,
+                iconBgColor: Colors.orange[100]!,
+                title: l10n.automaticBackup,
+                subtitle: l10n.syncingEveryChange,
+                textColor: textColor,
+                subTextColor: subTextColor,
+                customTrailing: Container(
+                  width: 40,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: AppColors.premiumPrimary,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        right: 2,
+                        top: 2,
+                        child: Container(
+                          width: 16,
+                          height: 16,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
                         ),
                       ),
-                    ),
-                    ProfileListItem(
-                      icon: Icons.upload_file,
-                      iconColor: Colors.cyan[600]!,
-                      iconBgColor: Colors.cyan[100]!,
-                      title: l10n.exportData,
-                      subtitle: l10n.csvJsonPdf,
-                      textColor: textColor,
-                      subTextColor: subTextColor,
-                      borderColor: borderColor,
-                      isLast: true,
-                      onTap: () {},
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+              ),
+              const SizedBox(height: 12),
+              ProfileListItem(
+                icon: Icons.upload_file,
+                iconColor: Colors.cyan[600]!,
+                iconBgColor: Colors.cyan[100]!,
+                title: l10n.exportData,
+                subtitle: l10n.csvJsonPdf,
+                textColor: textColor,
+                subTextColor: subTextColor,
+                onTap: () {},
               ),
 
               const SizedBox(height: 32),

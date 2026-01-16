@@ -145,5 +145,6 @@
   "monthlySpendingTitle": "Monthly Spending",
   "yearlySpendingTitle": "Yearly Spending",
   "incomeLabel": "Income",
-  "expensesLabel": "Expenses"
+  "expensesLabel": "Expenses",
+  "allLedgers": "All Ledgers"
 }

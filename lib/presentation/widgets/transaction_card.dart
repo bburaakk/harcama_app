@@ -59,7 +59,7 @@ class TransactionCard extends StatelessWidget {
       ),
       boxShadow: [
         BoxShadow(
-          color: AppColors.cardShadow(context),
+          color: AppColors.cardBorder(context), // Changed to cardBorder for consistent shadow
           offset: const Offset(0, 4),
         ),
       ],

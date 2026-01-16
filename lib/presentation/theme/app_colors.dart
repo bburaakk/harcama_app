@@ -57,8 +57,8 @@ class AppColors {
   static const Color premiumCardDark2 = Color(0xFF1F2D33); // Unified
   static const Color cardBorderDark = Color(0xFF37464F);
   static const Color premiumCardBorderDark = Color(0xFF37464F); // Unified
-  static const Color cardShadowDark = Color(0xFF151B1F);
-  static const Color premiumCardShadowDark = Color(0xFF151B1F); // Unified
+  static const Color cardShadowDark = Color(0xFF000000); // Changed to Black for visibility
+  static const Color premiumCardShadowDark = Color(0xFF000000); // Unified
   
   // Gray Colors (Dark)
   static const Color grayDark100 = Color(0xFF37464F);

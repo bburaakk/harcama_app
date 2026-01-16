@@ -853,6 +853,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Yearly Spending'**
   String get yearlySpendingTitle;
+
+  /// No description provided for @incomeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get incomeLabel;
+
+  /// No description provided for @expensesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get expensesLabel;
 }
 
 class _AppLocalizationsDelegate

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -72,13 +73,12 @@ class TopBar extends StatelessWidget {
                 children: [
                   // Ledger Menu Button (optional)
                   if (onLedgerTap != null)
-                    GestureDetector(
-                      onTap: onLedgerTap,
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(14),
+                    PressableContainer(
+                      onPressed: onLedgerTap!,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: AppColors.primaryDark.withOpacity(0.3),
                           width: 2,
@@ -97,8 +97,7 @@ class TopBar extends StatelessWidget {
                         size: 24,
                         weight: 700,
                       ),
-                    ),
-                  )
+                    )
                   else
                     const SizedBox.shrink(),
                   
@@ -125,31 +124,34 @@ class TopBar extends StatelessWidget {
   }
 
   Widget _buildSquareButton(BuildContext context, {required IconData icon, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
+    return PressableContainer(
+      onPressed: onTap,
+      padding: EdgeInsets.zero,
+      decoration: BoxDecoration(
+        color: AppColors.card(context),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppColors.cardBorder(context),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.cardBorder(context),
+            offset: const Offset(0, 4),
+            blurRadius: 0,
+          ),
+        ],
+      ),
+      child: SizedBox(
         width: 44,
         height: 44,
-        decoration: BoxDecoration(
-          color: AppColors.card(context),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: AppColors.cardBorder(context),
-            width: 2,
+        child: Center(
+          child: Icon(
+            icon,
+            color: AppColors.subtitleText(context),
+            size: 24,
+            weight: 600,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.cardBorder(context),
-              offset: const Offset(0, 4),
-              blurRadius: 0,
-            ),
-          ],
-        ),
-        child: Icon(
-          icon,
-          color: AppColors.subtitleText(context),
-          size: 24,
-          weight: 600,
         ),
       ),
     );

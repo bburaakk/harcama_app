@@ -391,4 +391,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yearlySpendingTitle => 'Yearly Spending';
+
+  @override
+  String get incomeLabel => 'Income';
+
+  @override
+  String get expensesLabel => 'Expenses';
 }

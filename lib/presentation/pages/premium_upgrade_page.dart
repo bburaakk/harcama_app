@@ -20,10 +20,10 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Colors from AppColors
-    final backgroundColor = isDark ? const Color(0xFF242428) : const Color(0xFFFFFFFF); // Keeping specific bg for this page as it might differ slightly
+    final backgroundColor = AppColors.premiumBackground(isDark);
     final textColor = AppColors.premiumText(isDark);
     final subTextColor = AppColors.premiumSubText(isDark);
-    final cardColor = isDark ? AppColors.premiumCardDark2 : AppColors.cardLight;
+    final cardColor = AppColors.premiumSurface(isDark);
     final borderColor = AppColors.premiumBorder(isDark);
 
     return Scaffold(
@@ -273,7 +273,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
                     child: Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: isDark ? backgroundColor.withOpacity(0.5) : Colors.white,
+                        color: cardColor,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: !isYearlySelected ? AppColors.premiumPrimary : borderColor,

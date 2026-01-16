@@ -4,7 +4,7 @@ class AppColors {
   // ============ LIGHT THEME ============
   // Background Colors
   static const Color scaffoldBackground = Color(0xFFFFFFFF);
-  static const Color premiumScaffoldBackground = Color(0xFFF9F9FB);
+  static const Color premiumScaffoldBackground = Color(0xFFFFFFFF); // Unified
   
   // Primary Colors - Green
   static const Color primary = Color(0xFF58CC02);
@@ -49,16 +49,16 @@ class AppColors {
   // ============ DARK THEME ============
   // Background Colors (Dark)
   static const Color scaffoldBackgroundDark = Color(0xFF131F24);
-  static const Color premiumScaffoldBackgroundDark = Color(0xFF1B293C);
+  static const Color premiumScaffoldBackgroundDark = Color(0xFF131F24); // Unified
   
   // Card Colors (Dark)
   static const Color cardDark = Color(0xFF1F2D33);
-  static const Color premiumCardDark = Color(0xFF2A3B4F);
-  static const Color premiumCardDark2 = Color(0xFF2D2D32); // For upgrade page
+  static const Color premiumCardDark = Color(0xFF1F2D33); // Unified
+  static const Color premiumCardDark2 = Color(0xFF1F2D33); // Unified
   static const Color cardBorderDark = Color(0xFF37464F);
-  static const Color premiumCardBorderDark = Color(0xFF334155);
+  static const Color premiumCardBorderDark = Color(0xFF37464F); // Unified
   static const Color cardShadowDark = Color(0xFF151B1F);
-  static const Color premiumCardShadowDark = Color(0xFF0F172A);
+  static const Color premiumCardShadowDark = Color(0xFF151B1F); // Unified
   
   // Gray Colors (Dark)
   static const Color grayDark100 = Color(0xFF37464F);

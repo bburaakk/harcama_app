@@ -17,8 +17,7 @@ class _PremiumUpgradePageState extends State<PremiumUpgradePage> {
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = context.watch<ThemeNotifier>();
-    final isDark = themeNotifier.isDark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Colors from AppColors
     final backgroundColor = isDark ? const Color(0xFF242428) : const Color(0xFFFFFFFF); // Keeping specific bg for this page as it might differ slightly

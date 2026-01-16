@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:harcama_app/presentation/notifiers/theme_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/premium_notifier.dart';
 import 'package:harcama_app/presentation/pages/premium_upgrade_page.dart';
@@ -13,9 +12,8 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = context.watch<ThemeNotifier>();
     final premiumNotifier = context.watch<PremiumNotifier>();
-    final isDark = themeNotifier.isDark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isPremium = premiumNotifier.isPremium;
 
     // Colors from AppColors

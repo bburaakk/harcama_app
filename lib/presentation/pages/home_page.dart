@@ -60,116 +60,124 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Stack(
           children: [
-            Column(
-                children: [
-                  TopBar(
-                    isSearching: isSearching,
-                    onSearchToggle: () =>
-                        setState(() => isSearching = !isSearching),
-                    onLedgerTap: _toggleLedgerSheet,
-                    searchHint: 'Search transactions...',
-                    onSearchChanged: txNotifier.updateSearchQuery,
-                    onSearchClear: () => txNotifier.updateSearchQuery(''),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 8),
-                          if (!isSearching) ...[
-                            RemainingBalanceCard(balance: balance),
-                            const SizedBox(height: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Your Goals',
+            GestureDetector(
+              onTap: () {
+                if (showLedgerSheet) {
+                  setState(() => showLedgerSheet = false);
+                }
+              },
+              behavior: HitTestBehavior.translucent,
+              child: Column(
+                  children: [
+                    TopBar(
+                      isSearching: isSearching,
+                      onSearchToggle: () =>
+                          setState(() => isSearching = !isSearching),
+                      onLedgerTap: _toggleLedgerSheet,
+                      searchHint: 'Search transactions...',
+                      onSearchChanged: txNotifier.updateSearchQuery,
+                      onSearchClear: () => txNotifier.updateSearchQuery(''),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 8),
+                            if (!isSearching) ...[
+                              RemainingBalanceCard(balance: balance),
+                              const SizedBox(height: 24),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Your Goals',
+                                    style: TextStyle(
+                                      color: AppColors.text(context),
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const GoalPage(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'See All',
+                                      style: TextStyle(
+                                        color: AppColors.primaryDark,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                height: 200, // Increased height to prevent clipping
+                                child: GridView.builder(
+                                  physics: const BouncingScrollPhysics(),
+                                  padding: const EdgeInsets.only(bottom: 16), // Bottom padding
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 24,
+                                        mainAxisSpacing: 12,
+                                        mainAxisExtent: 80,
+                                      ),
+                                  itemCount: goalNotifier.goals.length + 1,
+                                  itemBuilder: (context, index) {
+                                    if (index == goalNotifier.goals.length) {
+                                      return _addGoalCard(context);
+                                    }
+                                    return _goalCard(
+                                      context: context,
+                                      goal: goalNotifier.goals[index],
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Recent Activity',
                                   style: TextStyle(
                                     color: AppColors.text(context),
-                                    fontSize: 22,
+                                    fontSize: 20,
                                     fontWeight: FontWeight.w900,
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => const GoalPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    'See All',
-                                    style: TextStyle(
-                                      color: AppColors.primaryDark,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            SizedBox(
-                              height: 200, // Increased height to prevent clipping
-                              child: GridView.builder(
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                            Expanded(
+                              child: SingleChildScrollView(
                                 physics: const BouncingScrollPhysics(),
-                                padding: const EdgeInsets.only(bottom: 16), // Bottom padding
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      crossAxisSpacing: 24,
-                                      mainAxisSpacing: 12,
-                                      mainAxisExtent: 80,
+                                child: Column(
+                                  children: [
+                                    TransactionList(
+                                      transactions: visibleTx,
+                                      notifier: txNotifier,
                                     ),
-                                itemCount: goalNotifier.goals.length + 1,
-                                itemBuilder: (context, index) {
-                                  if (index == goalNotifier.goals.length) {
-                                    return _addGoalCard(context);
-                                  }
-                                  return _goalCard(
-                                    context: context,
-                                    goal: goalNotifier.goals[index],
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Recent Activity',
-                                style: TextStyle(
-                                  color: AppColors.text(context),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w900,
+                                    const SizedBox(height: 100),
+                                  ],
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 8),
                           ],
-                          Expanded(
-                            child: SingleChildScrollView(
-                              physics: const BouncingScrollPhysics(),
-                              child: Column(
-                                children: [
-                                  TransactionList(
-                                    transactions: visibleTx,
-                                    notifier: txNotifier,
-                                  ),
-                                  const SizedBox(height: 100),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+            ),
             
             LedgerDropdown(
               isVisible: showLedgerSheet,

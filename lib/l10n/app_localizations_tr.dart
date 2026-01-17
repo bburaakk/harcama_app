@@ -399,4 +399,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get expensesLabel => 'Giderler';
+
+  @override
+  String get allLedgers => 'Tüm Defterler';
 }

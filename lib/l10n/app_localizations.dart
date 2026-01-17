@@ -865,6 +865,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expenses'**
   String get expensesLabel;
+
+  /// No description provided for @allLedgers.
+  ///
+  /// In en, this message translates to:
+  /// **'All Ledgers'**
+  String get allLedgers;
 }
 
 class _AppLocalizationsDelegate

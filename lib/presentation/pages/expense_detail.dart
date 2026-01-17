@@ -94,13 +94,16 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
 
     // --- Kuruş Kontrolü (Max 2 basamak) ---
     if (!"+-*/".contains(value) && value != ",") {
-      final parts = RegExp(r"[^+\-\*/]+").allMatches(a);
-      final last = parts.isNotEmpty ? parts.last.group(0)! : a;
-      
-      if (last.contains('.')) {
-        final decimalPart = last.split('.')[1];
-        if (decimalPart.length >= 2) {
-          return; // Zaten 2 basamak var, daha fazla ekleme
+      // Eğer son karakter operatör ise yeni sayıya başlıyoruz demektir, kontrol etme.
+      if (!RegExp(r'[+\-\*/]$').hasMatch(a)) {
+        final parts = RegExp(r"[^+\-\*/]+").allMatches(a);
+        final last = parts.isNotEmpty ? parts.last.group(0)! : a;
+        
+        if (last.contains('.')) {
+          final decimalPart = last.split('.')[1];
+          if (decimalPart.length >= 2) {
+            return; // Zaten 2 basamak var, daha fazla ekleme
+          }
         }
       }
     }

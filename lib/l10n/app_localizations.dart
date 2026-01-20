@@ -871,6 +871,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All Ledgers'**
   String get allLedgers;
+
+  /// No description provided for @subscriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions'**
+  String get subscriptions;
+
+  /// No description provided for @yourSubscriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Subscriptions'**
+  String get yourSubscriptions;
+
+  /// No description provided for @newSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'New Subscription'**
+  String get newSubscription;
+
+  /// No description provided for @totalMonthlySubscriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Monthly'**
+  String get totalMonthlySubscriptions;
+
+  /// No description provided for @activeSubscriptionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active subscriptions'**
+  String activeSubscriptionsCount(int count);
+
+  /// No description provided for @nextPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Payment'**
+  String get nextPayment;
+
+  /// No description provided for @upcomingPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Payments'**
+  String get upcomingPayments;
+
+  /// No description provided for @subscriptionFrequencyDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get subscriptionFrequencyDaily;
+
+  /// No description provided for @subscriptionFrequencyWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get subscriptionFrequencyWeekly;
+
+  /// No description provided for @subscriptionFrequencyMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get subscriptionFrequencyMonthly;
+
+  /// No description provided for @subscriptionFrequencyYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get subscriptionFrequencyYearly;
+
+  /// No description provided for @noSubscriptionsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No subscriptions yet'**
+  String get noSubscriptionsYet;
+
+  /// No description provided for @addYourFirstSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first subscription'**
+  String get addYourFirstSubscription;
 }
 
 class _AppLocalizationsDelegate

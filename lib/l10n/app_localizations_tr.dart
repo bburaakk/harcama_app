@@ -402,4 +402,45 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get allLedgers => 'Tüm Defterler';
+
+  @override
+  String get subscriptions => 'Abonelikler';
+
+  @override
+  String get yourSubscriptions => 'Abonelikleriniz';
+
+  @override
+  String get newSubscription => 'Yeni Abonelik';
+
+  @override
+  String get totalMonthlySubscriptions => 'Toplam Aylık';
+
+  @override
+  String activeSubscriptionsCount(int count) {
+    return '$count aktif abonelik';
+  }
+
+  @override
+  String get nextPayment => 'Sonraki Ödeme';
+
+  @override
+  String get upcomingPayments => 'Yaklaşan Ödemeler';
+
+  @override
+  String get subscriptionFrequencyDaily => 'Günlük';
+
+  @override
+  String get subscriptionFrequencyWeekly => 'Haftalık';
+
+  @override
+  String get subscriptionFrequencyMonthly => 'Aylık';
+
+  @override
+  String get subscriptionFrequencyYearly => 'Yıllık';
+
+  @override
+  String get noSubscriptionsYet => 'Henüz aboneliğiniz yok';
+
+  @override
+  String get addYourFirstSubscription => 'İlk aboneliğinizi ekleyin';
 }

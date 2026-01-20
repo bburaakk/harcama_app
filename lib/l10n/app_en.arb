@@ -146,5 +146,25 @@
   "yearlySpendingTitle": "Yearly Spending",
   "incomeLabel": "Income",
   "expensesLabel": "Expenses",
-  "allLedgers": "All Ledgers"
+  "allLedgers": "All Ledgers",
+  "subscriptions": "Subscriptions",
+  "yourSubscriptions": "Your Subscriptions", 
+  "newSubscription": "New Subscription",
+  "totalMonthlySubscriptions": "Total Monthly",
+  "activeSubscriptionsCount": "{count} active subscriptions",
+  "@activeSubscriptionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nextPayment": "Next Payment",
+  "upcomingPayments": "Upcoming Payments",
+  "subscriptionFrequencyDaily": "Daily",
+  "subscriptionFrequencyWeekly": "Weekly",
+  "subscriptionFrequencyMonthly": "Monthly", 
+  "subscriptionFrequencyYearly": "Yearly",
+  "noSubscriptionsYet": "No subscriptions yet",
+  "addYourFirstSubscription": "Add your first subscription"
 }

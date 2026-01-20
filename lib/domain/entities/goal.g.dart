@@ -6,55 +6,6 @@ part of 'goal.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class GoalStatusAdapter extends TypeAdapter<GoalStatus> {
-  @override
-  final int typeId = 5;
-
-  @override
-  GoalStatus read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return GoalStatus.active;
-      case 1:
-        return GoalStatus.completed;
-      case 2:
-        return GoalStatus.paused;
-      case 3:
-        return GoalStatus.cancelled;
-      default:
-        return GoalStatus.active;
-    }
-  }
-
-  @override
-  void write(BinaryWriter writer, GoalStatus obj) {
-    switch (obj) {
-      case GoalStatus.active:
-        writer.writeByte(0);
-        break;
-      case GoalStatus.completed:
-        writer.writeByte(1);
-        break;
-      case GoalStatus.paused:
-        writer.writeByte(2);
-        break;
-      case GoalStatus.cancelled:
-        writer.writeByte(3);
-        break;
-    }
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GoalStatusAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
 class GoalAdapter extends TypeAdapter<Goal> {
   @override
   final int typeId = 6;
@@ -124,6 +75,55 @@ class GoalAdapter extends TypeAdapter<Goal> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is GoalAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class GoalStatusAdapter extends TypeAdapter<GoalStatus> {
+  @override
+  final int typeId = 5;
+
+  @override
+  GoalStatus read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return GoalStatus.active;
+      case 1:
+        return GoalStatus.completed;
+      case 2:
+        return GoalStatus.paused;
+      case 3:
+        return GoalStatus.cancelled;
+      default:
+        return GoalStatus.active;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, GoalStatus obj) {
+    switch (obj) {
+      case GoalStatus.active:
+        writer.writeByte(0);
+        break;
+      case GoalStatus.completed:
+        writer.writeByte(1);
+        break;
+      case GoalStatus.paused:
+        writer.writeByte(2);
+        break;
+      case GoalStatus.cancelled:
+        writer.writeByte(3);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GoalStatusAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

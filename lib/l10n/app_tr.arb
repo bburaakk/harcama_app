@@ -129,5 +129,25 @@
   "yearlySpendingTitle": "Yıllık Harcama",
   "incomeLabel": "Gelir",
   "expensesLabel": "Giderler",
-  "allLedgers": "Tüm Defterler"
+  "allLedgers": "Tüm Defterler",
+  "subscriptions": "Abonelikler",
+  "yourSubscriptions": "Abonelikleriniz",
+  "newSubscription": "Yeni Abonelik",
+  "totalMonthlySubscriptions": "Toplam Aylık",
+  "activeSubscriptionsCount": "{count} aktif abonelik",
+  "@activeSubscriptionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nextPayment": "Sonraki Ödeme",
+  "upcomingPayments": "Yaklaşan Ödemeler",
+  "subscriptionFrequencyDaily": "Günlük",
+  "subscriptionFrequencyWeekly": "Haftalık", 
+  "subscriptionFrequencyMonthly": "Aylık",
+  "subscriptionFrequencyYearly": "Yıllık",
+  "noSubscriptionsYet": "Henüz aboneliğiniz yok",
+  "addYourFirstSubscription": "İlk aboneliğinizi ekleyin"
 }

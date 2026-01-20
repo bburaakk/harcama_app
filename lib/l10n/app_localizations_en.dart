@@ -400,4 +400,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get allLedgers => 'All Ledgers';
+
+  @override
+  String get subscriptions => 'Subscriptions';
+
+  @override
+  String get yourSubscriptions => 'Your Subscriptions';
+
+  @override
+  String get newSubscription => 'New Subscription';
+
+  @override
+  String get totalMonthlySubscriptions => 'Total Monthly';
+
+  @override
+  String activeSubscriptionsCount(int count) {
+    return '$count active subscriptions';
+  }
+
+  @override
+  String get nextPayment => 'Next Payment';
+
+  @override
+  String get upcomingPayments => 'Upcoming Payments';
+
+  @override
+  String get subscriptionFrequencyDaily => 'Daily';
+
+  @override
+  String get subscriptionFrequencyWeekly => 'Weekly';
+
+  @override
+  String get subscriptionFrequencyMonthly => 'Monthly';
+
+  @override
+  String get subscriptionFrequencyYearly => 'Yearly';
+
+  @override
+  String get noSubscriptionsYet => 'No subscriptions yet';
+
+  @override
+  String get addYourFirstSubscription => 'Add your first subscription';
 }

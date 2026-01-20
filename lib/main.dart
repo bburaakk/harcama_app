@@ -5,15 +5,18 @@ import 'package:harcama_app/data/repositories/account_repository_impl.dart';
 import 'package:harcama_app/data/repositories/category_repository_impl.dart';
 import 'package:harcama_app/data/repositories/ledger_repository_impl.dart';
 import 'package:harcama_app/data/repositories/goal_repository_impl.dart';
+import 'package:harcama_app/data/repositories/subscription_repository_impl.dart';
 import 'package:harcama_app/domain/entities/account.dart';
 import 'package:harcama_app/domain/entities/category.dart';
 import 'package:harcama_app/domain/entities/ledger.dart';
 import 'package:harcama_app/domain/entities/goal.dart';
+import 'package:harcama_app/domain/entities/subscription.dart';
 import 'package:harcama_app/domain/usecases/generic_usecase.dart';
 import 'package:harcama_app/presentation/notifiers/account_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/category_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/goal_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/subscription_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/premium_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:provider/provider.dart';
@@ -34,18 +37,23 @@ void main() async {
   Hive.registerAdapter(LedgerAdapter());
   Hive.registerAdapter(GoalStatusAdapter());
   Hive.registerAdapter(GoalAdapter());
+  Hive.registerAdapter(SubscriptionFrequencyAdapter());
+  Hive.registerAdapter(SubscriptionStatusAdapter());
+  Hive.registerAdapter(SubscriptionAdapter());
 
   final transactionBox = await Hive.openBox<Transaction>('transactions');
   final categoryBox = await Hive.openBox<Category>('categories');
   final accountBox = await Hive.openBox<Account>('accounts');
   final ledgerBox = await Hive.openBox<Ledger>('ledgers');
   final goalBox = await Hive.openBox<Goal>('goals');
+  final subscriptionBox = await Hive.openBox<Subscription>('subscriptions');
 
   final transactionRepository = TransactionRepositoryImpl(transactionBox);
   final categoryRepository = CategoryRepositoryImpl(categoryBox);
   final accountRepository = AccountRepositoryImpl(accountBox);
   final ledgerRepository = LedgerRepositoryImpl(ledgerBox);
   final goalRepository = GoalRepositoryImpl(goalBox);
+  final subscriptionRepository = SubscriptionRepositoryImpl(subscriptionBox);
 
   runApp(
     MultiProvider(
@@ -94,6 +102,14 @@ void main() async {
             deleteUseCase: DeleteUseCase<Goal>(goalRepository),
             getAllUseCase: GetAllUseCase<Goal>(goalRepository),
             updateUseCase: UpdateUseCase<Goal>(goalRepository),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => SubscriptionNotifier(
+            createUseCase: CreateUseCase<Subscription>(subscriptionRepository),
+            deleteUseCase: DeleteUseCase<Subscription>(subscriptionRepository),
+            getAllUseCase: GetAllUseCase<Subscription>(subscriptionRepository),
+            updateUseCase: UpdateUseCase<Subscription>(subscriptionRepository),
           ),
         ),
       ],

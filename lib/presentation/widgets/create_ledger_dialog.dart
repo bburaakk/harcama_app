@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:harcama_app/domain/entities/ledger.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
+import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:harcama_app/l10n/app_localizations.dart';
 
@@ -150,26 +151,29 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
                       final iconName = icons[index];
                       final isSelected = iconName == selectedIcon;
 
-                      return GestureDetector(
-                        onTap: () => setState(() => selectedIcon = iconName),
-                        child: Container(
+                      return PressableContainer(
+                        onPressed: () => setState(() => selectedIcon = iconName),
+                        padding: EdgeInsets.zero,
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? AppColors.primary.withOpacity(0.1)
+                              : AppColors.progressBackground(context),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected ? AppColors.primary : AppColors.cardBorder(context),
+                            width: 2,
+                          ),
+                        ),
+                        child: SizedBox(
                           width: 48,
                           height: 48,
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? AppColors.primary.withOpacity(0.1)
-                                : AppColors.progressBackground(context),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected ? AppColors.primary : AppColors.cardBorder(context),
-                              width: 2,
+                          child: Center(
+                            child: Icon(
+                              _getIconData(iconName),
+                              color: isSelected ? AppColors.primary : AppColors.subtitleText(context),
+                              size: 24,
+                              weight: 700,
                             ),
-                          ),
-                          child: Icon(
-                            _getIconData(iconName),
-                            color: isSelected ? AppColors.primary : AppColors.subtitleText(context),
-                            size: 24,
-                            weight: 700,
                           ),
                         ),
                       );
@@ -180,49 +184,47 @@ class _CreateLedgerDialogState extends State<CreateLedgerDialog> {
                 const SizedBox(height: 32),
 
                 // Action Buttons
-                GestureDetector(
-                  onTap: _createLedger,
-                  child: Container(
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primaryDark,
-                          offset: const Offset(0, 4),
-                          blurRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        l10n.create,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.5,
-                        ),
+                PressableContainer(
+                  onPressed: _createLedger,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryDark,
+                        offset: const Offset(0, 4),
+                        blurRadius: 0,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      l10n.create,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.5,
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    height: 40,
+                PressableContainer(
+                  onPressed: () => Navigator.pop(context),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: const BoxDecoration(
                     color: Colors.transparent,
-                    child: Center(
-                      child: Text(
-                        l10n.cancel.toUpperCase(),
-                        style: TextStyle(
-                          color: AppColors.subtitleText(context),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.2,
-                        ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      l10n.cancel.toUpperCase(),
+                      style: TextStyle(
+                        color: AppColors.subtitleText(context),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
                       ),
                     ),
                   ),

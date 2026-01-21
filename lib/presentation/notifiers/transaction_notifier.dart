@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:harcama_app/domain/entities/account.dart';
 import 'package:harcama_app/domain/entities/category.dart';
+import 'package:harcama_app/domain/entities/ledger.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/notifiers/base_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
@@ -15,24 +18,89 @@ class TransactionNotifier extends BaseNotifier<Transaction> {
   });
 
   String _searchQuery = '';
+  TransactionType? _filterType;
+  Category? _filterCategory;
+  Ledger? _filterLedger;
+  Account? _filterAccount;
+  DateTimeRange? _filterDateRange;
   double monthlyBudget = 0;
 
+  TransactionType? get filterType => _filterType;
+  Category? get filterCategory => _filterCategory;
+  Ledger? get filterLedger => _filterLedger;
+  Account? get filterAccount => _filterAccount;
+  DateTimeRange? get filterDateRange => _filterDateRange;
+
   List<Transaction> get transactions {
-    if (_searchQuery.isEmpty) {
-      return items;
+    var result = items;
+
+    if (_searchQuery.isNotEmpty) {
+      final queryLower = _searchQuery.toLowerCase();
+      result = result.where((t) {
+        final titleLower = t.title.toLowerCase();
+        final categoryLower = t.category?.title.toLowerCase() ?? '';
+        return titleLower.contains(queryLower) || categoryLower.contains(queryLower);
+      }).toList();
     }
 
-    return items.where((t) {
-      final queryLower = _searchQuery.toLowerCase();
-      final titleLower = t.title.toLowerCase();
-      final categoryLower = t.category?.title.toLowerCase() ?? '';
+    if (_filterType != null) {
+      result = result.where((t) => t.type == _filterType).toList();
+    }
 
-      return titleLower.contains(queryLower) || categoryLower.contains(queryLower);
-    }).toList();
+    if (_filterCategory != null) {
+      result = result.where((t) => t.category?.id == _filterCategory!.id).toList();
+    }
+
+    if (_filterLedger != null) {
+      result = result.where((t) => t.ledgerID == _filterLedger!.id).toList();
+    }
+
+    if (_filterAccount != null) {
+      result = result.where((t) => t.accountID == _filterAccount!.id).toList();
+    }
+
+    if (_filterDateRange != null) {
+      result = result.where((t) {
+        // Normalize dates to ignore time part for inclusive comparison
+        final date = DateTime(t.date.year, t.date.month, t.date.day);
+        final start = DateTime(_filterDateRange!.start.year, _filterDateRange!.start.month, _filterDateRange!.start.day);
+        final end = DateTime(_filterDateRange!.end.year, _filterDateRange!.end.month, _filterDateRange!.end.day);
+        
+        return (date.isAtSameMomentAs(start) || date.isAfter(start)) && 
+               (date.isAtSameMomentAs(end) || date.isBefore(end));
+      }).toList();
+    }
+
+    return result;
   }
 
   void updateSearchQuery(String query) {
     _searchQuery = query;
+    notifyListeners();
+  }
+
+  void setFilterType(TransactionType? type) {
+    _filterType = type;
+    notifyListeners();
+  }
+
+  void setFilterCategory(Category? category) {
+    _filterCategory = category;
+    notifyListeners();
+  }
+
+  void setFilterLedger(Ledger? ledger) {
+    _filterLedger = ledger;
+    notifyListeners();
+  }
+
+  void setFilterAccount(Account? account) {
+    _filterAccount = account;
+    notifyListeners();
+  }
+
+  void setFilterDateRange(DateTimeRange? range) {
+    _filterDateRange = range;
     notifyListeners();
   }
 

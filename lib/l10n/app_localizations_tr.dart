@@ -407,13 +407,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get subscriptions => 'Abonelikler';
 
   @override
-  String get yourSubscriptions => 'Abonelikleriniz';
+  String get yourSubscriptions => 'Aboneliklerin';
 
   @override
   String get newSubscription => 'Yeni Abonelik';
 
   @override
-  String get totalMonthlySubscriptions => 'Toplam Aylık';
+  String get totalMonthlySubscriptions => 'Aylık Toplam';
 
   @override
   String activeSubscriptionsCount(int count) {
@@ -421,26 +421,126 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get nextPayment => 'Sonraki Ödeme';
+  String get nextPayment => 'Next Payment';
 
   @override
-  String get upcomingPayments => 'Yaklaşan Ödemeler';
+  String get upcomingPayments => 'Upcoming Payments';
 
   @override
-  String get subscriptionFrequencyDaily => 'Günlük';
+  String get subscriptionFrequencyDaily => 'Daily';
 
   @override
-  String get subscriptionFrequencyWeekly => 'Haftalık';
+  String get subscriptionFrequencyWeekly => 'Weekly';
 
   @override
-  String get subscriptionFrequencyMonthly => 'Aylık';
+  String get subscriptionFrequencyMonthly => 'Monthly';
 
   @override
-  String get subscriptionFrequencyYearly => 'Yıllık';
+  String get subscriptionFrequencyYearly => 'Yearly';
 
   @override
-  String get noSubscriptionsYet => 'Henüz aboneliğiniz yok';
+  String get noSubscriptionsYet => 'Henüz abonelik yok';
 
   @override
-  String get addYourFirstSubscription => 'İlk aboneliğinizi ekleyin';
+  String get addYourFirstSubscription => 'İlk aboneliğini ekle';
+
+  @override
+  String get addCategory => 'Add Category';
+
+  @override
+  String get editCategory => 'Edit Category';
+
+  @override
+  String get categoryName => 'Category Name';
+
+  @override
+  String get iconEmoji => 'Icon (Emoji)';
+
+  @override
+  String get deleteCategory => 'Delete Category?';
+
+  @override
+  String get deleteCategoryConfirm =>
+      'Are you sure you want to delete this category?';
+
+  @override
+  String get defaultCategoryError => 'Default categories cannot be edited';
+
+  @override
+  String get manageSubscriptions => 'Aboneliklerinizi kolayca yönetin';
+
+  @override
+  String get active => 'AKTİF';
+
+  @override
+  String get paused => 'DURAKLATILDI';
+
+  @override
+  String get catSupermarket => 'Market';
+
+  @override
+  String get catTransport => 'Ulaşım';
+
+  @override
+  String get catFood => 'Yemek';
+
+  @override
+  String get catBills => 'Faturalar';
+
+  @override
+  String get catFun => 'Eğlence';
+
+  @override
+  String get catHealth => 'Sağlık';
+
+  @override
+  String get catClothing => 'Giyim';
+
+  @override
+  String get catSalary => 'Maaş';
+
+  @override
+  String get catRent => 'Kira';
+
+  @override
+  String get catEducation => 'Eğitim';
+
+  @override
+  String get transactionType => 'İşlem Tipi';
+
+  @override
+  String get category => 'Kategori';
+
+  @override
+  String get ledger => 'Defter';
+
+  @override
+  String get dateRange => 'Tarih Aralığı';
+
+  @override
+  String get all => 'Tümü';
+
+  @override
+  String get allCategories => 'Tüm Kategoriler';
+
+  @override
+  String get allAccounts => 'Tüm Hesaplar';
+
+  @override
+  String get noLedgersFound => 'Defter bulunamadı';
+
+  @override
+  String get noAccountsFound => 'Hesap bulunamadı';
+
+  @override
+  String get dateFilterCleared => 'Tarih filtresi temizlendi';
+
+  @override
+  String get noCategoriesFound => 'Kategori bulunamadı';
+
+  @override
+  String get applySelection => 'SEÇİMİ UYGULA';
+
+  @override
+  String get overview => 'Genel Bakış';
 }

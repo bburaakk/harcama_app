@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/create_ledger_dialog.dart';
+import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:harcama_app/l10n/app_localizations.dart';
 
@@ -86,8 +87,8 @@ class LedgerDropdown extends StatelessWidget {
             const SizedBox(height: 4),
 
             // New Ledger Button
-            InkWell(
-              onTap: () async {
+            PressableContainer(
+              onPressed: () async {
                 final newLedger = await showDialog(
                   context: context,
                   builder: (ctx) => const CreateLedgerDialog(),
@@ -96,39 +97,36 @@ class LedgerDropdown extends StatelessWidget {
                   await ledgerNotifier.addItem(newLedger);
                 }
               },
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.transparent,
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.cardBorder(context),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Symbols.add_rounded,
-                        color: AppColors.subtitleText(context),
-                        size: 20,
-                      ),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.transparent,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.cardBorder(context),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      l10n.newLedger,
-                      style: TextStyle(
-                        color: AppColors.subtitleText(context),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
+                    child: Icon(
+                      Symbols.add_rounded,
+                      color: AppColors.subtitleText(context),
+                      size: 20,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    l10n.newLedger,
+                    style: TextStyle(
+                      color: AppColors.subtitleText(context),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -146,67 +144,64 @@ class LedgerDropdown extends StatelessWidget {
     VoidCallback? onDelete,
     required Color color,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          border: isSelected
-              ? Border.all(color: color.withOpacity(0.2), width: 2)
-              : Border.all(color: Colors.transparent, width: 2),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: Colors.white, size: 20),
+    return PressableContainer(
+      onPressed: onTap,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        border: isSelected
+            ? Border.all(color: color.withOpacity(0.2), width: 2)
+            : Border.all(color: Colors.transparent, width: 2),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(8),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                name,
-                style: TextStyle(
-                  color: isSelected
-                      ? AppColors.text(context)
-                      : AppColors.subtitleText(context),
-                  fontWeight: FontWeight.w900,
-                  fontSize: 14,
+            child: Icon(icon, color: Colors.white, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              name,
+              style: TextStyle(
+                color: isSelected
+                    ? AppColors.text(context)
+                    : AppColors.subtitleText(context),
+                fontWeight: FontWeight.w900,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isSelected)
+                Icon(
+                  Symbols.check_circle_rounded,
+                  color: color,
+                  fill: 1,
+                  size: 24,
                 ),
-              ),
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (isSelected)
-                  Icon(
-                    Symbols.check_circle_rounded,
-                    color: color,
-                    fill: 1,
-                    size: 24,
+              if (onDelete != null) ...[
+                if (isSelected) const SizedBox(width: 8),
+                InkWell(
+                  onTap: onDelete,
+                  child: Icon(
+                    Symbols.delete_rounded,
+                    color: AppColors.expenseColor(context),
+                    size: 20,
                   ),
-                if (onDelete != null) ...[
-                  if (isSelected) const SizedBox(width: 8),
-                  InkWell(
-                    onTap: onDelete,
-                    child: Icon(
-                      Symbols.delete_rounded,
-                      color: AppColors.expenseColor(context),
-                      size: 20,
-                    ),
-                  ),
-                ],
+                ),
               ],
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }

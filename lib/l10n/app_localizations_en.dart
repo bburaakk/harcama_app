@@ -441,4 +441,104 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addYourFirstSubscription => 'Add your first subscription';
+
+  @override
+  String get addCategory => 'Add Category';
+
+  @override
+  String get editCategory => 'Edit Category';
+
+  @override
+  String get categoryName => 'Category Name';
+
+  @override
+  String get iconEmoji => 'Icon (Emoji)';
+
+  @override
+  String get deleteCategory => 'Delete Category?';
+
+  @override
+  String get deleteCategoryConfirm =>
+      'Are you sure you want to delete this category?';
+
+  @override
+  String get defaultCategoryError => 'Default categories cannot be edited';
+
+  @override
+  String get manageSubscriptions => 'Manage your subscriptions easily';
+
+  @override
+  String get active => 'ACTIVE';
+
+  @override
+  String get paused => 'PAUSED';
+
+  @override
+  String get catSupermarket => 'Supermarket';
+
+  @override
+  String get catTransport => 'Transport';
+
+  @override
+  String get catFood => 'Food';
+
+  @override
+  String get catBills => 'Bills';
+
+  @override
+  String get catFun => 'Fun';
+
+  @override
+  String get catHealth => 'Health';
+
+  @override
+  String get catClothing => 'Clothing';
+
+  @override
+  String get catSalary => 'Salary';
+
+  @override
+  String get catRent => 'Rent';
+
+  @override
+  String get catEducation => 'Education';
+
+  @override
+  String get transactionType => 'Transaction Type';
+
+  @override
+  String get category => 'Category';
+
+  @override
+  String get ledger => 'Ledger';
+
+  @override
+  String get dateRange => 'Date Range';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get allCategories => 'All Categories';
+
+  @override
+  String get allAccounts => 'All Accounts';
+
+  @override
+  String get noLedgersFound => 'No ledgers found';
+
+  @override
+  String get noAccountsFound => 'No accounts found';
+
+  @override
+  String get dateFilterCleared => 'Date filter cleared';
+
+  @override
+  String get noCategoriesFound => 'No categories found';
+
+  @override
+  String get applySelection => 'APPLY SELECTION';
+
+  @override
+  String get overview => 'Overview';
 }

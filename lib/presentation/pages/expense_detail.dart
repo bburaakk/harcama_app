@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:harcama_app/presentation/notifiers/category_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:harcama_app/domain/entities/category.dart';
@@ -29,15 +30,6 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
   DateTime selectedDate = DateTime.now();
   Category? selectedCategory;
   TransactionType selectedType = TransactionType.expense;
-
-  final categories = const [
-    Category(id: "1", title: "Food", icon: "🍕"),
-    Category(id: "2", title: "Transport", icon: "🚌"),
-    Category(id: "3", title: "Shopping", icon: "🛍️"),
-    Category(id: "4", title: "Rent", icon: "🏠"),
-    Category(id: "5", title: "Fun", icon: "🎮"),
-    Category(id: "6", title: "Health", icon: "💊"),
-  ];
 
   @override
   void initState() {
@@ -490,6 +482,9 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
 
   Widget _buildCategorySection(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final categoryNotifier = context.watch<CategoryNotifier>();
+    final categories = categoryNotifier.categories;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -529,9 +524,30 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
     );
   }
 
+  String _getCategoryTitle(BuildContext context, Category cat) {
+    final l10n = AppLocalizations.of(context)!;
+    if (cat.id.startsWith('def_')) {
+      switch (cat.title) {
+        case 'Supermarket': return l10n.catSupermarket;
+        case 'Transport': return l10n.catTransport;
+        case 'Food': return l10n.catFood;
+        case 'Bills': return l10n.catBills;
+        case 'Fun': return l10n.catFun;
+        case 'Health': return l10n.catHealth;
+        case 'Clothing': return l10n.catClothing;
+        case 'Salary': return l10n.catSalary;
+        case 'Rent': return l10n.catRent;
+        case 'Education': return l10n.catEducation;
+        default: return cat.title;
+      }
+    }
+    return cat.title;
+  }
+
   Widget _buildCategoryItem(BuildContext context, Category cat, bool isActive) {
     return GestureDetector(
       onTap: () => setState(() => selectedCategory = cat),
+      onLongPress: () => _handleCategoryLongPress(cat),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final size = constraints.maxHeight * 0.65;
@@ -566,7 +582,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  cat.title,
+                  _getCategoryTitle(context, cat),
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
@@ -581,53 +597,515 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
     );
   }
 
+  void _handleCategoryLongPress(Category cat) {
+    final l10n = AppLocalizations.of(context)!;
+    if (cat.id.startsWith('def_')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.defaultCategoryError),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    _showEditCategoryDialog(cat);
+  }
+
   Widget _buildMoreCategoryButton(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final size = constraints.maxHeight * 0.65;
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.progressBackground(context),
-                border: Border.all(
-                  color: AppColors.cardBorder(context),
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
+    return GestureDetector(
+      onTap: _showAddCategoryDialog,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final size = constraints.maxHeight * 0.65;
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.card(context), // Changed to card color for dark mode visibility
+                  border: Border.all(
                     color: AppColors.cardBorder(context),
-                    offset: const Offset(0, 3),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.cardBorder(context),
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Symbols.add_rounded,
+                  color: AppColors.subtitleText(context),
+                  size: size * 0.45,
+                ),
+              ),
+              SizedBox(height: constraints.maxHeight * 0.05),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  l10n.more,
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.subtitleText(context),
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _showAddCategoryDialog() async {
+    final nameController = TextEditingController();
+    final iconController = TextEditingController();
+    final l10n = AppLocalizations.of(context)!;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(maxWidth: 340),
+          decoration: BoxDecoration(
+            color: AppColors.card(context),
+            borderRadius: BorderRadius.circular(32),
+            border: Border(
+              top: BorderSide(color: AppColors.cardBorder(context), width: 2),
+              left: BorderSide(color: AppColors.cardBorder(context), width: 2),
+              right: BorderSide(color: AppColors.cardBorder(context), width: 2),
+              bottom: BorderSide(color: AppColors.cardBorder(context), width: 6),
+            ),
+          ),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Text(
+                      l10n.addCategory,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.text(context),
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Icon Input
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      l10n.iconEmoji,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.subtitleText(context),
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.progressBackground(context),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.cardBorder(context), width: 2),
+                    ),
+                    child: TextField(
+                      controller: iconController,
+                      style: TextStyle(
+                        color: AppColors.text(context),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: "🍕",
+                        hintStyle: TextStyle(
+                          color: AppColors.subtitleText(context).withOpacity(0.5),
+                          fontWeight: FontWeight.bold,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      ),
+                      maxLength: 1,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 16),
+
+                  // Name Input
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      l10n.categoryName,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.subtitleText(context),
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.progressBackground(context),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.cardBorder(context), width: 2),
+                    ),
+                    child: TextField(
+                      controller: nameController,
+                      style: TextStyle(
+                        color: AppColors.text(context),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: "Food",
+                        hintStyle: TextStyle(
+                          color: AppColors.subtitleText(context).withOpacity(0.5),
+                          fontWeight: FontWeight.bold,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Action Buttons
+                  GestureDetector(
+                    onTap: () {
+                      if (nameController.text.isNotEmpty && iconController.text.isNotEmpty) {
+                        final newCategory = Category(
+                          id: DateTime.now().millisecondsSinceEpoch.toString(),
+                          title: nameController.text,
+                          icon: iconController.text,
+                        );
+                        context.read<CategoryNotifier>().addItem(newCategory);
+                        Navigator.pop(ctx);
+                      }
+                    },
+                    child: Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryDark,
+                            offset: const Offset(0, 4),
+                            blurRadius: 0,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          l10n.save,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(ctx),
+                    child: Container(
+                      height: 40,
+                      color: Colors.transparent,
+                      child: Center(
+                        child: Text(
+                          l10n.cancel.toUpperCase(),
+                          style: TextStyle(
+                            color: AppColors.subtitleText(context),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              child: Icon(
-                Symbols.grid_view_rounded,
-                color: AppColors.subtitleText(context),
-                size: size * 0.45,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showEditCategoryDialog(Category category) async {
+    final nameController = TextEditingController(text: category.title);
+    final iconController = TextEditingController(text: category.icon);
+    final l10n = AppLocalizations.of(context)!;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(maxWidth: 340),
+          decoration: BoxDecoration(
+            color: AppColors.card(context),
+            borderRadius: BorderRadius.circular(32),
+            border: Border(
+              top: BorderSide(color: AppColors.cardBorder(context), width: 2),
+              left: BorderSide(color: AppColors.cardBorder(context), width: 2),
+              right: BorderSide(color: AppColors.cardBorder(context), width: 2),
+              bottom: BorderSide(color: AppColors.cardBorder(context), width: 6),
+            ),
+          ),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Text(
+                      l10n.editCategory,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.text(context),
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Icon Input
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      l10n.iconEmoji,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.subtitleText(context),
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.progressBackground(context),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.cardBorder(context), width: 2),
+                    ),
+                    child: TextField(
+                      controller: iconController,
+                      style: TextStyle(
+                        color: AppColors.text(context),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: "🍕",
+                        hintStyle: TextStyle(
+                          color: AppColors.subtitleText(context).withOpacity(0.5),
+                          fontWeight: FontWeight.bold,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      ),
+                      maxLength: 1,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 16),
+
+                  // Name Input
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      l10n.categoryName,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.subtitleText(context),
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.progressBackground(context),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.cardBorder(context), width: 2),
+                    ),
+                    child: TextField(
+                      controller: nameController,
+                      style: TextStyle(
+                        color: AppColors.text(context),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: "Food",
+                        hintStyle: TextStyle(
+                          color: AppColors.subtitleText(context).withOpacity(0.5),
+                          fontWeight: FontWeight.bold,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Action Buttons
+                  GestureDetector(
+                    onTap: () {
+                      if (nameController.text.isNotEmpty && iconController.text.isNotEmpty) {
+                        final updatedCategory = Category(
+                          id: category.id,
+                          title: nameController.text,
+                          icon: iconController.text,
+                          monthlyBudget: category.monthlyBudget,
+                        );
+                        context.read<CategoryNotifier>().updateItem(updatedCategory);
+                        if (selectedCategory?.id == category.id) {
+                          setState(() => selectedCategory = updatedCategory);
+                        }
+                        Navigator.pop(ctx);
+                      }
+                    },
+                    child: Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryDark,
+                            offset: const Offset(0, 4),
+                            blurRadius: 0,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          l10n.save,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // Delete Button
+                  GestureDetector(
+                    onTap: () {
+                      // Delete Confirmation
+                      showDialog(
+                        context: context,
+                        builder: (deleteCtx) => AlertDialog(
+                          backgroundColor: AppColors.card(context),
+                          title: Text(l10n.deleteCategory, style: TextStyle(color: AppColors.text(context))),
+                          content: Text(
+                            l10n.deleteCategoryConfirm,
+                            style: TextStyle(color: AppColors.subtitleText(context)),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(deleteCtx),
+                              child: Text(l10n.cancel, style: TextStyle(color: AppColors.subtitleText(context))),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                context.read<CategoryNotifier>().deleteItem(category.id);
+                                if (selectedCategory?.id == category.id) {
+                                  setState(() => selectedCategory = null);
+                                }
+                                Navigator.pop(deleteCtx); // Close confirm
+                                Navigator.pop(ctx); // Close edit
+                              },
+                              child: Text(l10n.delete, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 40,
+                      color: Colors.transparent,
+                      child: Center(
+                        child: Text(
+                          l10n.delete.toUpperCase(),
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  GestureDetector(
+                    onTap: () => Navigator.pop(ctx),
+                    child: Container(
+                      height: 40,
+                      color: Colors.transparent,
+                      child: Center(
+                        child: Text(
+                          l10n.cancel.toUpperCase(),
+                          style: TextStyle(
+                            color: AppColors.subtitleText(context),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: constraints.maxHeight * 0.05),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                l10n.more,
-                style: TextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.subtitleText(context),
-                  letterSpacing: -0.5,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+          ),
+        ),
+      ),
     );
   }
 

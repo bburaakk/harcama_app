@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'package:intl/intl.dart';
 import 'package:harcama_app/l10n/app_localizations.dart';
 
@@ -52,6 +54,7 @@ class TopExpensesList extends StatelessWidget {
 
   Widget _buildExpenseItem(BuildContext context, Transaction tx) {
     final l10n = AppLocalizations.of(context)!;
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
     final dateFormat = DateFormat('MMM d, yyyy', Localizations.localeOf(context).toString());
 
     String iconString = tx.category?.icon ?? '';
@@ -125,7 +128,7 @@ class TopExpensesList extends StatelessWidget {
             ),
           ),
           Text(
-            '-₺${CurrencyHelper.format(tx.amount)}',
+            '-$currencySymbol${CurrencyHelper.format(tx.amount)}',
             style: TextStyle(
               color: AppColors.expenseColor(context),
               fontWeight: FontWeight.w900,

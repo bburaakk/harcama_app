@@ -124,7 +124,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appVersion => 'App version';
 
   @override
-  String get privacyPolicy => 'Privacy policy';
+  String get privacyPolicy => 'Privacy Policy';
 
   @override
   String get clearLocalData => 'CLEAR LOCAL DATA';
@@ -541,4 +541,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overview => 'Overview';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get general => 'General';
+
+  @override
+  String get defaultCurrency => 'Default Currency';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get darkMode => 'Dark Mode';
+
+  @override
+  String get financial => 'Financial';
+
+  @override
+  String get manageCategories => 'Manage Categories';
+
+  @override
+  String get termsOfUse => 'Terms of Use';
+
+  @override
+  String get aboutUs => 'About Us';
 }

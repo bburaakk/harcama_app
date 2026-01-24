@@ -1,8 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'package:harcama_app/l10n/app_localizations.dart';
 
 class DonutChartSection extends StatefulWidget {
@@ -25,13 +27,14 @@ class _DonutChartSectionState extends State<DonutChartSection> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
     final expenses = widget.transactions.where((t) => t.type == TransactionType.expense).toList();
 
     List<PieChartSectionData> sections = [];
     List<PieChartSectionData> shadowSections = [];
 
     String centerLabel = l10n.totalSpent;
-    String centerAmount = "₺${CurrencyHelper.format(widget.totalSpent)}";
+    String centerAmount = "$currencySymbol${CurrencyHelper.format(widget.totalSpent)}";
 
     if (expenses.isNotEmpty && widget.totalSpent > 0) {
       final Map<String, double> categoryTotals = {};
@@ -47,14 +50,14 @@ class _DonutChartSectionState extends State<DonutChartSection> {
         if (_touchedIndex < 4 && _touchedIndex < sortedCategories.length) {
           final entry = sortedCategories[_touchedIndex];
           centerLabel = entry.key.toUpperCase();
-          centerAmount = "₺${CurrencyHelper.format(entry.value)}";
+          centerAmount = "$currencySymbol${CurrencyHelper.format(entry.value)}";
         } else if (_touchedIndex == 4 && sortedCategories.length > 4) {
           double otherTotal = 0;
           for (int i = 4; i < sortedCategories.length; i++) {
             otherTotal += sortedCategories[i].value;
           }
           centerLabel = l10n.others;
-          centerAmount = "₺${CurrencyHelper.format(otherTotal)}";
+          centerAmount = "$currencySymbol${CurrencyHelper.format(otherTotal)}";
         }
       }
 

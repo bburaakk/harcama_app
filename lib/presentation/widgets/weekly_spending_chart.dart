@@ -1,8 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'dart:math' as math;
 import 'package:harcama_app/l10n/app_localizations.dart';
 
@@ -21,6 +23,7 @@ class WeeklySpendingChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
     final now = referenceDate ?? DateTime.now();
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
     final startOfWeekDate = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
@@ -93,7 +96,7 @@ class WeeklySpendingChart extends StatelessWidget {
                     getTooltipColor: (group) => AppColors.text(context),
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       return BarTooltipItem(
-                        '₺${CurrencyHelper.format(rod.toY)}', // Show decimals in tooltip
+                        '$currencySymbol${CurrencyHelper.format(rod.toY)}', // Show decimals in tooltip
                         TextStyle(
                             color: Theme.of(context).brightness == Brightness.dark
                                 ? Colors.black

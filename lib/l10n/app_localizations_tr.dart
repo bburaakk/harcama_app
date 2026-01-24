@@ -124,7 +124,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get appVersion => 'Uygulama sürümü';
 
   @override
-  String get privacyPolicy => 'Gizlilik politikası';
+  String get privacyPolicy => 'Gizlilik Politikası';
 
   @override
   String get clearLocalData => 'YEREL VERİYİ SİL';
@@ -331,7 +331,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get cancelAnytime => 'İSTEDİĞİN ZAMAN İPTAL ET';
 
   @override
-  String get termsOfService => 'HİZMET ŞARTLARI';
+  String get termsOfService => 'Kullanım Şartları';
 
   @override
   String get premiumWelcomeMessage =>
@@ -543,4 +543,31 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get overview => 'Genel Bakış';
+
+  @override
+  String get settings => 'Ayarlar';
+
+  @override
+  String get general => 'Genel';
+
+  @override
+  String get defaultCurrency => 'Varsayılan Para Birimi';
+
+  @override
+  String get language => 'Dil';
+
+  @override
+  String get darkMode => 'Karanlık Mod';
+
+  @override
+  String get financial => 'Finansal';
+
+  @override
+  String get manageCategories => 'Kategorileri Yönet';
+
+  @override
+  String get termsOfUse => 'Kullanım Şartları';
+
+  @override
+  String get aboutUs => 'Hakkımızda';
 }

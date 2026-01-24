@@ -68,4 +68,11 @@ class SubscriptionNotifier extends BaseNotifier<Subscription> {
   Future<void> deleteSubscription(String id) async {
     await deleteItem(id);
   }
+
+  Future<void> clearAllSubscriptions() async {
+    final allSubscriptions = List<Subscription>.from(items);
+    for (var sub in allSubscriptions) {
+      await deleteItem(sub.id);
+    }
+  }
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/goal.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:harcama_app/l10n/app_localizations.dart';
 
@@ -67,6 +69,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
     
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -143,7 +146,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                     decoration: _inputDecoration(
                       context,
                       l10n.targetAmountHint,
-                    ).copyWith(prefixText: '₺ '),
+                    ).copyWith(prefixText: '$currencySymbol '),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
@@ -160,7 +163,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                     decoration: _inputDecoration(
                       context,
                       l10n.currentAmountHint,
-                    ).copyWith(prefixText: '₺ '),
+                    ).copyWith(prefixText: '$currencySymbol '),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 
 class StatBox extends StatelessWidget {
   final IconData icon;
@@ -16,6 +18,8 @@ class StatBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
+    
     return Expanded(
       child: PressableContainer(
         onPressed: () => {},
@@ -48,7 +52,7 @@ class StatBox extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              "₺${value.toStringAsFixed(0)}",
+              "$currencySymbol${value.toStringAsFixed(0)}",
               style: const TextStyle(
                 color: AppColors.primaryTextOnCard,
                 fontSize: 18,

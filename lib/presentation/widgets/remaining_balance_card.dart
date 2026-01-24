@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:harcama_app/l10n/app_localizations.dart';
 
@@ -15,6 +17,8 @@ class RemainingBalanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
+
     return PressableContainer(
       onPressed: () {
         // TODO: Add functionality
@@ -47,7 +51,7 @@ class RemainingBalanceCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                "₺${CurrencyHelper.format(balance)}",
+                "$currencySymbol${CurrencyHelper.format(balance)}",
                 style: const TextStyle(
                   color: AppColors.textDark,
                   fontSize: 28,

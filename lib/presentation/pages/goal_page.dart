@@ -10,6 +10,7 @@ import 'package:harcama_app/presentation/widgets/edit_goal_dialog.dart';
 import 'package:harcama_app/presentation/widgets/edit_subscription_dialog.dart';
 import 'package:harcama_app/presentation/notifiers/goal_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/subscription_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'package:harcama_app/domain/entities/goal.dart';
 import 'package:harcama_app/domain/entities/subscription.dart';
 import 'package:harcama_app/l10n/app_localizations.dart';
@@ -38,6 +39,10 @@ class _GoalPageState extends State<GoalPage> {
     final goals = goalNotifier.goals;
     final subscriptions = subscriptionNotifier.subscriptions;
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Consistent shadow color logic from TransactionCard
+    final shadowColor = AppColors.cardBorder(context);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -58,6 +63,7 @@ class _GoalPageState extends State<GoalPage> {
                           curve: Curves.easeInOut,
                         );
                       },
+                      pressOffset: 4.0,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _currentPageIndex == 0
@@ -73,8 +79,9 @@ class _GoalPageState extends State<GoalPage> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.cardBorder(context),
+                          color: _currentPageIndex == 0 ? AppColors.primaryDark : shadowColor,
                           offset: const Offset(0, 4),
+                          blurRadius: 0,
                         ),
                       ],
                       child: Center(
@@ -101,6 +108,7 @@ class _GoalPageState extends State<GoalPage> {
                           curve: Curves.easeInOut,
                         );
                       },
+                      pressOffset: 4.0,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: _currentPageIndex == 1
@@ -116,8 +124,9 @@ class _GoalPageState extends State<GoalPage> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.cardBorder(context),
+                          color: _currentPageIndex == 1 ? AppColors.primaryDark : shadowColor,
                           offset: const Offset(0, 4),
+                          blurRadius: 0,
                         ),
                       ],
                       child: Center(
@@ -268,6 +277,7 @@ class _GoalPageState extends State<GoalPage> {
     List<Subscription> subscriptions,
     AppLocalizations l10n,
   ) {
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -300,7 +310,7 @@ class _GoalPageState extends State<GoalPage> {
             icon: Symbols.credit_card_rounded,
             title: l10n.totalMonthlySubscriptions,
             value:
-                '₺${subscriptionNotifier.totalMonthlyAmount.toStringAsFixed(0)}',
+                '$currencySymbol${subscriptionNotifier.totalMonthlyAmount.toStringAsFixed(0)}',
             subtitle: 'Aylık toplam',
             backgroundColor: AppColors.primary.withOpacity(0.1),
             borderColor: AppColors.primary.withOpacity(0.2),
@@ -482,6 +492,10 @@ class _GoalPageState extends State<GoalPage> {
   }
 
   Widget _goalCard({required BuildContext context, required Goal goal}) {
+    // Use AppColors.cardBorder(context) for shadow color to match TransactionCard
+    final shadowColor = AppColors.cardBorder(context);
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
+
     // Icon mapping
     final iconMap = {
       '🏖️': Symbols.beach_access_rounded,
@@ -527,6 +541,7 @@ class _GoalPageState extends State<GoalPage> {
           }
         }
       },
+      pressOffset: 4.0, // Ensure press offset matches shadow offset
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -535,8 +550,9 @@ class _GoalPageState extends State<GoalPage> {
       ),
       boxShadow: [
         BoxShadow(
-          color: AppColors.cardBorder(context),
+          color: shadowColor,
           offset: const Offset(0, 4),
+          blurRadius: 0, // No blur for 3D effect
         ),
       ],
       child: Column(
@@ -566,7 +582,7 @@ class _GoalPageState extends State<GoalPage> {
                     ),
                   ),
                   Text(
-                    "₺${goal.currentAmount.toStringAsFixed(0)}/₺${goal.targetAmount.toStringAsFixed(0)}",
+                    "$currencySymbol${goal.currentAmount.toStringAsFixed(0)}/$currencySymbol${goal.targetAmount.toStringAsFixed(0)}",
                     style: TextStyle(
                       color: AppColors.text(context),
                       fontSize: 14,
@@ -613,6 +629,7 @@ class _GoalPageState extends State<GoalPage> {
           context.read<GoalNotifier>().addItem(result);
         }
       },
+      pressOffset: 4.0,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -645,6 +662,10 @@ class _GoalPageState extends State<GoalPage> {
     required BuildContext context,
     required Subscription subscription,
   }) {
+    // Use AppColors.cardBorder(context) for shadow color to match TransactionCard
+    final shadowColor = AppColors.cardBorder(context);
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
+
     // Icon mapping for subscriptions
     final iconMap = {
       '🔄': Symbols.sync_rounded,
@@ -696,6 +717,7 @@ class _GoalPageState extends State<GoalPage> {
           }
         }
       },
+      pressOffset: 4.0,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -704,8 +726,9 @@ class _GoalPageState extends State<GoalPage> {
       ),
       boxShadow: [
         BoxShadow(
-          color: AppColors.cardBorder(context),
+          color: shadowColor,
           offset: const Offset(0, 4),
+          blurRadius: 0,
         ),
       ],
       child: Column(
@@ -735,7 +758,7 @@ class _GoalPageState extends State<GoalPage> {
                     ),
                   ),
                   Text(
-                    "₺${subscription.amount.toStringAsFixed(0)}/${subscription.frequencyText.toLowerCase()[0]}",
+                    "$currencySymbol${subscription.amount.toStringAsFixed(0)}/${subscription.frequencyText.toLowerCase()[0]}",
                     style: TextStyle(
                       color: AppColors.text(context),
                       fontSize: 14,
@@ -798,6 +821,7 @@ class _GoalPageState extends State<GoalPage> {
           context.read<SubscriptionNotifier>().addItem(result);
         }
       },
+      pressOffset: 4.0,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),

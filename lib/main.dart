@@ -18,6 +18,9 @@ import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/goal_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/subscription_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/premium_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/language_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/navigation_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -47,6 +50,7 @@ void main() async {
   final ledgerBox = await Hive.openBox<Ledger>('ledgers');
   final goalBox = await Hive.openBox<Goal>('goals');
   final subscriptionBox = await Hive.openBox<Subscription>('subscriptions');
+  final settingsBox = await Hive.openBox('settings');
 
   final transactionRepository = TransactionRepositoryImpl(transactionBox);
   final categoryRepository = CategoryRepositoryImpl(categoryBox);
@@ -59,7 +63,16 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => ThemeNotifier(),
+          create: (_) => ThemeNotifier(settingsBox),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => LanguageNotifier(settingsBox),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CurrencyNotifier(settingsBox),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => NavigationNotifier(),
         ),
         ChangeNotifierProvider(
           create: (_) => PremiumNotifier(),
@@ -124,6 +137,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = context.watch<ThemeNotifier>();
+    final languageNotifier = context.watch<LanguageNotifier>();
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -134,6 +148,7 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
+      locale: languageNotifier.currentLocale,
       themeMode: themeNotifier.currentTheme,
       theme: ThemeData(
         brightness: Brightness.light,

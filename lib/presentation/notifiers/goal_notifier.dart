@@ -9,12 +9,9 @@ class GoalNotifier extends BaseNotifier<Goal> {
     required super.deleteUseCase,
     required super.getAllUseCase,
   }) {
-    // Initialize with sample data if empty
+    // Initialize data
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await fetchItems();
-      if (items.isEmpty) {
-        await _createSampleGoals();
-      }
     });
   }
 
@@ -141,63 +138,10 @@ class GoalNotifier extends BaseNotifier<Goal> {
     return items.where((goal) => goal.ledgerID == ledgerID).toList();
   }
 
-  Future<void> _createSampleGoals() async {
-    final now = DateTime.now();
-
-    // Sample goals
-    final sampleGoals = [
-      Goal(
-        id: '1',
-        title: 'Vacation Fund',
-        description: 'Save for summer vacation',
-        targetAmount: 2000.0,
-        currentAmount: 1200.0,
-        startDate: now.subtract(const Duration(days: 30)),
-        targetDate: now.add(const Duration(days: 60)),
-        status: GoalStatus.active,
-        icon: '🏖️',
-        color: 'orange',
-        createdAt: now.subtract(const Duration(days: 30)),
-        updatedAt: now,
-        ledgerID: 'default',
-        accountID: 'default',
-      ),
-      Goal(
-        id: '2',
-        title: 'Emergency Fund',
-        description: 'Financial safety net',
-        targetAmount: 5000.0,
-        currentAmount: 4500.0,
-        startDate: now.subtract(const Duration(days: 90)),
-        targetDate: null,
-        status: GoalStatus.active,
-        icon: '🛡️',
-        color: 'blue',
-        createdAt: now.subtract(const Duration(days: 90)),
-        updatedAt: now,
-        ledgerID: 'default',
-        accountID: 'default',
-      ),
-      Goal(
-        id: '3',
-        title: 'New Laptop',
-        description: 'Upgrade my work laptop',
-        targetAmount: 1500.0,
-        currentAmount: 800.0,
-        startDate: now.subtract(const Duration(days: 15)),
-        targetDate: now.add(const Duration(days: 45)),
-        status: GoalStatus.active,
-        icon: '💻',
-        color: 'purple',
-        createdAt: now.subtract(const Duration(days: 15)),
-        updatedAt: now,
-        ledgerID: 'default',
-        accountID: 'default',
-      ),
-    ];
-
-    for (final goal in sampleGoals) {
-      await addItem(goal);
+  Future<void> clearAllGoals() async {
+    final allGoals = List<Goal>.from(items);
+    for (var goal in allGoals) {
+      await deleteItem(goal.id);
     }
   }
 }

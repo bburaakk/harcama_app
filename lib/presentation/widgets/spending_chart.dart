@@ -1,8 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' as math;
 import 'package:harcama_app/l10n/app_localizations.dart';
@@ -24,6 +26,7 @@ class SpendingChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
     final now = referenceDate ?? DateTime.now();
     final locale = Localizations.localeOf(context).toString();
     
@@ -180,7 +183,7 @@ class SpendingChart extends StatelessWidget {
                     getTooltipColor: (group) => AppColors.text(context),
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       return BarTooltipItem(
-                        '₺${CurrencyHelper.format(rod.toY)}',
+                        '$currencySymbol${CurrencyHelper.format(rod.toY)}',
                         TextStyle(
                             color: Theme.of(context).brightness == Brightness.dark
                                 ? Colors.black

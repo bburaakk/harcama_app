@@ -38,7 +38,7 @@
   "upgradeToPremium": "Premium'a Yükselt",
   "about": "Hakkında",
   "appVersion": "Uygulama sürümü",
-  "privacyPolicy": "Gizlilik politikası",
+  "privacyPolicy": "Gizlilik Politikası",
   "clearLocalData": "YEREL VERİYİ SİL",
   "thisActionCannotBeUndone": "BU İŞLEM GERİ ALINAMAZ",
   "clearLocalDataTitle": "Yerel Veriyi Sil?",
@@ -106,7 +106,7 @@
   "monthlyFullPrice": "₺29.99 / ay",
   "continueText": "DEVAM ET",
   "cancelAnytime": "İSTEDİĞİN ZAMAN İPTAL ET",
-  "termsOfService": "HİZMET ŞARTLARI",
+  "termsOfService": "Kullanım Şartları",
   "premiumWelcomeMessage": "DOSTUM ARTIK SEN DE PREMİUMSUN HOŞGELDİN ARAMIZA 🤙",
   "topExpenses": "En Çok Harcananlar",
   "totalSpent": "TOPLAM HARCAMA",
@@ -162,5 +162,14 @@
   "dateFilterCleared": "Tarih filtresi temizlendi",
   "noCategoriesFound": "Kategori bulunamadı",
   "applySelection": "SEÇİMİ UYGULA",
-  "overview": "Genel Bakış"
+  "overview": "Genel Bakış",
+  "settings": "Ayarlar",
+  "general": "Genel",
+  "defaultCurrency": "Varsayılan Para Birimi",
+  "language": "Dil",
+  "darkMode": "Karanlık Mod",
+  "financial": "Finansal",
+  "manageCategories": "Kategorileri Yönet",
+  "termsOfUse": "Kullanım Şartları",
+  "aboutUs": "Hakkımızda"
 }

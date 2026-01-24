@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 
 class ChartLegend extends StatelessWidget {
   final List<Transaction> transactions;
@@ -11,6 +13,7 @@ class ChartLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
     final expenses = transactions.where((t) => t.type == TransactionType.expense).toList();
 
     if (expenses.isEmpty) {
@@ -79,7 +82,7 @@ class ChartLegend extends StatelessWidget {
             iconWidget = Icon(iconData, color: Colors.white, size: 20);
           }
 
-          return _legendItem(context, iconWidget, entry.key.toUpperCase(), "₺${CurrencyHelper.format(entry.value)}", color);
+          return _legendItem(context, iconWidget, entry.key.toUpperCase(), "$currencySymbol${CurrencyHelper.format(entry.value)}", color);
         },
       ),
     );

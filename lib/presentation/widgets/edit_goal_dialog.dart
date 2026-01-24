@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:harcama_app/domain/entities/goal.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:harcama_app/l10n/app_localizations.dart';
 
@@ -73,6 +75,7 @@ class _EditGoalDialogState extends State<EditGoalDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
     
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -211,7 +214,7 @@ class _EditGoalDialogState extends State<EditGoalDialog> {
                                 ),
                                 border: InputBorder.none,
                                 contentPadding: const EdgeInsets.all(16),
-                                prefixText: '₺ ',
+                                prefixText: '$currencySymbol ',
                                 prefixStyle: TextStyle(
                                   color: AppColors.text(context),
                                   fontWeight: FontWeight.w600,
@@ -265,7 +268,7 @@ class _EditGoalDialogState extends State<EditGoalDialog> {
                                 ),
                                 border: InputBorder.none,
                                 contentPadding: const EdgeInsets.all(16),
-                                prefixText: '₺ ',
+                                prefixText: '$currencySymbol ',
                                 prefixStyle: TextStyle(
                                   color: AppColors.text(context),
                                   fontWeight: FontWeight.w600,

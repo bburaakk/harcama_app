@@ -6,6 +6,7 @@ import 'package:harcama_app/domain/entities/category.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'package:harcama_app/domain/utility/math_helper.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
 import 'package:harcama_app/presentation/widgets/Keypad.dart';
@@ -288,16 +289,53 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   }
 
   Future<void> _selectDate() async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: isDark
+                ? ColorScheme.dark(
+                    primary: AppColors.primary,
+                    onPrimary: Colors.white,
+                    surface: AppColors.cardDark,
+                    onSurface: AppColors.textLight,
+                  )
+                : ColorScheme.light(
+                    primary: AppColors.primary,
+                    onPrimary: Colors.white,
+                    surface: AppColors.cardLight,
+                    onSurface: AppColors.textDark,
+                  ),
+            dialogBackgroundColor: isDark ? AppColors.cardDark : AppColors.cardLight,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: isDark ? AppColors.cardDark : AppColors.cardLight,
+              elevation: 10,
+              shadowColor: isDark ? AppColors.cardBorderDark : AppColors.cardShadowLight,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+                side: BorderSide(
+                  color: isDark ? AppColors.cardBorderDark : AppColors.cardBorderLight,
+                  width: 2,
+                ),
+              ),
+              headerBackgroundColor: AppColors.primary,
+              headerForegroundColor: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) setState(() => selectedDate = picked);
   }
 
   Widget _buildAmountDisplay(BuildContext context) {
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
     return ValueListenableBuilder<String>(
       valueListenable: amount,
       builder: (_, value, __) {
@@ -312,7 +350,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                "₺",
+                currencySymbol,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -576,7 +614,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 height: size,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.card(context),
+                  color: AppColors.card(context), // Changed to card color for dark mode visibility
                   border: Border.all(
                     color: AppColors.cardBorder(context),
                     width: 2,

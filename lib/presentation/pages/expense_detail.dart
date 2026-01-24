@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:harcama_app/domain/entities/category.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'package:harcama_app/domain/utility/math_helper.dart';
 import 'package:harcama_app/domain/utility/currency_helper.dart';
 import 'package:harcama_app/presentation/widgets/Keypad.dart';
@@ -340,16 +341,53 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
   }
 
   Future<void> _selectDate() async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: isDark
+                ? ColorScheme.dark(
+                    primary: AppColors.primary,
+                    onPrimary: Colors.white,
+                    surface: AppColors.cardDark,
+                    onSurface: AppColors.textLight,
+                  )
+                : ColorScheme.light(
+                    primary: AppColors.primary,
+                    onPrimary: Colors.white,
+                    surface: AppColors.cardLight,
+                    onSurface: AppColors.textDark,
+                  ),
+            dialogBackgroundColor: isDark ? AppColors.cardDark : AppColors.cardLight,
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: isDark ? AppColors.cardDark : AppColors.cardLight,
+              elevation: 10,
+              shadowColor: isDark ? AppColors.cardBorderDark : AppColors.cardShadowLight,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+                side: BorderSide(
+                  color: isDark ? AppColors.cardBorderDark : AppColors.cardBorderLight,
+                  width: 2,
+                ),
+              ),
+              headerBackgroundColor: AppColors.primary,
+              headerForegroundColor: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) setState(() => selectedDate = picked);
   }
 
   Widget _buildAmountDisplay(BuildContext context) {
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
     return ValueListenableBuilder<String>(
       valueListenable: amount,
       builder: (_, value, __) {
@@ -362,7 +400,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                "₺",
+                currencySymbol,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -1029,7 +1067,7 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  
+
                   // Delete Button
                   GestureDetector(
                     onTap: () {
@@ -1153,16 +1191,113 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
 
   Future<void> _confirmDelete() async {
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? AppColors.cardDark : AppColors.cardLight;
+    final textColor = isDark ? AppColors.textLight : AppColors.textDark;
+    final borderColor = isDark ? AppColors.cardBorderDark : AppColors.cardBorderLight;
+    final shadowColor = isDark ? AppColors.cardBorderDark : AppColors.cardShadowLight;
+
+    final confirmed = await showGeneralDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.deleteTransaction),
-        content: Text(l10n.deleteTransactionConfirm),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.delete, style: const TextStyle(color: Colors.red))),
-        ],
-      ),
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) {
+        return const SizedBox();
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return Transform.scale(
+          scale: CurvedAnimation(parent: anim1, curve: Curves.easeOutBack).value,
+          child: Opacity(
+            opacity: anim1.value,
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              insetPadding: const EdgeInsets.all(24),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: borderColor, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: shadowColor,
+                      offset: const Offset(0, 8),
+                      blurRadius: 0,
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Icon
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.danger.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Symbols.delete_forever,
+                        color: AppColors.danger,
+                        size: 32,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Title
+                    Text(
+                      l10n.deleteTransaction,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Content
+                    Text(
+                      l10n.deleteTransactionConfirm,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark ? AppColors.grayDark400 : AppColors.gray400,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildDialogButton(
+                            context,
+                            label: l10n.cancel,
+                            onTap: () => Navigator.of(context).pop(false),
+                            isPrimary: false,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildDialogButton(
+                            context,
+                            label: l10n.delete,
+                            onTap: () => Navigator.of(context).pop(true),
+                            isPrimary: true,
+                            isDanger: true,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
 
     if (confirmed == true) {
@@ -1172,6 +1307,60 @@ class _ExpenseDetailPageState extends State<ExpenseDetailPage> {
         if (context.mounted) Navigator.pop(context);
       }
     }
+  }
+
+  Widget _buildDialogButton(
+    BuildContext context, {
+    required String label,
+    required VoidCallback onTap,
+    bool isPrimary = false,
+    bool isDanger = false,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final shadowColor = isDark ? AppColors.cardBorderDark : AppColors.cardShadowLight;
+    
+    Color bgColor;
+    Color textColor;
+    Color borderColor;
+
+    if (isDanger) {
+      bgColor = AppColors.danger;
+      textColor = Colors.white;
+      borderColor = AppColors.dangerDark;
+    } else {
+      bgColor = isDark ? AppColors.cardDark : AppColors.cardLight;
+      textColor = isDark ? AppColors.textLight : AppColors.textDark;
+      borderColor = isDark ? AppColors.grayDark100 : AppColors.gray200;
+    }
+
+    return PressableContainer(
+      onPressed: onTap,
+      pressOffset: 4.0,
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: isDanger ? AppColors.dangerDark : shadowColor,
+            offset: const Offset(0, 4),
+            blurRadius: 0,
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Center(
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _saveChanges() async {

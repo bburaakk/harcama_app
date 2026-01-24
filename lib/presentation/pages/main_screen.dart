@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:harcama_app/presentation/pages/home_page.dart';
 import 'package:harcama_app/presentation/pages/chart_page.dart';
-import 'package:harcama_app/presentation/pages/profile_page.dart';
+import 'package:harcama_app/presentation/pages/settings_page.dart';
 import 'package:harcama_app/presentation/pages/goal_page.dart';
 import 'package:harcama_app/presentation/viewmodels/nav_model.dart';
 import 'package:harcama_app/presentation/widgets/nav_bar.dart';
 import 'package:harcama_app/presentation/widgets/floating_add_button.dart';
+import 'package:harcama_app/presentation/notifiers/navigation_notifier.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -18,9 +20,8 @@ class _MainScreenState extends State<MainScreen> {
   final homeKey = GlobalKey<NavigatorState>();
   final chartKey = GlobalKey<NavigatorState>();
   final reportKey = GlobalKey<NavigatorState>();
-  final profileKey = GlobalKey<NavigatorState>();
+  final settingsKey = GlobalKey<NavigatorState>();
 
-  int selected = 0;
   List<NavModel> items = [];
 
   @override
@@ -30,12 +31,15 @@ class _MainScreenState extends State<MainScreen> {
       NavModel(page: const HomePage(), navKey: homeKey),
       NavModel(page: const ChartPage(), navKey: chartKey),
       NavModel(page: const GoalPage(), navKey: reportKey),
-      NavModel(page: const ProfilePage(), navKey: profileKey),
+      NavModel(page: const SettingsPage(), navKey: settingsKey),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
+    final navigationNotifier = context.watch<NavigationNotifier>();
+    final selected = navigationNotifier.selectedIndex;
+
     return WillPopScope(
       onWillPop: () async {
         if (items[selected].navKey.currentState?.canPop() ?? false) {
@@ -92,7 +96,7 @@ class _MainScreenState extends State<MainScreen> {
                             (route) => route.isFirst,
                           );
                         } else {
-                          setState(() => selected = i);
+                          context.read<NavigationNotifier>().setIndex(i);
                         }
                       },
                     ),

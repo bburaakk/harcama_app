@@ -41,7 +41,7 @@
   "upgradeToPremium": "Upgrade to Premium",
   "about": "About",
   "appVersion": "App version",
-  "privacyPolicy": "Privacy policy",
+  "privacyPolicy": "Privacy Policy",
   "clearLocalData": "CLEAR LOCAL DATA",
   "thisActionCannotBeUndone": "THIS ACTION CANNOT BE UNDONE",
   "clearLocalDataTitle": "Clear Local Data?",
@@ -199,5 +199,14 @@
   "dateFilterCleared": "Date filter cleared",
   "noCategoriesFound": "No categories found",
   "applySelection": "APPLY SELECTION",
-  "overview": "Overview"
+  "overview": "Overview",
+  "settings": "Settings",
+  "general": "General",
+  "defaultCurrency": "Default Currency",
+  "language": "Language",
+  "darkMode": "Dark Mode",
+  "financial": "Financial",
+  "manageCategories": "Manage Categories",
+  "termsOfUse": "Terms of Use",
+  "aboutUs": "About Us"
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
+import 'package:harcama_app/presentation/notifiers/currency_notifier.dart';
 import 'package:harcama_app/l10n/app_localizations.dart';
 
 class DailyGoalCard extends StatelessWidget {
@@ -27,6 +29,7 @@ class DailyGoalCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final progress = (current / target).clamp(0.0, 1.0);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final currencySymbol = context.watch<CurrencyNotifier>().currencySymbol;
 
     return PressableContainer(
       onPressed: onPressed ?? () {},
@@ -77,7 +80,7 @@ class DailyGoalCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "₺${current.toStringAsFixed(0)}/${target.toStringAsFixed(0)}",
+                    "$currencySymbol${current.toStringAsFixed(0)}/$currencySymbol${target.toStringAsFixed(0)}",
                     style: TextStyle(
                       color: AppColors.text(context),
                       fontSize: 14,

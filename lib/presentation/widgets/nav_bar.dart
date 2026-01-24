@@ -63,7 +63,7 @@ class NavBar extends StatelessWidget {
             context: context,
           ),
           _item(
-            icon: Symbols.person_rounded,
+            icon: Symbols.settings_rounded,
             i: 3,
             context: context,
           ),

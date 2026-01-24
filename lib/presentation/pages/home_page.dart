@@ -6,6 +6,7 @@ import 'package:harcama_app/l10n/app_localizations.dart';
 import 'package:harcama_app/presentation/notifiers/transaction_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/ledger_notifier.dart';
 import 'package:harcama_app/presentation/notifiers/goal_notifier.dart';
+import 'package:harcama_app/presentation/notifiers/navigation_notifier.dart';
 import 'package:harcama_app/presentation/theme/app_colors.dart';
 import 'package:harcama_app/presentation/widgets/top_bar.dart';
 import 'package:harcama_app/presentation/widgets/ledger_dropdown.dart';
@@ -13,7 +14,6 @@ import 'package:harcama_app/presentation/widgets/remaining_balance_card.dart';
 import 'package:harcama_app/presentation/widgets/transaction_list.dart';
 import 'package:harcama_app/presentation/widgets/create_goal_dialog.dart';
 import 'package:harcama_app/presentation/widgets/pressable_container.dart';
-import 'package:harcama_app/presentation/pages/goal_page.dart';
 import 'package:harcama_app/domain/entities/transaction.dart';
 import 'package:harcama_app/domain/entities/goal.dart';
 import 'package:intl/intl.dart';
@@ -128,12 +128,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => const GoalPage(),
-                                        ),
-                                      );
+                                      context.read<NavigationNotifier>().setIndex(2);
                                     },
                                     child: Text(
                                       l10n.seeAll,
